@@ -10,7 +10,7 @@ Etapas:
 * Geração de Assembly
 * Otimização e Recuperação de Erros
 
-[Link para a página da disciplina](http://www.inf.ufrgs.br/~johann/comp/)
+[Página da Disciplina](http://www.inf.ufrgs.br/~johann/comp/)
 
 ## Marcelo Jantsch Wille
 
