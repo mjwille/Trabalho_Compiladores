@@ -1,6 +1,27 @@
-int main()
+void check_arguments(int argc) {
+	if(argc < 2) {
+		fprintf(stderr, "ERROR!\nUsage: ./etapa1 <filename>\n");
+		exit(1);
+	}
+}
+
+
+void set_yyin(char *filename) {
+	yyin = fopen(filename, "r");
+	if(yyin == 0) {
+		fprintf(stderr, "ERROR!\nFile %s could not be opened.\n", filename);
+		exit(2);
+	}
+}
+
+
+int main(int argc, char *argv[])
 {
 	int tok;
+
+	check_arguments(argc);
+	set_yyin(argv[1]);
+
 	while(isRunning())
 	{
 		tok = yylex();
