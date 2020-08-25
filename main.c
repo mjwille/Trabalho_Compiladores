@@ -1,3 +1,4 @@
+// Verifica se o número de argumentos do programa é correto, abortando se não forem.
 void check_arguments(int argc) {
 	if(argc < 2) {
 		fprintf(stderr, "ERROR!\nUsage: ./etapa1 <filename>\n");
@@ -5,7 +6,7 @@ void check_arguments(int argc) {
 	}
 }
 
-
+// Verifica se o arquivo pode ser aberto, abortando caso não conseguir (yyin é variável do lex para o arquivo)
 void set_yyin(char *filename) {
 	yyin = fopen(filename, "r");
 	if(yyin == 0) {
@@ -17,14 +18,18 @@ void set_yyin(char *filename) {
 
 int main(int argc, char *argv[])
 {
+	// Faz verificações de número de argumentos e abertura correta do arquivo
 	check_arguments(argc);
 	set_yyin(argv[1]);
 
-	int tok;
+	// Inicializa a tabela hash com valores default NULL
 	hashInit();
+
+	int tok;
 
 	while(isRunning())
 	{
+		// Pede um token para o analisador léxico
 		tok = yylex();
 		switch(tok)
 		{
