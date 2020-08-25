@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
 		tok = yylex();
 		switch(tok)
 		{
+			case 0:   break;  /* Chegou ao fim [EOF] e yylex retorna 0 */
 			case 256: printf("KW_CHAR");        printf(" na linha %d.\n", getLineNumber()); break;
 			case 257: printf("KW_INT");         printf(" na linha %d.\n", getLineNumber()); break;
 			case 259: printf("KW_FLOAT");       printf(" na linha %d.\n", getLineNumber()); break;
@@ -57,7 +58,7 @@ int main(int argc, char *argv[])
 			case 285: printf("LIT_CHAR");       printf(" na linha %d.\n", getLineNumber()); break;
 			case 286: printf("LIT_STR");        printf(" na linha %d.\n", getLineNumber()); break;
 			case 290: printf("TK_ERROR");       printf(" na linha %d.\n", getLineNumber()); break;
-			default:  printf("%c", yytext[0]);  printf(" na linha %d.\n", getLineNumber()); break;
+			default:  printf("%c", tok);        printf(" na linha %d.\n", getLineNumber()); break;
 		}
 	}
 

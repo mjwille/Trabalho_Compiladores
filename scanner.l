@@ -76,7 +76,7 @@ int lineNumber = 1;
 <COMMENT>"*/"    { BEGIN(INITIAL); }
 
  /* Ignorar espaços e tabs */
-[ \t]      {}
+[ \t\r]    {}
 
  /* Contador de linhas */
 "\n"       { lineNumber++; }
@@ -98,7 +98,7 @@ int getLineNumber()
 	return lineNumber;
 }
 
-// Fim do arquivo (da análise léxica).
+// Função de fim da análise léxica.
 int yywrap()
 {
 	running = 0;
