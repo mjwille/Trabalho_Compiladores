@@ -61,10 +61,16 @@ int lineNumber = 1;
 
 [A-Za-z@_]+[A-Za-z@_0-9]*    { return TK_IDENTIFIER; }
 
-[ \t\r]        { }
-"\n"           { lineNumber++; }
+"//".*     {}
 
-.              { return TOKEN_ERROR; }
+"/*"       { BEGIN(COMMENT); }
+<COMMENT>"\n"    { lineNumber++;   }
+<COMMENT>.       {}
+<COMMENT>"*/"    { BEGIN(INITIAL); }
+
+[ \t]      {}
+"\n"       { lineNumber++; }
+.          { return TOKEN_ERROR; }
 
 %%
 
