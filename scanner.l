@@ -1,3 +1,8 @@
+/* Trabalho de Compiladores 2020/1
+   Nome: Marcelo Jantsch Wille
+   Universidade Federal do Rio Grande do Sul
+*/
+
 %{
 
 #include "tokens.h"
@@ -87,15 +92,22 @@ int lineNumber = 1;
 %%
 
 // Definição do trabalho: função que retorna se o análisador léxico está rodando
-int isRunning()
+int isRunning(void)
 {
 	return running;
 }
 
 // Definição do trabalho: função que retorna o número da linha atual
-int getLineNumber()
+int getLineNumber(void)
 {
 	return lineNumber;
+}
+
+// Definição do trabalho: função que faz a inicialização das estruturas necessárias
+void initMe(void)
+{
+	// Inicializa a tabela hash com valores default NULL
+	hashInit();
 }
 
 // Função de fim da análise léxica.

@@ -1,30 +1,27 @@
-// Verifica se o número de argumentos do programa é correto, abortando se não forem.
-void check_arguments(int argc) {
+/* Trabalho de Compiladores 2020/1
+   Nome: Marcelo Jantsch Wille
+   Universidade Federal do Rio Grande do Sul
+*/
+
+int main(int argc, char *argv[])
+{
+	// Faz verificações de número de argumentos
 	if(argc < 2) {
 		fprintf(stderr, "ERROR!\nUsage: ./etapa1 <filename>\n");
 		exit(1);
 	}
-}
 
-// Verifica se o arquivo pode ser aberto, abortando caso não conseguir (yyin é variável do lex para o arquivo)
-void set_yyin(char *filename) {
-	yyin = fopen(filename, "r");
+	// Faz verificação de abertura correta do arquivo
+	yyin = fopen(argv[1], "r");
 	if(yyin == 0) {
-		fprintf(stderr, "ERROR!\nFile %s could not be opened.\n", filename);
+		fprintf(stderr, "ERROR!\nFile %s could not be opened.\n", argv[1]);
 		exit(2);
 	}
-}
 
+	// Faz as inicializações necessárias (tabela hash)
+	initMe();
 
-int main(int argc, char *argv[])
-{
-	// Faz verificações de número de argumentos e abertura correta do arquivo
-	check_arguments(argc);
-	set_yyin(argv[1]);
-
-	// Inicializa a tabela hash com valores default NULL
-	hashInit();
-
+	// Token que será retornado pelo analisador léxico
 	int tok;
 
 	while(isRunning())

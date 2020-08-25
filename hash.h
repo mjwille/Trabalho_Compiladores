@@ -1,3 +1,8 @@
+/* Trabalho de Compiladores 2020/1
+   Nome: Marcelo Jantsch Wille
+   Universidade Federal do Rio Grande do Sul
+*/
+
 #include <stdio.h>
 #include <string.h>
 
