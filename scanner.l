@@ -52,10 +52,18 @@ int lineNumber = 1;
 "=="           { return OPERATOR_EQ;  }
 "!="           { return OPERATOR_DIF; }
 
+[+-]?[0-9ABCDEF]+                   { return LIT_INTEGER; }
+[+-]?[0-9ABCDEF]*\.[0-9ABCDEF]+     { return LIT_FLOAT;   }
+"TRUE"                              { return LIT_TRUE;    }
+"FALSE"                             { return LIT_FALSE;   }
+'.'                                 { return LIT_CHAR;    }
+\"[^\"]*\"                              { return LIT_STRING;  }
+
 [A-Za-z@_]+[A-Za-z@_0-9]*    { return TK_IDENTIFIER; }
 
 [ \t\r]        { }
 "\n"           { lineNumber++; }
+
 .              { return TOKEN_ERROR; }
 
 %%
