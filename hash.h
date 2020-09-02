@@ -43,11 +43,24 @@ int hashAddress(char *text)
 // Verifica se um nodo existe na tabela. Caso sim, retorna este nodo. Caso contrário, retorna NULL
 HASH_NODE* hashFind(char *text)
 {
-	return NULL;   //TODO
+	// pega qual seria o índice na tabela hash caso *text estivesse nela
+	int addr = hashAddress(text);
+
+	HASH_NODE *node;
+
+	// verifica a lista encadeada deste índice para ver se está lá
+	for(node=HASH_TABLE[addr]; node; node=node->next) {
+		// se está na lista encadeada
+		if(strcmp(node->text, text) == 0)
+			return node;
+	}
+
+	// se não está na lista encadeada
+	return NULL;
 }
 
 // Insere elemento dentro da tabela hash
-HASH_NODE* hashInsert(char *text)
+HASH_NODE* hashInsert(char *text, int type)
 {
 	// Calcula o índice (endereço) deste novo nodo para poder inserí-lo dentro da tabela hash
 	int addr = hashAddress(text);
@@ -55,7 +68,7 @@ HASH_NODE* hashInsert(char *text)
 	HASH_NODE *node = (HASH_NODE*) calloc(1, sizeof(HASH_NODE));
 
 	// Coloca dentro do nodo alocado os seus respectivos valores
-	node->type = 1;
+	node->type = type;
 	node->text = (char*) calloc(strlen(text)+1, sizeof(char));
 	strcpy(node->text, text);
 
@@ -72,17 +85,17 @@ void hashPrint()
 	int i;
 	HASH_NODE *node;
 
-	printf("-------------------------- SYMBOL TABLE BEGIN --------------------------\n");
+	printf("----------------------------- SYMBOL TABLE BEGIN -----------------------------\n");
 
 	for(i=0; i<HASH_SIZE; i++) {
 		if(HASH_TABLE[i] != NULL)
 		{
 			printf("[%d]", i);
 			for(node=HASH_TABLE[i]; node; node=node->next)
-				printf(" <- ( Type: %d | Text: %s )", node->type, node->text);
+				printf(" <- [ Type: %d | Text: %s ]", node->type, node->text);
 			printf("\n");
 		}
 	}
 
-	printf("--------------------------- SYMBOL TABLE END ---------------------------\n");
+	printf("------------------------------ SYMBOL TABLE END ------------------------------\n");
 }

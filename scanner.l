@@ -62,15 +62,15 @@ int lineNumber = 1;
 "!="           { return OPERATOR_DIF; }
 
  /* Literais */
-[+-]?[0-9ABCDEF]+                      { hashInsert(yytext); return LIT_INTEGER; }
-[+-]?[0-9ABCDEF]*\.[0-9ABCDEF]+        { hashInsert(yytext); return LIT_FLOAT;   }
-"TRUE"                                 { hashInsert(yytext); return LIT_TRUE;    }
-"FALSE"                                { hashInsert(yytext); return LIT_FALSE;   }
-'.'                                    { hashInsert(yytext); return LIT_CHAR;    }
-\"[^\"]*\"                             { hashInsert(yytext); return LIT_STRING;  }
+[+-]?[0-9ABCDEF]+                      { hashInsert(yytext, LIT_INTEGER);   return LIT_INTEGER; }
+[+-]?[0-9ABCDEF]*\.[0-9ABCDEF]+        { hashInsert(yytext, LIT_FLOAT);     return LIT_FLOAT;   }
+"TRUE"                                 { hashInsert(yytext, LIT_TRUE);      return LIT_TRUE;    }
+"FALSE"                                { hashInsert(yytext, LIT_FALSE);     return LIT_FALSE;   }
+'.'                                    { hashInsert(yytext, LIT_CHAR);      return LIT_CHAR;    }
+\"[^\"]*\"                             { hashInsert(yytext, LIT_STRING);    return LIT_STRING;  }
 
  /* Identificadores */
-[A-Za-z@_]+[A-Za-z@_0-9]*              { hashInsert(yytext); return TK_IDENTIFIER; }
+[A-Za-z@_]+[A-Za-z@_0-9]*              { hashInsert(yytext, TK_IDENTIFIER); return TK_IDENTIFIER; }
 
  /* Comentários */
 "//".*     {}
