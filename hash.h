@@ -13,10 +13,12 @@ typedef struct hash_node
 	struct hash_node *next;
 } HASH_NODE;
 
+
 // Definição do tamanho do array da tabela hash
 #define HASH_SIZE 997
 // Definição da tabela hash
 HASH_NODE *HASH_TABLE[HASH_SIZE];
+
 
 // Inicializa todas as posições da tabela hash com o valor default NULL
 void hashInit()
@@ -27,6 +29,7 @@ void hashInit()
 		HASH_TABLE[i] = NULL;
 	}
 }
+
 
 // Calcula o endereço (índice) de um dado element (dado seu campo texto) dentro do array da tabela hash
 int hashAddress(char *text)
@@ -39,6 +42,7 @@ int hashAddress(char *text)
 	}
 	return addr-1;   // Corrige para ficar entre 0 e 996
 }
+
 
 // Verifica se um nodo existe na tabela. Caso sim, retorna este nodo. Caso contrário, retorna NULL
 HASH_NODE* hashFind(char *text)
@@ -59,13 +63,25 @@ HASH_NODE* hashFind(char *text)
 	return NULL;
 }
 
+
 // Insere elemento dentro da tabela hash
 HASH_NODE* hashInsert(char *text, int type)
 {
+	HASH_NODE *node;
+
+	// se nodo já está na hash, retorna o nodo sem inserir ele na tabela de símbolos novamente
+	node = hashFind(text);
+	if(node != NULL) {
+		return node;
+	}
+
+	// senão, insere ele na tabela e depois retorna o novo nodo:
+
 	// Calcula o índice (endereço) deste novo nodo para poder inserí-lo dentro da tabela hash
 	int addr = hashAddress(text);
 
-	HASH_NODE *node = (HASH_NODE*) calloc(1, sizeof(HASH_NODE));
+	// aloca espaço para novo nodo na memória
+	node = (HASH_NODE*) calloc(1, sizeof(HASH_NODE));
 
 	// Coloca dentro do nodo alocado os seus respectivos valores
 	node->type = type;
@@ -78,6 +94,7 @@ HASH_NODE* hashInsert(char *text, int type)
 
 	return node;
 }
+
 
 // Imprime todo elemento que a tabela hash contém dentro dela (índice a índice)
 void hashPrint()
