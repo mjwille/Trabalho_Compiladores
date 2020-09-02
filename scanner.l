@@ -5,7 +5,7 @@
 
 %{
 
-#include "tokens.h"
+#include "y.tab.h"
 #include "hash.h"
 
 int running = 1;
@@ -117,4 +117,5 @@ int yywrap()
 	return 1;
 }
 
+#include "y.tab.c"
 #include "main.c"

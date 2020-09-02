@@ -3,11 +3,14 @@
 # Universidade Federal do Rio Grande do Sul
 
 
-etapa1: lex.yy.c
-	gcc -o etapa1 lex.yy.c
+etapa2: lex.yy.c
+	gcc -o etapa2 lex.yy.c
 
-lex.yy.c: scanner.l
+lex.yy.c: scanner.l y.tab.c
 	flex scanner.l
 
+y.tab.c: parser.y
+	yacc -d parser.y
+
 clean:
-	rm etapa1 lex.yy.c
+	rm etapa2 lex.yy.c y.tab.c y.tab.h
