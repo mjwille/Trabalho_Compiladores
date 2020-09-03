@@ -49,7 +49,6 @@ dec: global_var
    | func
    ;
 
-
 /* Variáveis Globais */
 
 global_var: TK_IDENTIFIER '=' type ':' global_init_value
@@ -71,7 +70,6 @@ global_vector_size: LIT_INTEGER
                   |
                   ;
 
-
 /* Funções */
 
 func: TK_IDENTIFIER '(' parameters ')' '=' type block
@@ -84,8 +82,48 @@ parameters: parameter
 parameter: TK_IDENTIFIER '=' type
          ;
 
-block: '{' '}'
+block: '{' commands '}'
      ;
+
+/* Comandos */
+
+commands: cmd commands
+        ;
+
+cmd: attr_cmd
+   | read_cmd
+   | print_cmd
+   | return_cmd
+   ;
+
+/* Comando de Atribuição */
+
+attr_cmd: TK_IDENTIFIER '=' expr
+        | TK_IDENTIFIER '[' expr ']' '=' expr
+        ;
+
+/* Comando de Leitura (read) */
+
+read_cmd: KW_READ TK_IDENTIFIER
+        ;
+
+/* Comando de Impressão (print) */
+
+print_cmd: KW_PRINT elements
+         ;
+
+elements: element
+        | element elements
+        ;
+
+element: LIT_STRING
+       | expr
+       ;
+
+/* Comando de Retorno (return) */
+
+return_cmd: KW_RETURN expr
+          ;
 
 %%
 
