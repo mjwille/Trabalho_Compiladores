@@ -1,3 +1,8 @@
+/* Trabalho de Compiladores 2020/1
+   Nome: Marcelo Jantsch Wille
+   Universidade Federal do Rio Grande do Sul
+*/
+
 %{
 int yyerror(char *s);
 %}
@@ -36,13 +41,51 @@ int yyerror(char *s);
 programa: decl
         ;
 
-decl: dec ',' decl
+decl: dec ';' decl
     |
     ;
 
-dec: KW_INT TK_IDENTIFIER
-   | KW_INT TK_IDENTIFIER '(' ')' '{' '}'
+dec: global_var
+   | func
    ;
+
+
+/* Variáveis Globais */
+
+global_var: TK_IDENTIFIER '=' type ':' global_init_value
+          | TK_IDENTIFIER '=' type '[' global_vector_size ']' ':' global_init_value
+          ;
+
+type: KW_BOOL
+    | KW_CHAR
+    | KW_INT
+    | KW_FLOAT
+    ;
+
+global_init_value: LIT_INTEGER
+                 | LIT_FLOAT
+                 | LIT_CHAR
+                 ;
+
+global_vector_size: LIT_INTEGER
+                  |
+                  ;
+
+
+/* Funções */
+
+func: TK_IDENTIFIER '(' parameters ')' '=' type block
+    ;
+
+parameters: parameter
+          | parameter ',' parameters
+          ;
+
+parameter: TK_IDENTIFIER '=' type
+         ;
+
+block: '{' '}'
+     ;
 
 %%
 
