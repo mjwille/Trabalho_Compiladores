@@ -87,13 +87,15 @@ block: '{' commands '}'
 
 /* Comandos */
 
-commands: cmd commands
+commands: cmd
+        | cmd commands
         ;
 
 cmd: attr_cmd
    | read_cmd
    | print_cmd
    | return_cmd
+   |
    ;
 
 /* Comando de Atribuição */
@@ -124,6 +126,11 @@ element: LIT_STRING
 
 return_cmd: KW_RETURN expr
           ;
+
+/* Expressão */
+
+expr: '#'
+    ;
 
 %%
 
