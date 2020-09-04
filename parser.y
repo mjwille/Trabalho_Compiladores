@@ -129,8 +129,32 @@ return_cmd: KW_RETURN expr
 
 /* Expressão */
 
-expr: '#'
+expr: operand
+    | '(' expr ')'
+    | expr '+' expr
+    | expr '-' expr
+    | expr '*' expr
+    | expr '/' expr
+    | expr '<' expr
+    | expr '>' expr
+    | expr OPERATOR_LE expr
+    | expr OPERATOR_GE expr
+    | expr OPERATOR_EQ expr
+    | expr OPERATOR_DIF expr
+    | expr '^' expr
+    | expr '|' expr
+    | '~' expr
     ;
+
+operand: TK_IDENTIFIER
+       | LIT_INTEGER
+       | LIT_FLOAT
+       | LIT_CHAR
+       | func_call
+       ;
+
+func_call: '#'
+         ;
 
 %%
 
