@@ -95,6 +95,9 @@ cmd: attr_cmd
    | read_cmd
    | print_cmd
    | return_cmd
+   | if_cmd
+   | while_cmd
+   | loop_cmd
    |
    ;
 
@@ -161,6 +164,18 @@ arguments: argument
          ;
 
 argument: expr
+        ;
+
+/* Comandos de Controle de Fluxo */
+
+if_cmd: KW_IF '(' expr ')' KW_THEN cmd
+      | KW_IF '(' expr ')' KW_THEN cmd KW_ELSE cmd
+      ;
+
+while_cmd: KW_WHILE '(' expr ')' cmd
+         ;
+
+loop_cmd: KW_LOOP '(' TK_IDENTIFIER ':' expr ',' expr ',' expr ')' cmd
         ;
 
 %%
