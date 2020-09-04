@@ -153,8 +153,15 @@ operand: TK_IDENTIFIER
        | func_call
        ;
 
-func_call: '#'
+func_call: TK_IDENTIFIER '(' arguments ')'
          ;
+
+arguments: argument
+         | argument ',' arguments
+         ;
+
+argument: expr
+        ;
 
 %%
 
