@@ -51,8 +51,8 @@ dec: global_var
 
 /* Variáveis Globais */
 
-global_var: TK_IDENTIFIER '=' type ':' global_init_value
-          | TK_IDENTIFIER '=' type '[' global_vector_size ']' ':' global_init_value
+global_var: TK_IDENTIFIER '=' type ':' init_value
+          | TK_IDENTIFIER '=' type '[' vector_size ']' init_vector
           ;
 
 type: KW_BOOL
@@ -61,14 +61,21 @@ type: KW_BOOL
     | KW_FLOAT
     ;
 
-global_init_value: LIT_INTEGER
-                 | LIT_FLOAT
-                 | LIT_CHAR
-                 ;
+init_value: LIT_INTEGER
+          | LIT_FLOAT
+          | LIT_CHAR
+          ;
 
-global_vector_size: LIT_INTEGER
-                  |
-                  ;
+vector_size: LIT_INTEGER
+           ;
+
+init_vector: ':' vector_values
+           |
+           ;
+
+vector_values: init_value
+             | init_value vector_values
+             ;
 
 /* Funções */
 
@@ -98,6 +105,7 @@ cmd: attr_cmd
    | if_cmd
    | while_cmd
    | loop_cmd
+   | block
    |
    ;
 
