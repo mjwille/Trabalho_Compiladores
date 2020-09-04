@@ -79,8 +79,12 @@ vector_values: init_value
 
 /* Funções */
 
-func: TK_IDENTIFIER '(' parameters ')' '=' type block
+func: TK_IDENTIFIER '(' parameters_list ')' '=' type block
     ;
+
+parameters_list: parameters
+               |
+               ;
 
 parameters: parameter
           | parameter ',' parameters
@@ -158,14 +162,19 @@ expr: operand
     ;
 
 operand: TK_IDENTIFIER
+       | TK_IDENTIFIER '[' LIT_INTEGER ']'
        | LIT_INTEGER
        | LIT_FLOAT
        | LIT_CHAR
        | func_call
        ;
 
-func_call: TK_IDENTIFIER '(' arguments ')'
+func_call: TK_IDENTIFIER '(' arguments_list ')'
          ;
+
+arguments_list: arguments
+              |
+              ;
 
 arguments: argument
          | argument ',' arguments
