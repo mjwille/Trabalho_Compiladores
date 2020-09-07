@@ -64,6 +64,8 @@ type: KW_BOOL
 init_value: LIT_INTEGER
           | LIT_FLOAT
           | LIT_CHAR
+          | LIT_TRUE
+          | LIT_FALSE
           ;
 
 vector_size: LIT_INTEGER
@@ -130,7 +132,7 @@ print_cmd: KW_PRINT elements
          ;
 
 elements: element
-        | element elements
+        | elements ',' element
         ;
 
 element: LIT_STRING
