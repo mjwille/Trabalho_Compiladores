@@ -36,6 +36,11 @@ int yyerror(char *s);
 
 %token TOKEN_ERROR
 
+%left '^' '|' '~'
+%left '<' '>' OPERATOR_EQ OPERATOR_DIF OPERATOR_GE OPERATOR_LE
+%left '+' '-'
+%left '*' '/'
+
 %%
 
 programa: decl
@@ -160,7 +165,7 @@ expr: operand
     | expr OPERATOR_DIF expr
     | expr '^' expr
     | expr '|' expr
-    | '~' expr
+    | expr '~' expr
     ;
 
 operand: TK_IDENTIFIER
