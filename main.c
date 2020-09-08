@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
 	// Faz verificações de número de argumentos
 	if(argc < 2) {
-		fprintf(stderr, "ERROR!\nUsage: ./etapa1 <filename>\n");
+		fprintf(stderr, "ERROR!\nUsage: ./etapa2 <filename>\n");
 		exit(1);
 	}
 
