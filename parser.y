@@ -105,8 +105,8 @@ block: '{' commands '}'
 
 /* Comandos */
 
-commands: cmd commands
-        |
+commands: cmd
+        | cmd commands
         ;
 
 cmd: attr_cmd
@@ -117,6 +117,7 @@ cmd: attr_cmd
    | while_cmd
    | loop_cmd
    | block
+   |
    ;
 
 /* Comando de Atribuição */
