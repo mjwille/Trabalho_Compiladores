@@ -3,6 +3,9 @@
    Universidade Federal do Rio Grande do Sul
 */
 
+#ifndef HASH_HEADER
+#define HASH_HEADER
+
 #include <stdio.h>
 #include <string.h>
 
@@ -116,3 +119,5 @@ void hashPrint()
 
 	printf("------------------------------ SYMBOL TABLE END ------------------------------\n");
 }
+
+#endif

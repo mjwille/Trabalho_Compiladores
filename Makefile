@@ -4,7 +4,7 @@
 
 
 etapa2: lex.yy.c
-	gcc -o etapa2 lex.yy.c
+	gcc -o etapa3 lex.yy.c
 
 lex.yy.c: scanner.l y.tab.c
 	flex scanner.l
@@ -13,4 +13,4 @@ y.tab.c: parser.y
 	yacc -d parser.y
 
 clean:
-	rm etapa2 lex.yy.c y.tab.c y.tab.h
+	rm etapa3 lex.yy.c y.tab.c y.tab.h

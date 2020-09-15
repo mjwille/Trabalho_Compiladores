@@ -4,8 +4,15 @@
 */
 
 %{
-int yyerror(char *s);
+        #include "hash.h"
+        int yyerror(char *s);
 %}
+
+%union
+{
+        int value;
+        HASH_NODE *symbol;
+}
 
 %token KW_CHAR
 %token KW_INT

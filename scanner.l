@@ -5,8 +5,8 @@
 
 %{
 
-#include "y.tab.h"
 #include "hash.h"
+#include "y.tab.h"
 
 #define SYMBOL_LIT_INTEGER 1
 #define SYMBOL_LIT_FLOAT 2
