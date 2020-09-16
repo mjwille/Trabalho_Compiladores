@@ -10,7 +10,6 @@
 
 %union
 {
-        int value;
         HASH_NODE *symbol;
 }
 
@@ -38,7 +37,7 @@
 %token LIT_FLOAT
 %token LIT_TRUE
 %token LIT_FALSE
-%token LIT_CHAR
+%token<symbol> LIT_CHAR
 %token LIT_STRING
 
 %token TOKEN_ERROR
@@ -75,7 +74,7 @@ type: KW_BOOL
 
 init_value: LIT_INTEGER
           | LIT_FLOAT
-          | LIT_CHAR
+          | LIT_CHAR                 { printf("INITIALIZED ==> %s\n", $1->text); }
           | LIT_TRUE
           | LIT_FALSE
           ;
