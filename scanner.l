@@ -6,6 +6,7 @@
 %{
 
 #include "hash.h"
+#include "ast.h"
 #include "y.tab.h"
 
 #define SYMBOL_LIT_INTEGER 1

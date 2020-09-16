@@ -3,14 +3,17 @@
 # Universidade Federal do Rio Grande do Sul
 
 
-etapa3: main.o y.tab.o lex.yy.o hash.o
-	gcc main.o y.tab.o lex.yy.o hash.o -o etapa3
+etapa3: main.o y.tab.o lex.yy.o hash.o ast.o
+	gcc main.o y.tab.o lex.yy.o hash.o ast.o -o etapa3
 
 main.o: main.c
 	gcc -c main.c
 
 hash.o: hash.c
 	gcc -c hash.c
+
+ast.o: ast.c
+	gcc -c ast.c
 
 y.yab.o: y.tab.c
 	gcc -c y.tab.c

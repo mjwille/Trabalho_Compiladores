@@ -7,6 +7,7 @@
         #include <stdio.h>
         #include <stdlib.h>
         #include "hash.h"
+        #include "ast.h"
 
         int yylex();
         int getLineNumber(void);
@@ -16,6 +17,7 @@
 %union
 {
         HASH_NODE *symbol;
+        AST_NODE *ast;
 }
 
 %token KW_CHAR
