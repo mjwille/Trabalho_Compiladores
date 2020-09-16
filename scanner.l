@@ -125,6 +125,3 @@ int yywrap()
 	running = 0;
 	return 1;
 }
-
-#include "y.tab.c"
-#include "main.c"

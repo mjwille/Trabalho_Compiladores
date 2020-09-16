@@ -4,7 +4,12 @@
 */
 
 %{
+        #include <stdio.h>
+        #include <stdlib.h>
         #include "hash.h"
+
+        int yylex();
+        int getLineNumber(void);
         int yyerror(char *s);
 %}
 

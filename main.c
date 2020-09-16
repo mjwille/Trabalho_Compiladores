@@ -3,6 +3,14 @@
    Universidade Federal do Rio Grande do Sul
 */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "hash.h"
+
+extern FILE *yyin;
+extern void initMe();
+extern int yyparse();
+
 int main(int argc, char *argv[])
 {
 	// Faz verificações de número de argumentos
