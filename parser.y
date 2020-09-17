@@ -50,6 +50,7 @@
 %token TOKEN_ERROR
 
 %type<ast> cmd
+%type<ast> attr_cmd
 %type<ast> read_cmd
 %type<ast> print_cmd
 %type<ast> elements
@@ -137,10 +138,10 @@ commands: cmd
         | cmd commands
         ;
 
-cmd: attr_cmd
+cmd: attr_cmd                                     { astPrint($1);}
    | read_cmd
-   | print_cmd                                         { astPrint($1);}
-   | return_cmd                                        { astPrint($1);}
+   | print_cmd                                    { astPrint($1);}
+   | return_cmd                                   { astPrint($1);}
    | if_cmd
    | while_cmd
    | loop_cmd
@@ -150,8 +151,8 @@ cmd: attr_cmd
 
 /* Comando de Atribuição */
 
-attr_cmd: TK_IDENTIFIER '=' expr
-        | TK_IDENTIFIER '[' expr ']' '=' expr
+attr_cmd: TK_IDENTIFIER '=' expr                 { $$ = astInsert(AST_ATTR,     $1, $3, NULL, NULL, NULL); }
+        | TK_IDENTIFIER '[' expr ']' '=' expr    { $$ = astInsert(AST_ATTR_VEC, $1, $3,   $6, NULL, NULL); }
         ;
 
 /* Comando de Leitura (read) */
@@ -197,7 +198,7 @@ expr: operand                                     { $$ = $1; }
     ;
 
 operand: TK_IDENTIFIER                             { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
-       | TK_IDENTIFIER '[' LIT_INTEGER ']'
+       | TK_IDENTIFIER '[' LIT_INTEGER ']'         { $$ = astInsert(   AST_VEC, $1,   astInsert(AST_SYMBOL, $3, NULL, NULL, NULL, NULL), NULL, NULL, NULL); }
        | LIT_INTEGER                               { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
        | LIT_FLOAT                                 { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
        | LIT_CHAR                                  { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }

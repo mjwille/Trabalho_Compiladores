@@ -10,25 +10,28 @@
 
 // Definição dos tipos que um AST_NODE pode ter
 #define AST_SYMBOL      1
-#define AST_ADD         2
-#define AST_SUB         3
-#define AST_MUL         4
-#define AST_DIV         5
-#define AST_LT          6
-#define AST_GT          7
-#define AST_LE          8
-#define AST_GE          9
-#define AST_EQ         10
-#define AST_DIF        11
-#define AST_XOR        12
-#define AST_OR         13
-#define AST_NOT        14
-#define AST_FUNCALL    15
-#define AST_ARGS       16
-#define AST_READ       17
-#define AST_PRINT      18
-#define AST_PRINT_LIST 19
-#define AST_RETURN     20
+#define AST_VEC         2
+#define AST_ADD         3
+#define AST_SUB         4
+#define AST_MUL         5
+#define AST_DIV         6
+#define AST_LT          7
+#define AST_GT          8
+#define AST_LE          9
+#define AST_GE         10
+#define AST_EQ         11
+#define AST_DIF        12
+#define AST_XOR        13
+#define AST_OR         14
+#define AST_NOT        15
+#define AST_FUNCALL    16
+#define AST_ARGS       17
+#define AST_ATTR       18
+#define AST_ATTR_VEC   19
+#define AST_READ       20
+#define AST_PRINT      21
+#define AST_PRINT_LIST 22
+#define AST_RETURN     23
 
 // Máximo de filhos que um AST_NODE pode ter
 #define MAX_SONS 4

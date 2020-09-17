@@ -96,7 +96,8 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 
 	// imprime o tipo do nodo
 	switch(node->type) {
-		case AST_SYMBOL:       printf("AST_SYMBOL: ");        break;
+		case AST_SYMBOL:       printf("AST_SYMBOL: ");        break;  // tem também símbolo na tabela hash (nome do identificador)
+		case AST_VEC:          printf("AST_VEC: ");           break;  // tem também símbolo na tabela hash (nome do identificador do vetor)
 		case AST_ADD:          printf("AST_ADD\n");           break;
 		case AST_SUB:          printf("AST_SUB\n");           break;
 		case AST_MUL:          printf("AST_MUL\n");           break;
@@ -112,6 +113,8 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 		case AST_NOT:          printf("AST_NOT\n");           break;
 		case AST_FUNCALL:      printf("AST_FUNCALL: ");       break;    // tem também símbolo na tabela hash (nome da função)
 		case AST_ARGS:         printf("AST_ARGS\n");          break;
+		case AST_ATTR:         printf("AST_ATTR: ");          break;    // tem também símbolo na tabela hash (nome do identificador do lado esquerdo da atribuição)
+		case AST_ATTR_VEC:     printf("AST_ATTR_VEC: ");      break;    // tem também símbolo na tabela hash (nome do identificador do vetor do lado esquerdo da atribuição)
 		case AST_READ:         printf("AST_READ: ");          break;    // tem também símbolo na tabela hash (identificado para onde será lido o valor)
 		case AST_PRINT:        printf("AST_PRINT\n");         break;
 		case AST_PRINT_LIST:   printf("AST_PRINT_LIST\n");    break;
