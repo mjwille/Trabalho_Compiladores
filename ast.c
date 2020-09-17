@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "ast.h"
 
 AST_NODE *astInsert(int type, HASH_NODE *symbol, AST_NODE *son0, AST_NODE *son1, AST_NODE *son2, AST_NODE *son3) {
@@ -21,27 +22,49 @@ AST_NODE *astInsert(int type, HASH_NODE *symbol, AST_NODE *son0, AST_NODE *son1,
 	return node;
 }
 
-void astFormat(int spaces) {
-	if(spaces > 0) {
-		int i;
-		for(i=0; i<spaces-1; i++)
-			printf("    ");
-		printf("\u2502\n");
-		for(i=0; i<spaces-1; i++)
-			printf("    ");
-		printf("\u2514\u2500\u2500 ");
-	}
-}
-
 void astPrint(AST_NODE *node) {
 	printf("\nABSTRACT SYNTAX TREE:\n\n");
-	astShow(node, 0);
+	astShow(node, 0, 0, 0);
 	printf("\n");
 }
 
-void astShow(AST_NODE *node, int spaces) {
+void astFormat(int spaces, int bar, int last) {
+	if(spaces > 0) {
+		int i, j, aux;
+		for(i=0; i<=spaces; i++) {
+			aux = 1 << (i);
+			if((bar & aux) == aux)
+				printf("   \u2502");
+			else
+				printf("    ");
+		}
+		if(last)
+			printf("\b\b\b\b\b\u2502\n");
+		else
+			printf("\n");
+		for(i=0; i<spaces; i++) {
+			aux = 1 << (i);
+			if((bar & aux) == aux)
+				printf("   \u2502");
+			else
+				printf("    ");
+		}
+		printf("\b\u2514\u2500\u2500 ");
+	}
+}
 
-	astFormat(spaces);
+int hasAnotherSon(AST_NODE *node, int i) {
+	int j;
+	for(j=i; j<MAX_SONS; j++) {
+		if(node->son[j] != NULL)
+			return 1;
+	}
+	return 0;
+}
+
+void astShow(AST_NODE *node, int spaces, int bar, int last) {
+
+	astFormat(spaces, bar, last);
 
 	switch(node->type) {
 		case AST_SYMBOL: printf("AST_SYMBOL: ");     break;
@@ -58,7 +81,15 @@ void astShow(AST_NODE *node, int spaces) {
 
 	int i;
 	for(i=0; i<MAX_SONS; i++) {
-		if(node->son[i] != NULL)
-			astShow(node->son[i], spaces+1);
+		if(node->son[i] != NULL) {
+			if(hasAnotherSon(node, i+1)) {
+				bar += pow(2, spaces);
+				astShow(node->son[i], spaces+1, bar, 0);
+			}
+			else {
+				astShow(node->son[i], spaces+1, bar, 1);
+			}
+			bar -= pow(2, spaces);
+		}
 	}
 }
