@@ -49,6 +49,8 @@
 
 %token TOKEN_ERROR
 
+%type<ast> cmd
+%type<ast> return_cmd
 %type<ast> expr
 %type<ast> operand
 
@@ -130,7 +132,7 @@ commands: cmd
 cmd: attr_cmd
    | read_cmd
    | print_cmd
-   | return_cmd
+   | return_cmd                                        { astPrint($1);}
    | if_cmd
    | while_cmd
    | loop_cmd
@@ -164,7 +166,7 @@ element: LIT_STRING
 
 /* Comando de Retorno (return) */
 
-return_cmd: KW_RETURN expr                        { astPrint($2); }
+return_cmd: KW_RETURN expr                        { $$ = astInsert(AST_RETURN, NULL, $2, NULL, NULL, NULL); }
           ;
 
 /* Expressão */
@@ -175,15 +177,15 @@ expr: operand                                     { $$ = $1; }
     | expr '-' expr                               { $$ = astInsert(AST_SUB, NULL, $1, $3, NULL, NULL); }
     | expr '*' expr                               { $$ = astInsert(AST_MUL, NULL, $1, $3, NULL, NULL); }
     | expr '/' expr                               { $$ = astInsert(AST_DIV, NULL, $1, $3, NULL, NULL); }
-    | expr '<' expr
-    | expr '>' expr
-    | expr OPERATOR_LE expr
-    | expr OPERATOR_GE expr
-    | expr OPERATOR_EQ expr
-    | expr OPERATOR_DIF expr
-    | expr '^' expr
-    | expr '|' expr
-    | expr '~' expr
+    | expr '<' expr                               { $$ = astInsert(AST_LT,  NULL, $1, $3, NULL, NULL); }
+    | expr '>' expr                               { $$ = astInsert(AST_GT,  NULL, $1, $3, NULL, NULL); }
+    | expr OPERATOR_LE expr                       { $$ = astInsert(AST_LE,  NULL, $1, $3, NULL, NULL); }
+    | expr OPERATOR_GE expr                       { $$ = astInsert(AST_GE,  NULL, $1, $3, NULL, NULL); }
+    | expr OPERATOR_EQ expr                       { $$ = astInsert(AST_EQ,  NULL, $1, $3, NULL, NULL); }
+    | expr OPERATOR_DIF expr                      { $$ = astInsert(AST_DIF, NULL, $1, $3, NULL, NULL); }
+    | expr '^' expr                               { $$ = astInsert(AST_XOR, NULL, $1, $3, NULL, NULL); }
+    | expr '|' expr                               { $$ = astInsert(AST_OR,  NULL, $1, $3, NULL, NULL); }
+    | '~' expr                                    { $$ = astInsert(AST_NOT, NULL, $2, NULL, NULL, NULL); }
     ;
 
 operand: TK_IDENTIFIER                             { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }

@@ -14,6 +14,16 @@
 #define AST_SUB 3
 #define AST_MUL 4
 #define AST_DIV 5
+#define AST_LT 6
+#define AST_GT 7
+#define AST_LE 8
+#define AST_GE 9
+#define AST_EQ 10
+#define AST_DIF 11
+#define AST_XOR 12
+#define AST_OR 13
+#define AST_NOT 14
+#define AST_RETURN 15
 
 // Máximo de filhos que um AST_NODE pode ter
 #define MAX_SONS 4

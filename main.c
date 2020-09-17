@@ -35,6 +35,6 @@ int main(int argc, char *argv[])
 	// Imprime a tabela de símbolos
 	hashPrint();
 
-	printf("Compilation was a success.\n");
+	printf("\nCompilation was a success.\n\n");
 	exit(0);
 }

@@ -101,6 +101,16 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 		case AST_SUB:    printf("AST_SUB\n");        break;
 		case AST_MUL:    printf("AST_MUL\n");        break;
 		case AST_DIV:    printf("AST_DIV\n");        break;
+		case AST_LT:     printf("AST_LT\n");         break;
+		case AST_GT:     printf("AST_GT\n");         break;
+		case AST_LE:     printf("AST_LE\n");         break;
+		case AST_GE:     printf("AST_GE\n");         break;
+		case AST_EQ:     printf("AST_EQ\n");         break;
+		case AST_DIF:    printf("AST_DIF\n");        break;
+		case AST_XOR:    printf("AST_XOR\n");        break;
+		case AST_OR:     printf("AST_OR\n");         break;
+		case AST_NOT:    printf("AST_NOT\n");        break;
+		case AST_RETURN: printf("AST_RETURN\n");     break;
 		default:         printf("AST_UNKNOWN\n");    break;
 	}
 
