@@ -96,24 +96,27 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 
 	// imprime o tipo do nodo
 	switch(node->type) {
-		case AST_SYMBOL:   printf("AST_SYMBOL: ");     break;
-		case AST_ADD:      printf("AST_ADD\n");        break;
-		case AST_SUB:      printf("AST_SUB\n");        break;
-		case AST_MUL:      printf("AST_MUL\n");        break;
-		case AST_DIV:      printf("AST_DIV\n");        break;
-		case AST_LT:       printf("AST_LT\n");         break;
-		case AST_GT:       printf("AST_GT\n");         break;
-		case AST_LE:       printf("AST_LE\n");         break;
-		case AST_GE:       printf("AST_GE\n");         break;
-		case AST_EQ:       printf("AST_EQ\n");         break;
-		case AST_DIF:      printf("AST_DIF\n");        break;
-		case AST_XOR:      printf("AST_XOR\n");        break;
-		case AST_OR:       printf("AST_OR\n");         break;
-		case AST_NOT:      printf("AST_NOT\n");        break;
-		case AST_FUNCALL:  printf("AST_FUNCALL: ");    break;    // tem também símbolo na tabela hash (nome da função)
-		case AST_ARG:      printf("AST_ARG\n");        break;
-		case AST_RETURN:   printf("AST_RETURN\n");     break;
-		default:           printf("AST_UNKNOWN\n");    break;
+		case AST_SYMBOL:       printf("AST_SYMBOL: ");        break;
+		case AST_ADD:          printf("AST_ADD\n");           break;
+		case AST_SUB:          printf("AST_SUB\n");           break;
+		case AST_MUL:          printf("AST_MUL\n");           break;
+		case AST_DIV:          printf("AST_DIV\n");           break;
+		case AST_LT:           printf("AST_LT\n");            break;
+		case AST_GT:           printf("AST_GT\n");            break;
+		case AST_LE:           printf("AST_LE\n");            break;
+		case AST_GE:           printf("AST_GE\n");            break;
+		case AST_EQ:           printf("AST_EQ\n");            break;
+		case AST_DIF:          printf("AST_DIF\n");           break;
+		case AST_XOR:          printf("AST_XOR\n");           break;
+		case AST_OR:           printf("AST_OR\n");            break;
+		case AST_NOT:          printf("AST_NOT\n");           break;
+		case AST_FUNCALL:      printf("AST_FUNCALL: ");       break;    // tem também símbolo na tabela hash (nome da função)
+		case AST_ARGS:         printf("AST_ARGS\n");          break;
+		case AST_READ:         printf("AST_READ: ");          break;    // tem também símbolo na tabela hash (identificado para onde será lido o valor)
+		case AST_PRINT:        printf("AST_PRINT\n");         break;
+		case AST_PRINT_LIST:   printf("AST_PRINT_LIST\n");    break;
+		case AST_RETURN:       printf("AST_RETURN\n");        break;
+		default:               printf("AST_UNKNOWN\n");       break;
 	}
 
 	// se é um símbolo na tabela hash (tabela de símbolos), imprime ainda seu conteúdo texto

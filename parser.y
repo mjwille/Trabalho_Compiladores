@@ -50,6 +50,10 @@
 %token TOKEN_ERROR
 
 %type<ast> cmd
+%type<ast> read_cmd
+%type<ast> print_cmd
+%type<ast> elements
+%type<ast> element
 %type<ast> return_cmd
 %type<ast> expr
 %type<ast> operand
@@ -135,7 +139,7 @@ commands: cmd
 
 cmd: attr_cmd
    | read_cmd
-   | print_cmd
+   | print_cmd                                         { astPrint($1);}
    | return_cmd                                        { astPrint($1);}
    | if_cmd
    | while_cmd
@@ -152,20 +156,20 @@ attr_cmd: TK_IDENTIFIER '=' expr
 
 /* Comando de Leitura (read) */
 
-read_cmd: KW_READ TK_IDENTIFIER
+read_cmd: KW_READ TK_IDENTIFIER                  { $$ = astInsert(AST_READ, $2, NULL, NULL, NULL, NULL); }
         ;
 
 /* Comando de Impressão (print) */
 
-print_cmd: KW_PRINT elements
+print_cmd: KW_PRINT elements                     { $$ = astInsert(AST_PRINT, NULL, $2, NULL, NULL, NULL); }
          ;
 
-elements: element
-        | elements ',' element
+elements: element                                { $$ = $1; }
+        | element ',' elements                   { $$ = astInsert(AST_PRINT_LIST, NULL, $1, $3,   NULL, NULL); }
         ;
 
-element: LIT_STRING
-       | expr
+element: LIT_STRING                              { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
+       | expr                                    { $$ = $1; }
        ;
 
 /* Comando de Retorno (return) */
@@ -207,8 +211,8 @@ arguments_list: arguments                          { $$ = $1; }
               |                                    { $$ = NULL; }
               ;
 
-arguments: argument                                { $$ = astInsert(AST_ARG, NULL, $1, NULL, NULL, NULL); }
-         | argument ',' arguments                  { $$ = astInsert(AST_ARG, NULL, $1, $3, NULL, NULL);   }
+arguments: argument                                { $$ = $1; }
+         | argument ',' arguments                  { $$ = astInsert(AST_ARGS, NULL, $1, $3, NULL, NULL);   }
          ;
 
 argument: expr                                     { $$ = $1; }
