@@ -115,6 +115,7 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 		case AST_ARGS:         printf("AST_ARGS\n");          break;
 		case AST_ATTR:         printf("AST_ATTR: ");          break;    // tem também símbolo na tabela hash (nome do identificador do lado esquerdo da atribuição)
 		case AST_ATTR_VEC:     printf("AST_ATTR_VEC: ");      break;    // tem também símbolo na tabela hash (nome do identificador do vetor do lado esquerdo da atribuição)
+		case AST_CMD:          printf("AST_CMD\n");           break;
 		case AST_READ:         printf("AST_READ: ");          break;    // tem também símbolo na tabela hash (identificador para onde será lido o valor)
 		case AST_PRINT:        printf("AST_PRINT\n");         break;
 		case AST_PRINT_LIST:   printf("AST_PRINT_LIST\n");    break;

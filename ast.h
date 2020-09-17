@@ -28,14 +28,15 @@
 #define AST_ARGS       17
 #define AST_ATTR       18
 #define AST_ATTR_VEC   19
-#define AST_READ       20
-#define AST_PRINT      21
-#define AST_PRINT_LIST 22
-#define AST_RETURN     23
-#define AST_IF         24
-#define AST_IF_ELSE    25
-#define AST_WHILE      26
-#define AST_LOOP       27
+#define AST_CMD        20
+#define AST_READ       21
+#define AST_PRINT      22
+#define AST_PRINT_LIST 23
+#define AST_RETURN     24
+#define AST_IF         25
+#define AST_IF_ELSE    26
+#define AST_WHILE      27
+#define AST_LOOP       28
 
 // Máximo de filhos que um AST_NODE pode ter
 #define MAX_SONS 4

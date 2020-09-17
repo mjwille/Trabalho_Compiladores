@@ -49,6 +49,8 @@
 
 %token TOKEN_ERROR
 
+%type<ast> block
+%type<ast> commands
 %type<ast> cmd
 %type<ast> attr_cmd
 %type<ast> read_cmd
@@ -100,7 +102,7 @@ type: KW_BOOL
 
 init_value: LIT_INTEGER
           | LIT_FLOAT
-          | LIT_CHAR                 { printf("INITIALIZED ==> %s\n", $1->text); }
+          | LIT_CHAR
           | LIT_TRUE
           | LIT_FALSE
           ;
@@ -132,24 +134,24 @@ parameters: parameter
 parameter: TK_IDENTIFIER '=' type
          ;
 
-block: '{' commands '}'
+block: '{' commands '}'                          { astPrint($2); }
      ;
 
 /* Comandos */
 
-commands: cmd
-        | cmd commands
+commands: cmd                                    { $$ = $1; }
+        | cmd commands                           { $$ = astInsert(AST_CMD, NULL, $1, $2, NULL, NULL); }
         ;
 
-cmd: attr_cmd                                    { astPrint($1); }
-   | read_cmd                                    { astPrint($1); }
-   | print_cmd                                   { astPrint($1); }
-   | return_cmd                                  { astPrint($1); }
-   | if_cmd                                      { astPrint($1); }
-   | while_cmd                                   { astPrint($1); }
-   | loop_cmd                                    { astPrint($1); }
-   | block
-   |
+cmd: attr_cmd                                    {   $$ = $1; }
+   | read_cmd                                    {   $$ = $1; }
+   | print_cmd                                   {   $$ = $1; }
+   | return_cmd                                  {   $$ = $1; }
+   | if_cmd                                      {   $$ = $1; }
+   | while_cmd                                   {   $$ = $1; }
+   | loop_cmd                                    {   $$ = $1; }
+   | block                                       {   $$ = $1; }
+   |                                             { $$ = NULL; }
    ;
 
 /* Comando de Atribuição */
