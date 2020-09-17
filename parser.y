@@ -53,6 +53,10 @@
 %type<ast> return_cmd
 %type<ast> expr
 %type<ast> operand
+%type<ast> func_call
+%type<ast> arguments_list
+%type<ast> arguments
+%type<ast> argument
 
 %left '^' '|' '~'
 %left '<' '>' OPERATOR_EQ OPERATOR_DIF OPERATOR_GE OPERATOR_LE
@@ -193,21 +197,21 @@ operand: TK_IDENTIFIER                             { $$ = astInsert(AST_SYMBOL, 
        | LIT_INTEGER                               { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
        | LIT_FLOAT                                 { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
        | LIT_CHAR                                  { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
-       | func_call
+       | func_call                                 { $$ = $1; }
        ;
 
-func_call: TK_IDENTIFIER '(' arguments_list ')'
+func_call: TK_IDENTIFIER '(' arguments_list ')'    { $$ = astInsert(AST_FUNCALL, $1, $3, NULL, NULL, NULL); }
          ;
 
-arguments_list: arguments
-              |
+arguments_list: arguments                          { $$ = $1; }
+              |                                    { $$ = NULL; }
               ;
 
-arguments: argument
-         | argument ',' arguments
+arguments: argument                                { $$ = astInsert(AST_ARG, NULL, $1, NULL, NULL, NULL); }
+         | argument ',' arguments                  { $$ = astInsert(AST_ARG, NULL, $1, $3, NULL, NULL);   }
          ;
 
-argument: expr
+argument: expr                                     { $$ = $1; }
         ;
 
 /* Comandos de Controle de Fluxo */
