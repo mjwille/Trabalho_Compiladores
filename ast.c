@@ -9,7 +9,7 @@
 #include "ast.h"
 
 AST_NODE *astInsert(int type, HASH_NODE *symbol, AST_NODE *son0, AST_NODE *son1, AST_NODE *son2, AST_NODE *son3) {
-	AST_NODE *node;
+	AST_NODE *node = (AST_NODE*) calloc(1, sizeof(AST_NODE));
 
 	node->type = type;
 	node->symbol = symbol;
@@ -40,6 +40,7 @@ void astPrint(AST_NODE *node) {
 
 	int i;
 	for(i=0; i<MAX_SONS; i++) {
-		astPrint(node->son[i]);
+		if(node->son[i] != NULL)
+			astPrint(node->son[i]);
 	}
 }

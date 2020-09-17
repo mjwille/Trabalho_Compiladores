@@ -38,21 +38,26 @@
 %token OPERATOR_GE
 %token OPERATOR_EQ
 %token OPERATOR_DIF
-%token TK_IDENTIFIER
+%token<symbol> TK_IDENTIFIER
 
-%token LIT_INTEGER
-%token LIT_FLOAT
-%token LIT_TRUE
-%token LIT_FALSE
+%token<symbol> LIT_INTEGER
+%token<symbol> LIT_FLOAT
+%token<symbol> LIT_TRUE
+%token<symbol> LIT_FALSE
 %token<symbol> LIT_CHAR
-%token LIT_STRING
+%token<symbol> LIT_STRING
 
 %token TOKEN_ERROR
+
+%type<ast> expr
+%type<ast> operand
 
 %left '^' '|' '~'
 %left '<' '>' OPERATOR_EQ OPERATOR_DIF OPERATOR_GE OPERATOR_LE
 %left '+' '-'
 %left '*' '/'
+
+%start programa
 
 %%
 
@@ -159,17 +164,17 @@ element: LIT_STRING
 
 /* Comando de Retorno (return) */
 
-return_cmd: KW_RETURN expr
+return_cmd: KW_RETURN expr                        { astPrint($2); }
           ;
 
 /* Expressão */
 
-expr: operand
-    | '(' expr ')'
-    | expr '+' expr
-    | expr '-' expr
-    | expr '*' expr
-    | expr '/' expr
+expr: operand                                     { $$ = $1; }
+    | '(' expr ')'                                { $$ = $2; }
+    | expr '+' expr                               { $$ = astInsert(AST_ADD, NULL, $1, $3, NULL, NULL); }
+    | expr '-' expr                               { $$ = astInsert(AST_SUB, NULL, $1, $3, NULL, NULL); }
+    | expr '*' expr                               { $$ = astInsert(AST_MUL, NULL, $1, $3, NULL, NULL); }
+    | expr '/' expr                               { $$ = astInsert(AST_DIV, NULL, $1, $3, NULL, NULL); }
     | expr '<' expr
     | expr '>' expr
     | expr OPERATOR_LE expr
@@ -181,11 +186,11 @@ expr: operand
     | expr '~' expr
     ;
 
-operand: TK_IDENTIFIER
+operand: TK_IDENTIFIER                             { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
        | TK_IDENTIFIER '[' LIT_INTEGER ']'
-       | LIT_INTEGER
-       | LIT_FLOAT
-       | LIT_CHAR
+       | LIT_INTEGER                               { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
+       | LIT_FLOAT                                 { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
+       | LIT_CHAR                                  { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
        | func_call
        ;
 
