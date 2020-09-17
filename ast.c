@@ -21,26 +21,44 @@ AST_NODE *astInsert(int type, HASH_NODE *symbol, AST_NODE *son0, AST_NODE *son1,
 	return node;
 }
 
+void astFormat(int spaces) {
+	if(spaces > 0) {
+		int i;
+		for(i=0; i<spaces-1; i++)
+			printf("    ");
+		printf("\u2502\n");
+		for(i=0; i<spaces-1; i++)
+			printf("    ");
+		printf("\u2514\u2500\u2500 ");
+	}
+}
+
 void astPrint(AST_NODE *node) {
+	printf("\nABSTRACT SYNTAX TREE:\n\n");
+	astShow(node, 0);
+	printf("\n");
+}
+
+void astShow(AST_NODE *node, int spaces) {
+
+	astFormat(spaces);
+
 	switch(node->type) {
-		case AST_SYMBOL: printf("AST_SYMBOL!\n"); break;
-		case AST_ADD:    printf("AST_ADD!\n");    break;
-		case AST_SUB:    printf("AST_SUB!\n");    break;
-		case AST_MUL:    printf("AST_MUL!\n");    break;
-		case AST_DIV:    printf("AST_DIV!\n");    break;
-		default:         printf("AST_UNKN!\n");   break;
+		case AST_SYMBOL: printf("AST_SYMBOL: ");     break;
+		case AST_ADD:    printf("AST_ADD\n");        break;
+		case AST_SUB:    printf("AST_SUB\n");        break;
+		case AST_MUL:    printf("AST_MUL\n");        break;
+		case AST_DIV:    printf("AST_DIV\n");        break;
+		default:         printf("AST_UNKNOWN\n");    break;
 	}
 
 	if(node-> symbol != NULL) {
 		printf("%s\n", node->symbol->text);
 	}
-	else {
-		printf("NULL\n");
-	}
 
 	int i;
 	for(i=0; i<MAX_SONS; i++) {
 		if(node->son[i] != NULL)
-			astPrint(node->son[i]);
+			astShow(node->son[i], spaces+1);
 	}
 }

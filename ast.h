@@ -24,6 +24,8 @@ typedef struct AST_NODE
 } AST_NODE;
 
 AST_NODE *astInsert(int type, HASH_NODE *symbol, AST_NODE *son0, AST_NODE *son1, AST_NODE *son2, AST_NODE *son3);
+void astFormat(int spaces);
 void astPrint(AST_NODE *node);
+void astShow(AST_NODE *node, int spaces);
 
 #endif
