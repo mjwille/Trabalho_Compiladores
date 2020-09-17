@@ -32,6 +32,8 @@
 #define AST_PRINT      21
 #define AST_PRINT_LIST 22
 #define AST_RETURN     23
+#define AST_IF         24
+#define AST_IF_ELSE    25
 
 // Máximo de filhos que um AST_NODE pode ter
 #define MAX_SONS 4

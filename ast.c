@@ -119,6 +119,8 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 		case AST_PRINT:        printf("AST_PRINT\n");         break;
 		case AST_PRINT_LIST:   printf("AST_PRINT_LIST\n");    break;
 		case AST_RETURN:       printf("AST_RETURN\n");        break;
+		case AST_IF:           printf("AST_IF\n");            break;
+		case AST_IF_ELSE:      printf("AST_IF_ELSE\n");       break;
 		default:               printf("AST_UNKNOWN\n");       break;
 	}
 

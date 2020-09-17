@@ -56,6 +56,7 @@
 %type<ast> elements
 %type<ast> element
 %type<ast> return_cmd
+%type<ast> if_cmd
 %type<ast> expr
 %type<ast> operand
 %type<ast> func_call
@@ -138,11 +139,11 @@ commands: cmd
         | cmd commands
         ;
 
-cmd: attr_cmd                                     { astPrint($1);}
-   | read_cmd
-   | print_cmd                                    { astPrint($1);}
-   | return_cmd                                   { astPrint($1);}
-   | if_cmd
+cmd: attr_cmd                                    { astPrint($1); }
+   | read_cmd                                    { astPrint($1); }
+   | print_cmd                                   { astPrint($1); }
+   | return_cmd                                  { astPrint($1); }
+   | if_cmd                                      { astPrint($1); }
    | while_cmd
    | loop_cmd
    | block
@@ -221,8 +222,8 @@ argument: expr                                     { $$ = $1; }
 
 /* Comandos de Controle de Fluxo */
 
-if_cmd: KW_IF '(' expr ')' KW_THEN cmd
-      | KW_IF '(' expr ')' KW_THEN cmd KW_ELSE cmd
+if_cmd: KW_IF '(' expr ')' KW_THEN cmd                   { $$ = astInsert(     AST_IF, NULL, $3, $6, NULL, NULL); }
+      | KW_IF '(' expr ')' KW_THEN cmd KW_ELSE cmd       { $$ = astInsert(AST_IF_ELSE, NULL, $3, $6,   $8, NULL); }
       ;
 
 while_cmd: KW_WHILE '(' expr ')' cmd
