@@ -57,6 +57,8 @@
 %type<ast> element
 %type<ast> return_cmd
 %type<ast> if_cmd
+%type<ast> while_cmd
+%type<ast> loop_cmd
 %type<ast> expr
 %type<ast> operand
 %type<ast> func_call
@@ -144,8 +146,8 @@ cmd: attr_cmd                                    { astPrint($1); }
    | print_cmd                                   { astPrint($1); }
    | return_cmd                                  { astPrint($1); }
    | if_cmd                                      { astPrint($1); }
-   | while_cmd
-   | loop_cmd
+   | while_cmd                                   { astPrint($1); }
+   | loop_cmd                                    { astPrint($1); }
    | block
    |
    ;
@@ -226,10 +228,10 @@ if_cmd: KW_IF '(' expr ')' KW_THEN cmd                   { $$ = astInsert(     A
       | KW_IF '(' expr ')' KW_THEN cmd KW_ELSE cmd       { $$ = astInsert(AST_IF_ELSE, NULL, $3, $6,   $8, NULL); }
       ;
 
-while_cmd: KW_WHILE '(' expr ')' cmd
+while_cmd: KW_WHILE '(' expr ')' cmd                     { $$ = astInsert(  AST_WHILE, NULL, $3, $5, NULL, NULL); }
          ;
 
-loop_cmd: KW_LOOP '(' TK_IDENTIFIER ':' expr ',' expr ',' expr ')' cmd
+loop_cmd: KW_LOOP '(' TK_IDENTIFIER ':' expr ',' expr ',' expr ')' cmd      { $$ = astInsert(AST_LOOP, $3, $5, $7, $9, $11); }
         ;
 
 %%

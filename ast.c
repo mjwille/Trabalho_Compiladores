@@ -115,12 +115,14 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 		case AST_ARGS:         printf("AST_ARGS\n");          break;
 		case AST_ATTR:         printf("AST_ATTR: ");          break;    // tem também símbolo na tabela hash (nome do identificador do lado esquerdo da atribuição)
 		case AST_ATTR_VEC:     printf("AST_ATTR_VEC: ");      break;    // tem também símbolo na tabela hash (nome do identificador do vetor do lado esquerdo da atribuição)
-		case AST_READ:         printf("AST_READ: ");          break;    // tem também símbolo na tabela hash (identificado para onde será lido o valor)
+		case AST_READ:         printf("AST_READ: ");          break;    // tem também símbolo na tabela hash (identificador para onde será lido o valor)
 		case AST_PRINT:        printf("AST_PRINT\n");         break;
 		case AST_PRINT_LIST:   printf("AST_PRINT_LIST\n");    break;
 		case AST_RETURN:       printf("AST_RETURN\n");        break;
 		case AST_IF:           printf("AST_IF\n");            break;
 		case AST_IF_ELSE:      printf("AST_IF_ELSE\n");       break;
+		case AST_WHILE:        printf("AST_WHILE\n");         break;
+		case AST_LOOP:         printf("AST_LOOP: ");          break;    // tem também símbolo na tabela hash (identificado do controle do laço)
 		default:               printf("AST_UNKNOWN\n");       break;
 	}
 

@@ -34,6 +34,8 @@
 #define AST_RETURN     23
 #define AST_IF         24
 #define AST_IF_ELSE    25
+#define AST_WHILE      26
+#define AST_LOOP       27
 
 // Máximo de filhos que um AST_NODE pode ter
 #define MAX_SONS 4
