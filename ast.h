@@ -26,9 +26,9 @@
 #define AST_NOT        15
 #define AST_FUNCALL    16
 #define AST_ARGS       17
-#define AST_ATTR       18
-#define AST_ATTR_VEC   19
-#define AST_CMD        20
+#define AST_CMD        18
+#define AST_ATTR       19
+#define AST_ATTR_VEC   20
 #define AST_READ       21
 #define AST_PRINT      22
 #define AST_PRINT_LIST 23
@@ -37,6 +37,12 @@
 #define AST_IF_ELSE    26
 #define AST_WHILE      27
 #define AST_LOOP       28
+#define AST_PARAMS     29
+#define AST_FUNCDEF    30
+#define AST_BOOL       31
+#define AST_CHAR       32
+#define AST_INT        33
+#define AST_FLOAT      34
 
 // Máximo de filhos que um AST_NODE pode ter
 #define MAX_SONS 4

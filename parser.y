@@ -49,6 +49,11 @@
 
 %token TOKEN_ERROR
 
+%type<ast> type
+%type<ast> func
+%type<ast> parameters_list
+%type<ast> parameters
+%type<ast> parameter
 %type<ast> block
 %type<ast> commands
 %type<ast> cmd
@@ -94,10 +99,10 @@ global_var: TK_IDENTIFIER '=' type ':' init_value
           | TK_IDENTIFIER '=' type '[' vector_size ']' init_vector
           ;
 
-type: KW_BOOL
-    | KW_CHAR
-    | KW_INT
-    | KW_FLOAT
+type: KW_BOOL                             { $$ = astInsert(AST_BOOL,  NULL, NULL, NULL, NULL, NULL); }
+    | KW_CHAR                             { $$ = astInsert(AST_CHAR,  NULL, NULL, NULL, NULL, NULL); }
+    | KW_INT                              { $$ = astInsert(AST_INT,   NULL, NULL, NULL, NULL, NULL); }
+    | KW_FLOAT                            { $$ = astInsert(AST_FLOAT, NULL, NULL, NULL, NULL, NULL); }
     ;
 
 init_value: LIT_INTEGER
@@ -120,21 +125,21 @@ vector_values: init_value
 
 /* Funções */
 
-func: TK_IDENTIFIER '(' parameters_list ')' '=' type block
+func: TK_IDENTIFIER '(' parameters_list ')' '=' type block   { $$ = astInsert(AST_FUNCDEF, $1, $3, $6, $7, NULL); astPrint($$); }
     ;
 
-parameters_list: parameters
-               |
+parameters_list: parameters                      { $$ =   $1; }
+               |                                 { $$ = NULL; }
                ;
 
-parameters: parameter
-          | parameter ',' parameters
+parameters: parameter                            { $$ = $1; }
+          | parameter ',' parameters             { $$ = astInsert(AST_PARAMS, NULL, $1, $3, NULL, NULL); }
           ;
 
-parameter: TK_IDENTIFIER '=' type
+parameter: TK_IDENTIFIER '=' type                { $$ = astInsert(AST_SYMBOL, $1, $3, NULL, NULL, NULL); }
          ;
 
-block: '{' commands '}'                          { astPrint($2); }
+block: '{' commands '}'                          { $$ = $2; }
      ;
 
 /* Comandos */

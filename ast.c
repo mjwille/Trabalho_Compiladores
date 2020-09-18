@@ -123,7 +123,13 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 		case AST_IF:           printf("AST_IF\n");            break;
 		case AST_IF_ELSE:      printf("AST_IF_ELSE\n");       break;
 		case AST_WHILE:        printf("AST_WHILE\n");         break;
-		case AST_LOOP:         printf("AST_LOOP: ");          break;    // tem também símbolo na tabela hash (identificado do controle do laço)
+		case AST_LOOP:         printf("AST_LOOP: ");          break;    // tem também símbolo na tabela hash (identificador do controle do laço)
+		case AST_PARAMS:       printf("AST_PARAMS\n");        break;
+		case AST_FUNCDEF:      printf("AST_FUNCDEF: ");       break;    // tem também símbolo na tabela hash (identificador que é o nome da função)
+		case AST_BOOL:         printf("AST_BOOL\n");          break;
+		case AST_CHAR:         printf("AST_CHAR\n");          break;
+		case AST_INT:          printf("AST_INT\n");           break;
+		case AST_FLOAT:        printf("AST_FLOAT\n");         break;
 		default:               printf("AST_UNKNOWN\n");       break;
 	}
 
