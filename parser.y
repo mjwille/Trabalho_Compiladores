@@ -49,6 +49,14 @@
 
 %token TOKEN_ERROR
 
+%type<ast> programa
+%type<ast> decl
+%type<ast> dec
+%type<ast> global_var
+%type<ast> init_value
+%type<ast> vector_size
+%type<ast> init_vector
+%type<ast> vector_values
 %type<ast> type
 %type<ast> func
 %type<ast> parameters_list
@@ -82,21 +90,21 @@
 
 %%
 
-programa: decl
+programa: decl                           { $$ = $1; astPrint($$); }
         ;
 
-decl: dec ';' decl
-    |
+decl: dec ';' decl                       { $$ = astInsert(AST_DECL,  NULL, $1, $3, NULL, NULL); }
+    |                                    { $$ = NULL; }
     ;
 
-dec: global_var
-   | func
+dec: global_var                          { $$ = $1; }
+   | func                                { $$ = $1; }
    ;
 
 /* Variáveis Globais */
 
-global_var: TK_IDENTIFIER '=' type ':' init_value
-          | TK_IDENTIFIER '=' type '[' vector_size ']' init_vector
+global_var: TK_IDENTIFIER '=' type ':' init_value                         { $$ = astInsert(AST_DECL_VAR,      $1, $3, $5, NULL, NULL); }
+          | TK_IDENTIFIER '=' type '[' vector_size ']' init_vector        { $$ = astInsert(AST_DECL_VAR_VEC,  $1, $3, $5,   $7, NULL); }
           ;
 
 type: KW_BOOL                             { $$ = astInsert(AST_BOOL,  NULL, NULL, NULL, NULL, NULL); }
@@ -105,27 +113,27 @@ type: KW_BOOL                             { $$ = astInsert(AST_BOOL,  NULL, NULL
     | KW_FLOAT                            { $$ = astInsert(AST_FLOAT, NULL, NULL, NULL, NULL, NULL); }
     ;
 
-init_value: LIT_INTEGER
-          | LIT_FLOAT
-          | LIT_CHAR
-          | LIT_TRUE
-          | LIT_FALSE
+init_value: LIT_INTEGER                   { $$ = astInsert(AST_SYMBOL,  $1, NULL, NULL, NULL, NULL); }
+          | LIT_FLOAT                     { $$ = astInsert(AST_SYMBOL,  $1, NULL, NULL, NULL, NULL); }
+          | LIT_CHAR                      { $$ = astInsert(AST_SYMBOL,  $1, NULL, NULL, NULL, NULL); }
+          | LIT_TRUE                      { $$ = astInsert(AST_SYMBOL,  $1, NULL, NULL, NULL, NULL); }
+          | LIT_FALSE                     { $$ = astInsert(AST_SYMBOL,  $1, NULL, NULL, NULL, NULL); }
           ;
 
-vector_size: LIT_INTEGER
+vector_size: LIT_INTEGER                  { $$ = astInsert(AST_SYMBOL,  $1, NULL, NULL, NULL, NULL); }
            ;
 
-init_vector: ':' vector_values
-           |
+init_vector: ':' vector_values            { $$ =   $2; }
+           |                              { $$ = NULL; }
            ;
 
-vector_values: init_value
-             | init_value vector_values
+vector_values: init_value                          { $$ = $1; }
+             | init_value vector_values            { $$ = astInsert(AST_VEC_VAL, NULL, $1, $2, NULL, NULL); }
              ;
 
 /* Funções */
 
-func: TK_IDENTIFIER '(' parameters_list ')' '=' type block   { $$ = astInsert(AST_FUNCDEF, $1, $3, $6, $7, NULL); astPrint($$); }
+func: TK_IDENTIFIER '(' parameters_list ')' '=' type block   { $$ = astInsert(AST_DECL_FUNC, $1, $3, $6, $7, NULL); }
     ;
 
 parameters_list: parameters                      { $$ =   $1; }

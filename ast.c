@@ -125,11 +125,15 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 		case AST_WHILE:        printf("AST_WHILE\n");         break;
 		case AST_LOOP:         printf("AST_LOOP: ");          break;    // tem também símbolo na tabela hash (identificador do controle do laço)
 		case AST_PARAMS:       printf("AST_PARAMS\n");        break;
-		case AST_FUNCDEF:      printf("AST_FUNCDEF: ");       break;    // tem também símbolo na tabela hash (identificador que é o nome da função)
+		case AST_DECL_FUNC:    printf("AST_DECL_FUNC: ");     break;    // tem também símbolo na tabela hash (identificador que é o nome da função)
 		case AST_BOOL:         printf("AST_BOOL\n");          break;
 		case AST_CHAR:         printf("AST_CHAR\n");          break;
 		case AST_INT:          printf("AST_INT\n");           break;
 		case AST_FLOAT:        printf("AST_FLOAT\n");         break;
+		case AST_DECL_VAR:     printf("AST_DECL_VAR: ");      break;    // tem também símbolo na tabela hash (identificador que é o nome da variável declarada)
+		case AST_DECL_VAR_VEC: printf("AST_DECL_VAR_VEC: ");  break;    // tem também símbolo na tabela hash (identificador que é o nome do vetor declarado)
+		case AST_VEC_VAL:      printf("AST_VEC_VAL\n");       break;
+		case AST_DECL:         printf("AST_DECL\n");          break;
 		default:               printf("AST_UNKNOWN\n");       break;
 	}
 
