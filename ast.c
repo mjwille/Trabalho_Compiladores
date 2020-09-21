@@ -450,6 +450,7 @@ void decompileNode(AST_NODE *node) {
 			}
 			break;
 
+		// se o nodo não está na AST, então deu algum erro
 		default:
 			fprintf(outputFile, "ERROR! Decompilation of AST was not possible.\n");
 			break;
