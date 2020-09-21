@@ -290,6 +290,35 @@ void decompile(AST_NODE *node) {
 			fprintf(outputFile, "] = ");
 			decompile(node->son[1]);
 			break;
+		case AST_CMD:
+			if(node->son[0] != NULL) {
+				decompile(node->son[0]);
+				fprintf(outputFile, "\n");
+			}
+			if(node->son[1] != NULL) {
+				decompile(node->son[1]);
+			}
+			break;
+		case AST_READ:
+			fprintf(outputFile, "read %s", node->symbol->text);
+			break;
+		case AST_PRINT:
+			fprintf(outputFile, "print ");
+			decompile(node->son[0]);
+			break;
+		case AST_PRINT_LIST:
+			for(i=0; i<MAX_SONS; i++) {
+				if(node->son[i] != NULL) {
+					if(hasAnotherSon(node, i+1)) {
+						decompile(node->son[i]);
+						fprintf(outputFile, ", ");
+					}
+					else {
+						decompile(node->son[i]);
+					}
+				}
+			}
+			break;
 
 		// por ora, o caso default só serve para percorrer o resto e chegar no que já foi feito
 		// TODO: caso default será o caso de impressão de erro
