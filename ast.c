@@ -96,7 +96,7 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 
 	// imprime o tipo do nodo
 	switch(node->type) {
-		case AST_SYMBOL:       printf("AST_SYMBOL: ");        break;  // tem também símbolo na tabela hash (nome do identificador)
+		case AST_SYMBOL:       printf("AST_SYMBOL: ");        break;  // tem símbolo na tabela hash (nome do identificador)
 		case AST_VEC:          printf("AST_VEC: ");           break;  // tem também símbolo na tabela hash (nome do identificador do vetor)
 		case AST_ADD:          printf("AST_ADD\n");           break;
 		case AST_SUB:          printf("AST_SUB\n");           break;
@@ -176,3 +176,9 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
  * bar não seria atualizado somente para aquele nodo específico, não imprimindo nenhuma barra
  * acima do nodo final.
  */
+
+
+// Função para avaliação da etapa3, que descompila a AST em código novamente
+void decompile(AST_NODE *node) {
+	fprintf(outputFile, "Decompiling...\n");
+}

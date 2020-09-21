@@ -7,22 +7,30 @@
 #include <stdlib.h>
 #include "hash.h"
 
-extern FILE *yyin;
-extern void initMe();
-extern int yyparse();
+extern FILE *yyin;               // from scanner.l
+extern FILE *outputFile;         // from ast.h  (for the decompilation of the AST)
+extern void initMe();            // from scanner.l
+extern int yyparse();            // from parser.y
 
 int main(int argc, char *argv[])
 {
 	// Faz verificações de número de argumentos
-	if(argc < 2) {
-		fprintf(stderr, "ERROR!\nUsage: ./etapa2 <filename>\n");
+	if(argc < 3) {
+		fprintf(stderr, "ERROR!\nUsage: ./etapa3 <input_filename> <output_filename>\n");
 		exit(1);
 	}
 
-	// Faz verificação de abertura correta do arquivo
+	// Faz verificação de abertura correta do arquivo de input
 	yyin = fopen(argv[1], "r");
 	if(yyin == 0) {
 		fprintf(stderr, "ERROR!\nFile %s could not be opened.\n", argv[1]);
+		exit(2);
+	}
+
+	// Faz verificação de abertura correta do arquivo de output
+	outputFile = fopen(argv[2], "w");
+	if(outputFile == 0) {
+		fprintf(stderr, "ERROR!\nFile %s could not be opened.\n", argv[2]);
 		exit(2);
 	}
 
@@ -36,5 +44,7 @@ int main(int argc, char *argv[])
 	hashPrint();
 
 	printf("\nCompilation was a success.\n\n");
+
+	fclose(outputFile);
 	exit(0);
 }

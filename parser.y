@@ -90,7 +90,7 @@
 
 %%
 
-programa: decl                           { $$ = $1; astPrint($$); }
+programa: decl                           { $$ = $1; astPrint($$); decompile($$); }
         ;
 
 decl: dec ';' decl                       { $$ = astInsert(AST_DECL,  NULL, $1, $3, NULL, NULL); }
@@ -156,14 +156,14 @@ commands: cmd                                    { $$ = $1; }
         | cmd commands                           { $$ = astInsert(AST_CMD, NULL, $1, $2, NULL, NULL); }
         ;
 
-cmd: attr_cmd                                    {   $$ = $1; }
-   | read_cmd                                    {   $$ = $1; }
-   | print_cmd                                   {   $$ = $1; }
-   | return_cmd                                  {   $$ = $1; }
-   | if_cmd                                      {   $$ = $1; }
-   | while_cmd                                   {   $$ = $1; }
-   | loop_cmd                                    {   $$ = $1; }
-   | block                                       {   $$ = $1; }
+cmd: attr_cmd                                    { $$ =   $1; }
+   | read_cmd                                    { $$ =   $1; }
+   | print_cmd                                   { $$ =   $1; }
+   | return_cmd                                  { $$ =   $1; }
+   | if_cmd                                      { $$ =   $1; }
+   | while_cmd                                   { $$ =   $1; }
+   | loop_cmd                                    { $$ =   $1; }
+   | block                                       { $$ =   $1; }
    |                                             { $$ = NULL; }
    ;
 
@@ -226,7 +226,7 @@ operand: TK_IDENTIFIER                             { $$ = astInsert(AST_SYMBOL, 
 func_call: TK_IDENTIFIER '(' arguments_list ')'    { $$ = astInsert(AST_FUNCALL, $1, $3, NULL, NULL, NULL); }
          ;
 
-arguments_list: arguments                          { $$ = $1; }
+arguments_list: arguments                          { $$ =   $1; }
               |                                    { $$ = NULL; }
               ;
 

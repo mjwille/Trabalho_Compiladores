@@ -8,6 +8,8 @@
 
 #include "hash.h"
 
+FILE *outputFile;
+
 // Definição dos tipos que um AST_NODE pode ter
 #define AST_SYMBOL         1
 #define AST_VEC            2
@@ -73,5 +75,8 @@ int hasAnotherSon(AST_NODE *node, int i);
 
 // Função auxiliar para fazer a impressão (esta é a função recursiva de impressão que é chamada por astPrint)
 void astShow(AST_NODE *node, int spaces, int bar, int last);
+
+// Função para avaliação da etapa3, que descompila a AST em código novamente
+void decompile(AST_NODE *node);
 
 #endif
