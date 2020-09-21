@@ -144,7 +144,7 @@ parameters: parameter                            { $$ = $1; }
           | parameter ',' parameters             { $$ = astInsert(AST_PARAMS, NULL, $1, $3, NULL, NULL); }
           ;
 
-parameter: TK_IDENTIFIER '=' type                { $$ = astInsert(AST_SYMBOL, $1, $3, NULL, NULL, NULL); }
+parameter: TK_IDENTIFIER '=' type                { $$ = astInsert(AST_PARAM, $1, $3, NULL, NULL, NULL); }
          ;
 
 block: '{' commands '}'                          { $$ = $2; }

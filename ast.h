@@ -40,15 +40,16 @@ FILE *outputFile;
 #define AST_WHILE         27
 #define AST_LOOP          28
 #define AST_PARAMS        29
-#define AST_DECL_FUNC     30
-#define AST_BOOL          31
-#define AST_CHAR          32
-#define AST_INT           33
-#define AST_FLOAT         34
-#define AST_DECL_VAR      35
-#define AST_DECL_VAR_VEC  36
-#define AST_VEC_VAL       37
-#define AST_DECL          38
+#define AST_PARAM         30
+#define AST_DECL_FUNC     31
+#define AST_BOOL          32
+#define AST_CHAR          33
+#define AST_INT           34
+#define AST_FLOAT         35
+#define AST_DECL_VAR      36
+#define AST_DECL_VAR_VEC  37
+#define AST_VEC_VAL       38
+#define AST_DECL          39
 
 // Máximo de filhos que um AST_NODE pode ter
 #define MAX_SONS 4

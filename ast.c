@@ -125,6 +125,7 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 		case AST_WHILE:        printf("AST_WHILE\n");         break;
 		case AST_LOOP:         printf("AST_LOOP: ");          break;    // tem também símbolo na tabela hash (identificador do controle do laço)
 		case AST_PARAMS:       printf("AST_PARAMS\n");        break;
+		case AST_PARAM:        printf("AST_PARAM: ");         break;    // tem também símbolo na tabela hash (identificador que é o nome do parâmetro)
 		case AST_DECL_FUNC:    printf("AST_DECL_FUNC: ");     break;    // tem também símbolo na tabela hash (identificador que é o nome da função)
 		case AST_BOOL:         printf("AST_BOOL\n");          break;
 		case AST_CHAR:         printf("AST_CHAR\n");          break;
@@ -352,6 +353,45 @@ void decompile(AST_NODE *node) {
 			decompile(node->son[2]);
 			fprintf(outputFile, ")\n");
 			decompile(node->son[3]);
+			break;
+		case AST_PARAMS:
+			for(i=0; i<MAX_SONS; i++) {
+				if(node->son[i] != NULL) {
+					if(hasAnotherSon(node, i+1)) {
+						decompile(node->son[i]);
+						fprintf(outputFile, ", ");
+					}
+					else {
+						decompile(node->son[i]);
+					}
+				}
+			}
+			break;
+		case AST_PARAM:
+			fprintf(outputFile, "%s = ", node->symbol->text);
+			decompile(node->son[0]);
+			break;
+		case AST_DECL_FUNC:
+			fprintf(outputFile, "%s(", node->symbol->text);
+			if(node->son[0] != NULL) {
+			decompile(node->son[0]);
+			}
+			fprintf(outputFile, ") = ");
+			decompile(node->son[1]);
+			fprintf(outputFile, "\n");
+			decompile(node->son[2]);
+			break;
+		case AST_BOOL:
+			fprintf(outputFile, "bool");
+			break;
+		case AST_CHAR:
+			fprintf(outputFile, "char");
+			break;
+		case AST_INT:
+			fprintf(outputFile, "int");
+			break;
+		case AST_FLOAT:
+			fprintf(outputFile, "float");
 			break;
 
 		// por ora, o caso default só serve para percorrer o resto e chegar no que já foi feito
