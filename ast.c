@@ -242,6 +242,20 @@ void decompile(AST_NODE *node) {
 			fprintf(outputFile, " != ");
 			decompile(node->son[1]);
 			break;
+		case AST_XOR:
+			decompile(node->son[0]);
+			fprintf(outputFile, " ^ ");
+			decompile(node->son[1]);
+			break;
+		case AST_OR:
+			decompile(node->son[0]);
+			fprintf(outputFile, " | ");
+			decompile(node->son[1]);
+			break;
+		case AST_NOT:
+			fprintf(outputFile, "~ ");
+			decompile(node->son[0]);
+			break;
 
 		// por ora, o caso default só serve para percorrer o resto e chegar no que já foi feito
 		// TODO: caso default será o caso de impressão de erro
