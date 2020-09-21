@@ -212,6 +212,36 @@ void decompile(AST_NODE *node) {
 			fprintf(outputFile, " / ");
 			decompile(node->son[1]);
 			break;
+		case AST_LT:
+			decompile(node->son[0]);
+			fprintf(outputFile, " < ");
+			decompile(node->son[1]);
+			break;
+		case AST_GT:
+			decompile(node->son[0]);
+			fprintf(outputFile, " > ");
+			decompile(node->son[1]);
+			break;
+		case AST_LE:
+			decompile(node->son[0]);
+			fprintf(outputFile, " <= ");
+			decompile(node->son[1]);
+			break;
+		case AST_GE:
+			decompile(node->son[0]);
+			fprintf(outputFile, " >= ");
+			decompile(node->son[1]);
+			break;
+		case AST_EQ:
+			decompile(node->son[0]);
+			fprintf(outputFile, " == ");
+			decompile(node->son[1]);
+			break;
+		case AST_DIF:
+			decompile(node->son[0]);
+			fprintf(outputFile, " != ");
+			decompile(node->son[1]);
+			break;
 
 		// por ora, o caso default só serve para percorrer o resto e chegar no que já foi feito
 		// TODO: caso default será o caso de impressão de erro
