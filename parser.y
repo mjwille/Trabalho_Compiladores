@@ -147,7 +147,7 @@ parameters: parameter                            { $$ = $1; }
 parameter: TK_IDENTIFIER '=' type                { $$ = astInsert(AST_PARAM, $1, $3, NULL, NULL, NULL); }
          ;
 
-block: '{' commands '}'                          { $$ = $2; }
+block: '{' commands '}'                          { $$ = astInsert(AST_BLOCK, NULL, $2, NULL, NULL, NULL); }
      ;
 
 /* Comandos */
@@ -199,20 +199,20 @@ return_cmd: KW_RETURN expr                        { $$ = astInsert(AST_RETURN, N
 /* Expressão */
 
 expr: operand                                     { $$ = $1; }
-    | '(' expr ')'                                { $$ = $2; }
-    | expr '+' expr                               { $$ = astInsert(AST_ADD, NULL, $1, $3, NULL, NULL); }
-    | expr '-' expr                               { $$ = astInsert(AST_SUB, NULL, $1, $3, NULL, NULL); }
-    | expr '*' expr                               { $$ = astInsert(AST_MUL, NULL, $1, $3, NULL, NULL); }
-    | expr '/' expr                               { $$ = astInsert(AST_DIV, NULL, $1, $3, NULL, NULL); }
-    | expr '<' expr                               { $$ = astInsert(AST_LT,  NULL, $1, $3, NULL, NULL); }
-    | expr '>' expr                               { $$ = astInsert(AST_GT,  NULL, $1, $3, NULL, NULL); }
-    | expr OPERATOR_LE expr                       { $$ = astInsert(AST_LE,  NULL, $1, $3, NULL, NULL); }
-    | expr OPERATOR_GE expr                       { $$ = astInsert(AST_GE,  NULL, $1, $3, NULL, NULL); }
-    | expr OPERATOR_EQ expr                       { $$ = astInsert(AST_EQ,  NULL, $1, $3, NULL, NULL); }
-    | expr OPERATOR_DIF expr                      { $$ = astInsert(AST_DIF, NULL, $1, $3, NULL, NULL); }
-    | expr '^' expr                               { $$ = astInsert(AST_XOR, NULL, $1, $3, NULL, NULL); }
-    | expr '|' expr                               { $$ = astInsert(AST_OR,  NULL, $1, $3, NULL, NULL); }
-    | '~' expr                                    { $$ = astInsert(AST_NOT, NULL, $2, NULL, NULL, NULL); }
+    | '(' expr ')'                                { $$ = astInsert(AST_PARENTHESIS, NULL, $2, NULL, NULL, NULL); }
+    | expr '+' expr                               { $$ = astInsert(AST_ADD,         NULL, $1,   $3, NULL, NULL); }
+    | expr '-' expr                               { $$ = astInsert(AST_SUB,         NULL, $1,   $3, NULL, NULL); }
+    | expr '*' expr                               { $$ = astInsert(AST_MUL,         NULL, $1,   $3, NULL, NULL); }
+    | expr '/' expr                               { $$ = astInsert(AST_DIV,         NULL, $1,   $3, NULL, NULL); }
+    | expr '<' expr                               { $$ = astInsert(AST_LT,          NULL, $1,   $3, NULL, NULL); }
+    | expr '>' expr                               { $$ = astInsert(AST_GT,          NULL, $1,   $3, NULL, NULL); }
+    | expr OPERATOR_LE expr                       { $$ = astInsert(AST_LE,          NULL, $1,   $3, NULL, NULL); }
+    | expr OPERATOR_GE expr                       { $$ = astInsert(AST_GE,          NULL, $1,   $3, NULL, NULL); }
+    | expr OPERATOR_EQ expr                       { $$ = astInsert(AST_EQ,          NULL, $1,   $3, NULL, NULL); }
+    | expr OPERATOR_DIF expr                      { $$ = astInsert(AST_DIF,         NULL, $1,   $3, NULL, NULL); }
+    | expr '^' expr                               { $$ = astInsert(AST_XOR,         NULL, $1,   $3, NULL, NULL); }
+    | expr '|' expr                               { $$ = astInsert(AST_OR,          NULL, $1,   $3, NULL, NULL); }
+    | '~' expr                                    { $$ = astInsert(AST_NOT,         NULL, $2, NULL, NULL, NULL); }
     ;
 
 operand: TK_IDENTIFIER                             { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }

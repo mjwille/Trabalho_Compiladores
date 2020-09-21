@@ -111,6 +111,7 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 		case AST_XOR:          printf("AST_XOR\n");           break;
 		case AST_OR:           printf("AST_OR\n");            break;
 		case AST_NOT:          printf("AST_NOT\n");           break;
+		case AST_PARENTHESIS:  printf("AST_PARENTHESIS\n");   break;
 		case AST_FUNCALL:      printf("AST_FUNCALL: ");       break;    // tem também símbolo na tabela hash (nome da função)
 		case AST_ARGS:         printf("AST_ARGS\n");          break;
 		case AST_ATTR:         printf("AST_ATTR: ");          break;    // tem também símbolo na tabela hash (nome do identificador do lado esquerdo da atribuição)
@@ -124,6 +125,7 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 		case AST_IF_ELSE:      printf("AST_IF_ELSE\n");       break;
 		case AST_WHILE:        printf("AST_WHILE\n");         break;
 		case AST_LOOP:         printf("AST_LOOP: ");          break;    // tem também símbolo na tabela hash (identificador do controle do laço)
+		case AST_BLOCK:        printf("AST_BLOCK\n");         break;
 		case AST_PARAMS:       printf("AST_PARAMS\n");        break;
 		case AST_PARAM:        printf("AST_PARAM: ");         break;    // tem também símbolo na tabela hash (identificador que é o nome do parâmetro)
 		case AST_DECL_FUNC:    printf("AST_DECL_FUNC: ");     break;    // tem também símbolo na tabela hash (identificador que é o nome da função)
@@ -257,6 +259,11 @@ void decompile(AST_NODE *node) {
 			fprintf(outputFile, "~ ");
 			decompile(node->son[0]);
 			break;
+		case AST_PARENTHESIS:
+			fprintf(outputFile, "(");
+			decompile(node->son[0]);
+			fprintf(outputFile, ")");
+			break;
 		case AST_FUNCALL:
 			fprintf(outputFile, "%s", node->symbol->text);
 			fprintf(outputFile, "(");
@@ -353,6 +360,11 @@ void decompile(AST_NODE *node) {
 			decompile(node->son[2]);
 			fprintf(outputFile, ")\n");
 			decompile(node->son[3]);
+			break;
+		case AST_BLOCK:
+			fprintf(outputFile, "{\n");
+			decompile(node->son[0]);
+			fprintf(outputFile, "\n}");
 			break;
 		case AST_PARAMS:
 			for(i=0; i<MAX_SONS; i++) {
