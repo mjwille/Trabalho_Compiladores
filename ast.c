@@ -256,6 +256,28 @@ void decompile(AST_NODE *node) {
 			fprintf(outputFile, "~ ");
 			decompile(node->son[0]);
 			break;
+		case AST_FUNCALL:
+			fprintf(outputFile, "%s", node->symbol->text);
+			fprintf(outputFile, "(");
+			// verifica se a função tem argumentos passados na chamada
+			if(node->son[0] != NULL) {
+				decompile(node->son[0]);
+			}
+			fprintf(outputFile, ")");
+			break;
+		case AST_ARGS:
+			for(i=0; i<MAX_SONS; i++) {
+				if(node->son[i] != NULL) {
+					if(hasAnotherSon(node, i+1)) {
+						decompile(node->son[i]);
+						fprintf(outputFile, ", ");
+					}
+					else {
+						decompile(node->son[i]);
+					}
+				}
+			}
+			break;
 
 		// por ora, o caso default só serve para percorrer o resto e chegar no que já foi feito
 		// TODO: caso default será o caso de impressão de erro
