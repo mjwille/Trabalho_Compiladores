@@ -319,6 +319,40 @@ void decompile(AST_NODE *node) {
 				}
 			}
 			break;
+		case AST_RETURN:
+			fprintf(outputFile, "return ");
+			decompile(node->son[0]);
+			break;
+		case AST_IF:
+			fprintf(outputFile, "if(");
+			decompile(node->son[0]);
+			fprintf(outputFile, ") then\n");
+			decompile(node->son[1]);
+			break;
+		case AST_IF_ELSE:
+			fprintf(outputFile, "if(");
+			decompile(node->son[0]);
+			fprintf(outputFile, ") then\n");
+			decompile(node->son[1]);
+			fprintf(outputFile, "\nelse\n");
+			decompile(node->son[2]);
+			break;
+		case AST_WHILE:
+			fprintf(outputFile, "while(");
+			decompile(node->son[0]);
+			fprintf(outputFile, ")\n");
+			decompile(node->son[1]);
+			break;
+		case AST_LOOP:
+			fprintf(outputFile, "loop(%s : ", node->symbol->text);
+			decompile(node->son[0]);
+			fprintf(outputFile, ", ");
+			decompile(node->son[1]);
+			fprintf(outputFile, ", ");
+			decompile(node->son[2]);
+			fprintf(outputFile, ")\n");
+			decompile(node->son[3]);
+			break;
 
 		// por ora, o caso default só serve para percorrer o resto e chegar no que já foi feito
 		// TODO: caso default será o caso de impressão de erro
