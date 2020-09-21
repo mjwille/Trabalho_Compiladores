@@ -378,7 +378,9 @@ void decompileNode(AST_NODE *node) {
 			break;
 		case AST_BLOCK:
 			fprintf(outputFile, "{\n");
-			decompileNode(node->son[0]);     // commands
+			if(node->son[0] != NULL) {
+				decompileNode(node->son[0]);     // commands
+			}
 			fprintf(outputFile, "\n}");
 			break;
 		case AST_PARAMS:

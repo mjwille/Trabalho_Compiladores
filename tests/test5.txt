@@ -11,7 +11,7 @@ fibonacci(n = int) = int {
 };
 
 main() = int {
-	x = fibonacci
+	x = fibonacci(5)
 	print x
 	return 0
 };

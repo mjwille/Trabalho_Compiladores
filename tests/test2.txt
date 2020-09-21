@@ -4,12 +4,12 @@
  */
 
 euclides(divisor = int, dividend = int) = int {
-	quocient = divisor + dividend
+	quocient = divisor / dividend                // divisão inteira
 	rest = divisor - (quocient * dividend)
 	while(rest != 0) {
 		divisor = quocient
 		dividend = rest
-		quocient = divisor + dividend
+		quocient = divisor / dividend            // divisão inteira
 		rest = divisor - (quocient * dividend)
 	}
 	return quocient
