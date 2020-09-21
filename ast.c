@@ -180,5 +180,47 @@ void astShow(AST_NODE *node, int spaces, int bar, int last) {
 
 // Função para avaliação da etapa3, que descompila a AST em código novamente
 void decompile(AST_NODE *node) {
-	fprintf(outputFile, "Decompiling...\n");
+	int i;
+	// para cada tipo de nodo na AST, faz caminho reverso e gera o código de acordo com a linguagem
+	switch(node->type) {
+		case AST_SYMBOL:
+			fprintf(outputFile, "%s", node->symbol->text);
+			break;
+		case AST_VEC:
+			fprintf(outputFile, "%s", node->symbol->text);
+			fprintf(outputFile, "[");
+			decompile(node->son[0]);
+			fprintf(outputFile, "]");
+			break;
+		case AST_ADD:
+			decompile(node->son[0]);
+			fprintf(outputFile, " + ");
+			decompile(node->son[1]);
+			break;
+		case AST_SUB:
+			decompile(node->son[0]);
+			fprintf(outputFile, " - ");
+			decompile(node->son[1]);
+			break;
+		case AST_MUL:
+			decompile(node->son[0]);
+			fprintf(outputFile, " * ");
+			decompile(node->son[1]);
+			break;
+		case AST_DIV:
+			decompile(node->son[0]);
+			fprintf(outputFile, " / ");
+			decompile(node->son[1]);
+			break;
+
+		// por ora, o caso default só serve para percorrer o resto e chegar no que já foi feito
+		// TODO: caso default será o caso de impressão de erro
+		default:
+			for(i=0; i<MAX_SONS; i++) {
+				if(node->son[i] != NULL) {
+					decompile(node->son[i]);
+				}
+			}
+			break;
+	}
 }
