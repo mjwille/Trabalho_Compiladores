@@ -1,0 +1,22 @@
+/* Programa que soma os n primeiros números
+ * de um array usando a linguagem do trabalho.
+ */
+
+arr = int[10] : 15 33 1 10 2 20 4 9 7 16;
+
+sumNumbers(n = int) = int {
+
+	acc = 0
+
+	loop(i : 0, i < 10,  1) {
+		acc = acc + arr[i]
+	}
+
+	return acc
+};
+
+main() = int {
+	result = sumNumbers()
+	print "The sum is: ", result
+	return 0
+};

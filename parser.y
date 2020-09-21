@@ -216,7 +216,7 @@ expr: operand                                     { $$ = $1; }
     ;
 
 operand: TK_IDENTIFIER                             { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
-       | TK_IDENTIFIER '[' LIT_INTEGER ']'         { $$ = astInsert(   AST_VEC, $1,   astInsert(AST_SYMBOL, $3, NULL, NULL, NULL, NULL), NULL, NULL, NULL); }
+       | TK_IDENTIFIER '[' expr ']'                { $$ = astInsert(   AST_VEC, $1,   $3, NULL, NULL, NULL); }
        | LIT_INTEGER                               { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
        | LIT_FLOAT                                 { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
        | LIT_CHAR                                  { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }

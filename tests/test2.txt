@@ -1,0 +1,22 @@
+/* Implementação do algoritmo de euclides
+ * (cálculo do GCD) usando a linguagem
+ * definida para o trabalho.
+ */
+
+euclides(divisor = int, dividend = int) = int {
+	quocient = divisor + dividend
+	rest = divisor - (quocient * dividend)
+	while(rest != 0) {
+		divisor = quocient
+		dividend = rest
+		quocient = divisor + dividend
+		rest = divisor - (quocient * dividend)
+	}
+	return quocient
+};
+
+main() = int {
+	result = euclides(38, 16)
+	print result
+	return 0
+};

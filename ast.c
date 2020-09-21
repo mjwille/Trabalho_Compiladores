@@ -207,7 +207,7 @@ void decompileNode(AST_NODE *node) {
 		case AST_VEC:
 			fprintf(outputFile, "%s", node->symbol->text);
 			fprintf(outputFile, "[");
-			decompileNode(node->son[0]);    // LIT_INTEGER
+			decompileNode(node->son[0]);    // expr
 			fprintf(outputFile, "]");
 			break;
 		case AST_ADD:
@@ -453,8 +453,15 @@ void decompileNode(AST_NODE *node) {
 				}
 			}
 			break;
+		case AST_DECL:
+			for(i=0; i<MAX_SONS; i++) {
+				if(node->son[i] != NULL) {
+					decompileNode(node->son[i]);     // dec (declaração)
+				}
+			}
+			break;
 
-		// se o nodo não está na AST, então deu algum erro
+		// caso o nodo seja uma declaração do programa
 		default:
 			fprintf(outputFile, "ERROR! Decompilation of AST was not possible.\n");
 			break;

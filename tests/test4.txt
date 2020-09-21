@@ -1,0 +1,32 @@
+/* Programa que implementa o algoritmo
+ * Selection Sort para fazer o ordenamento
+ * de um array usando a linguagem do trabalho.
+ */
+
+arr = int[10] : 15 33 1 10 2 20 4 9 7 16;
+arr_size = int : 10;
+
+selectionSort() = int {
+
+	loop(i : 0, i < arr_size - 1, 1) {
+		j = i
+		loop(k : j + 1, k < arr_size, 1) {
+			if(arr[k] < arr[j]) then
+				j = k
+		}
+
+		aux = arr[j]
+		arr[j] = arr[i]
+		arr[i] = aux
+	}
+
+	return 0
+};
+
+main() = int {
+	x = selectionSort()
+	loop(i : 0, i < arr_size, 1) {
+		print arr[i], "\n"
+	}
+	return 0
+};

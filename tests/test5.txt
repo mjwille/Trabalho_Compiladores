@@ -1,0 +1,17 @@
+/* Programa que implementa o algoritmo
+ * de fibonacci, fazendo chamadas recursivas,
+ * usando a linguagem do trabalho.
+ */
+
+fibonacci(n = int) = int {
+	if(n == 1) then
+		return 1
+	else
+		return n * fibonacci(n - 1)
+};
+
+main() = int {
+	x = fibonacci
+	print x
+	return 0
+};
