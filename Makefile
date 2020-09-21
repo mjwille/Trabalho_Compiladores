@@ -1,4 +1,4 @@
-# Trabalho de Compiladores 2020/1
+# Trabalho de Compiladores 2020/ERE
 # Nome: Marcelo Jantsch Wille
 # Universidade Federal do Rio Grande do Sul
 

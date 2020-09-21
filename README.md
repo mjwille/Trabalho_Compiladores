@@ -1,4 +1,4 @@
-# Trabalho de Compiladores 2020/1
+# Trabalho de Compiladores 2020/ERE
 
 [Página da Disciplina](http://www.inf.ufrgs.br/~johann/comp/)  
 [Link para o Teams](https://teams.microsoft.com/_#/school/conversations/General?threadId=19:baa9ea1ce5854775a80b5cc4edc47811@thread.tacv2&ctx=channel)

@@ -1,4 +1,4 @@
-/* Trabalho de Compiladores 2020/1
+/* Trabalho de Compiladores 2020/ERE
    Nome: Marcelo Jantsch Wille
    Universidade Federal do Rio Grande do Sul
 */
@@ -43,8 +43,10 @@ int main(int argc, char *argv[])
 	// Imprime a tabela de símbolos
 	hashPrint();
 
+	// Imprime mensagem de compilação bem feita até o fim
 	printf("\nCompilation was a success.\n\n");
 
+	// fecha arquivo de output (de ast.h) e encerra programa com código de sucesso
 	fclose(outputFile);
 	exit(0);
 }
