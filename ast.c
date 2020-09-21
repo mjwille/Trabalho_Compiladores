@@ -380,6 +380,7 @@ void decompile(AST_NODE *node) {
 			decompile(node->son[1]);
 			fprintf(outputFile, "\n");
 			decompile(node->son[2]);
+			fprintf(outputFile, ";\n");
 			break;
 		case AST_BOOL:
 			fprintf(outputFile, "bool");
@@ -392,6 +393,38 @@ void decompile(AST_NODE *node) {
 			break;
 		case AST_FLOAT:
 			fprintf(outputFile, "float");
+			break;
+		case AST_DECL_VAR:
+			fprintf(outputFile, "%s = ", node->symbol->text);
+			decompile(node->son[0]);
+			fprintf(outputFile, " : ");
+			decompile(node->son[1]);
+			fprintf(outputFile, ";\n");
+			break;
+		case AST_DECL_VAR_VEC:
+			fprintf(outputFile, "%s = ", node->symbol->text);
+			decompile(node->son[0]);
+			fprintf(outputFile, "[");
+			decompile(node->son[1]);
+			fprintf(outputFile, "]");
+			if(node->son[2] != NULL) {
+				fprintf(outputFile, " : ");
+				decompile(node->son[2]);
+			}
+			fprintf(outputFile, ";\n");
+			break;
+		case AST_VEC_VAL:
+			for(i=0; i<MAX_SONS; i++) {
+				if(node->son[i] != NULL) {
+					if(hasAnotherSon(node, i+1)) {
+						decompile(node->son[i]);
+						fprintf(outputFile, " ");
+					}
+					else {
+						decompile(node->son[i]);
+					}
+				}
+			}
 			break;
 
 		// por ora, o caso default só serve para percorrer o resto e chegar no que já foi feito
