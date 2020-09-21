@@ -77,9 +77,12 @@ void astFormat(int spaces, int bar, int last);
 int hasAnotherSon(AST_NODE *node, int i);
 
 // Função auxiliar para fazer a impressão (esta é a função recursiva de impressão que é chamada por astPrint)
-void astShow(AST_NODE *node, int spaces, int bar, int last);
+void astPrintNode(AST_NODE *node, int spaces, int bar, int last);
 
 // Função para avaliação da etapa3, que descompila a AST em código novamente
 void decompile(AST_NODE *node);
+
+// Função que joga no arquivo de saída a decompilação nodo a nodo da AST gerada durante a compilação
+void decompileNode(AST_NODE *node);
 
 #endif
