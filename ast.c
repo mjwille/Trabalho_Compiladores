@@ -30,8 +30,10 @@ AST_NODE *astInsert(int type, HASH_NODE *symbol, AST_NODE *son0, AST_NODE *son1,
 // Imprime toda a AST
 void astPrint(AST_NODE *node) {
 	printf("\nABSTRACT SYNTAX TREE:\n\n");
-	// chama a função que imprime nodo a nodo recursivamente a AST
-	astPrintNode(node, 0, 0, 0);
+	// chama a função que imprime nodo a nodo recursivamente a AST (se tiver algum nodo)
+	if(node != NULL) {
+		astPrintNode(node, 0, 0, 0);
+	}
 	printf("\n");
 }
 
@@ -185,8 +187,10 @@ void astPrintNode(AST_NODE *node, int spaces, int bar, int last) {
 void decompile(AST_NODE *node) {
 	// escreve no arquivo de saída meta informação como comentário
 	fprintf(outputFile, "/* Arquivo gerado como resultado\n * da descompilação da AST\n * do programa original.\n */\n\n");
-	// faz a descompilação recursivamente nodo a nodo da AST
-	decompileNode(node);
+	// faz a descompilação recursivamente nodo a nodo da AST (se tiver algum nodo)
+	if(node != NULL) {
+		decompileNode(node);
+	}
 	// escreve no arquivo de saída comentário indicando que descompilação terminou com sucesso
 	fprintf(outputFile, "\n/* Descompilação terminada com sucesso. */\n");
 }
