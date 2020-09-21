@@ -278,6 +278,18 @@ void decompile(AST_NODE *node) {
 				}
 			}
 			break;
+		case AST_ATTR:
+			fprintf(outputFile, "%s", node->symbol->text);
+			fprintf(outputFile, " = ");
+			decompile(node->son[0]);
+			break;
+		case AST_ATTR_VEC:
+			fprintf(outputFile, "%s", node->symbol->text);
+			fprintf(outputFile, "[");
+			decompile(node->son[0]);
+			fprintf(outputFile, "] = ");
+			decompile(node->son[1]);
+			break;
 
 		// por ora, o caso default só serve para percorrer o resto e chegar no que já foi feito
 		// TODO: caso default será o caso de impressão de erro
