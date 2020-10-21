@@ -7,9 +7,9 @@ Etapas:
 
 - [x] (26/08/2020) Análise Léxica e Inicialização de Tabela de Símbolos
 - [x] (09/09/2020) Análise Sintática
-- [ ] (28/09/2020) Geração de Árvore Sintática Abstrata (AST)
-- [ ] (19/10/2020) Verificações Semânticas
-- [ ] (30/10/2020) Geração de Código Intermediário (TACs)
+- [x] (30/09/2020) Geração de Árvore Sintática Abstrata (AST)
+- [ ] (26/10/2020) Verificações Semânticas
+- [ ] (04/11/2020) Geração de Código Intermediário (TACs)
 - [ ] (16/11/2020) Geração de Assembly
 - [ ] (25/11/2020) Otimização e Recuperação de Erros
 
