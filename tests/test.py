@@ -2,7 +2,7 @@ import unittest
 from os import system, chdir, popen
 from time import sleep
 
-etapa = 'etapa3'
+etapa = 'etapa4'
 astOut1 = 'out1.txt'
 astOut2 = 'out2.txt'
 

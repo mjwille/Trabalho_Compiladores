@@ -8,6 +8,7 @@
         #include <stdlib.h>
         #include "hash.h"
         #include "ast.h"
+        #include "semantic.h"
 
         int yylex();
         int getLineNumber(void);
@@ -90,7 +91,7 @@
 
 %%
 
-programa: decl                           { $$ = $1; astPrint($$); decompile($$); }
+programa: decl                           { $$ = $1; semanticAnalysis($$); astPrint($$);  /* decompile($$); */  }
         ;
 
 decl: dec ';' decl                       { $$ = astInsert(AST_DECL,  NULL, $1, $3, NULL, NULL); }
