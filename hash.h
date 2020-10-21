@@ -6,10 +6,28 @@
 #ifndef HASH_HEADER
 #define HASH_HEADER
 
+#define SYMBOL_LIT_INTEGER 1
+#define SYMBOL_LIT_FLOAT 2
+#define SYMBOL_LIT_TRUE 3
+#define SYMBOL_LIT_FALSE 4
+#define SYMBOL_LIT_CHAR 5
+#define SYMBOL_LIT_STRING 6
+
+#define SYMBOL_IDENTIFIER 7
+#define SYMBOL_SCALAR 8
+#define SYMBOL_VECTOR 9
+#define SYMBOL_FUNCTION 10
+
+#define DATATYPE_BOOL  11
+#define DATATYPE_CHAR  12
+#define DATATYPE_INT   13
+#define DATATYPE_FLOAT 14
+
 typedef struct hash_node
 {
 	int type;
 	char *text;
+	int datatype;
 	struct hash_node *next;
 } HASH_NODE;
 
@@ -29,7 +47,7 @@ int hashAddress(char *text);
 HASH_NODE* hashFind(char *text);
 
 // Insere elemento dentro da tabela hash
-HASH_NODE* hashInsert(char *text, int type);
+HASH_NODE* hashInsert(char *text, int type, int datatype);
 
 // Imprime todo elemento que a tabela hash contém dentro dela (índice a índice)
 void hashPrint();

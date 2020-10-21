@@ -54,7 +54,7 @@ HASH_NODE* hashFind(char *text)
 
 
 // Insere elemento dentro da tabela hash
-HASH_NODE* hashInsert(char *text, int type)
+HASH_NODE* hashInsert(char *text, int type, int datatype)
 {
 	HASH_NODE *node;
 
@@ -74,6 +74,7 @@ HASH_NODE* hashInsert(char *text, int type)
 
 	// Coloca dentro do nodo alocado os seus respectivos valores
 	node->type = type;
+	node->datatype = datatype;
 	node->text = (char*) calloc(strlen(text)+1, sizeof(char));
 	strcpy(node->text, text);
 
@@ -98,7 +99,7 @@ void hashPrint()
 		{
 			printf("[%d]", i);
 			for(node=HASH_TABLE[i]; node; node=node->next)
-				printf(" <- [ Type: %d | Text: %s ]", node->type, node->text);
+				printf(" <- [ Type: %d | Text: %s | Datatype: %d ]", node->type, node->text, node->datatype);
 			printf("\n");
 		}
 	}
