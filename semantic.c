@@ -22,9 +22,13 @@ void semanticAnalysis(AST_NODE *node) {
 
 // Verifica se identificadores foram declarados, colocando o datatype do identificador caso sim
 void checkDeclarations(AST_NODE *node) {
+	// Se nodo for um dos nodos de identificadores
 	if(node->type == AST_DECL_FUNC) {
+		// É um identificador mas não tem tipo SYMBOL_IDENTIFIER, significa que já encontrou o identificador e alterou
+		// o tipo dele na hash para um tipo que diz mais sobre o símbolo (SCALAR, VECTOR, FUNCTION) e portanto redeclarou.
 		if(node->symbol->type != SYMBOL_IDENTIFIER) {
-			fprintf(stderr, "Semantic Error!");
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> Redeclaration of symbol '%s'.\n", node->symbol->text);
 			SEMANTIC_ERRORS++;
 		}
 		else {
@@ -41,7 +45,7 @@ void checkDeclarations(AST_NODE *node) {
 				node->symbol->datatype = DATATYPE_FLOAT;
 		}
 	}
-	// Recursão para os nodos filhos
+	// Verifica os nodos filhos
 	int i;
 	for(i=0; i<MAX_SONS; i++) {
 		if(node->son[i] != NULL) {

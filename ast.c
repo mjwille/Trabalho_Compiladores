@@ -9,14 +9,16 @@
 #include <math.h>
 #include "ast.h"
 
+extern int getLineNumber(void);
 
 // Insere nodo na AST dando seu tipo, o símbolo (que é o próprio nodo na tabela hash) e os nodos filhos
 AST_NODE *astInsert(int type, HASH_NODE *symbol, AST_NODE *son0, AST_NODE *son1, AST_NODE *son2, AST_NODE *son3) {
 	// Faz alocação em memória do nodo
 	AST_NODE *node = (AST_NODE*) calloc(1, sizeof(AST_NODE));
 	// Coloca dentro do nodo alocado os seus respectivos valores
-	node->type = type;            // o tipo definido em ast.h
-	node->symbol = symbol;        // o símbolo (ponteiro para um nodo na tabela hash)
+	node->type = type;                    // o tipo definido em ast.h
+	node->symbol = symbol;                // o símbolo (ponteiro para um nodo na tabela hash)
+	node->lineNumber = getLineNumber();   // a linha em que o símbolo ocorre
 	// os filhos
 	node->son[0] = son0;
 	node->son[1] = son1;

@@ -6,6 +6,7 @@
 #ifndef HASH_HEADER
 #define HASH_HEADER
 
+// Literais
 #define SYMBOL_LIT_INTEGER 1
 #define SYMBOL_LIT_FLOAT 2
 #define SYMBOL_LIT_TRUE 3
@@ -13,11 +14,14 @@
 #define SYMBOL_LIT_CHAR 5
 #define SYMBOL_LIT_STRING 6
 
+// Identificador
 #define SYMBOL_IDENTIFIER 7
+// Semântica dos Identificadores (redefinido pela análise semântica)
 #define SYMBOL_SCALAR 8
 #define SYMBOL_VECTOR 9
 #define SYMBOL_FUNCTION 10
 
+// Tipos de dados dos identificadores (variável escalar é tipo int, variável escalar float, função que retorna bool, ...)
 #define DATATYPE_BOOL  11
 #define DATATYPE_CHAR  12
 #define DATATYPE_INT   13
