@@ -20,4 +20,7 @@ void redefineIdentifiers(AST_NODE *node);
 // Verifica se algum identificador usado no código não foi declarado
 void checkUndeclared(AST_NODE *node);
 
+// Verifica se o uso dos identificadores está compatível com sua declaração
+void checkUsage(AST_NODE *node);
+
 #endif

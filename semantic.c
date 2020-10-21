@@ -16,6 +16,8 @@ void semanticAnalysis(AST_NODE *node) {
 	redefineIdentifiers(node);
 	// Verifica se algum identificador usado no código não foi declarado
 	checkUndeclared(node);
+	// Verifica se o uso dos identificadores está compatível com sua declaração
+	checkUsage(node);
 	// Verifica se erros semânticos foram encontrados. Caso sim, retorna 4 conforme especificação do trabalho
 	if(SEMANTIC_ERRORS > 0) {
 		exit(4);
@@ -110,6 +112,59 @@ void checkUndeclared(AST_NODE *node) {
 	for(i=0; i<MAX_SONS; i++) {
 		if(node->son[i] != NULL) {
 			checkUndeclared(node->son[i]);
+		}
+	}
+}
+
+
+// Verifica se o uso dos identificadores está compatível com sua declaração
+void checkUsage(AST_NODE *node) {
+	// Vetor usado como vetor
+	if(node->type == AST_SYMBOL) {
+		if(node->symbol->type == SYMBOL_VECTOR) {
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> Vector '%s' used as a scalar.\n", node->symbol->text);
+			SEMANTIC_ERRORS++;
+		}
+		if(node->symbol->type == SYMBOL_FUNCTION) {
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> Function '%s' used as a scalar.\n", node->symbol->text);
+			SEMANTIC_ERRORS++;
+		}
+	}
+	// Vetor usado como vetor
+	if(node->type == AST_VEC) {
+		if(node->symbol->type == SYMBOL_SCALAR) {
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> Scalar '%s' used as a vector.\n", node->symbol->text);
+			SEMANTIC_ERRORS++;
+		}
+		if(node->symbol->type == SYMBOL_FUNCTION) {
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> Function '%s' used as a vector.\n", node->symbol->text);
+			SEMANTIC_ERRORS++;
+		}
+	}
+	// Função usada como função
+	if(node->type == AST_FUNCALL) {
+		if(node->symbol->type == SYMBOL_SCALAR) {
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> Scalar '%s' used as a function.\n", node->symbol->text);
+			SEMANTIC_ERRORS++;
+		}
+		if(node->symbol->type == SYMBOL_VECTOR) {
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> Vector '%s' used as a function.\n", node->symbol->text);
+			SEMANTIC_ERRORS++;
+		}
+	}
+	// TODO: Atribuições... (escalar e vetor)
+
+	// Verifica os nodos filhos
+	int i;
+	for(i=0; i<MAX_SONS; i++) {
+		if(node->son[i] != NULL) {
+			checkUsage(node->son[i]);
 		}
 	}
 }
