@@ -14,6 +14,8 @@ int SEMANTIC_ERRORS = 0;
 void semanticAnalysis(AST_NODE *node) {
 	// Especifica semanticamente o tipo do identificador nas declarações de variáveis e funções, e define seu tipo (datatype)
 	redefineIdentifiers(node);
+	// Verifica se algum identificador usado no código não foi declarado
+	checkUndeclared(node);
 	// Verifica se erros semânticos foram encontrados. Caso sim, retorna 4 conforme especificação do trabalho
 	if(SEMANTIC_ERRORS > 0) {
 		exit(4);
@@ -82,6 +84,32 @@ void redefineIdentifiers(AST_NODE *node) {
 	for(i=0; i<MAX_SONS; i++) {
 		if(node->son[i] != NULL) {
 			redefineIdentifiers(node->son[i]);
+		}
+	}
+}
+
+
+// Verifica se algum identificador usado no código não foi declarado
+void checkUndeclared(AST_NODE *node) {
+	/*
+	 * Se sobrar algum identificador na tabela hash com tipo SYMBOL_IDENTIFIER, não foi declarado pois
+	 * a redefinição de tipos dos identificadores de declarações feito anteriormente deveria ter alterado.
+	 */
+
+	// se possue ponteiro para tabela de símbolos
+	if(node->symbol != NULL) {
+		// e símbolo é SYMBOL_IDENTIFIER
+		if(node->symbol->type == SYMBOL_IDENTIFIER) {
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> '%s' was not declared.\n", node->symbol->text);
+			SEMANTIC_ERRORS++;
+		}
+	}
+	// Verifica os nodos filhos
+	int i;
+	for(i=0; i<MAX_SONS; i++) {
+		if(node->son[i] != NULL) {
+			checkUndeclared(node->son[i]);
 		}
 	}
 }

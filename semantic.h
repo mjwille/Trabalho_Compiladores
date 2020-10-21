@@ -17,4 +17,7 @@ int isDeclaration(AST_NODE *node);
 // Especifica semanticamente o tipo do identificador nas declarações de variáveis e funções, e define seu tipo (datatype)
 void redefineIdentifiers(AST_NODE *node);
 
+// Verifica se algum identificador usado no código não foi declarado
+void checkUndeclared(AST_NODE *node);
+
 #endif
