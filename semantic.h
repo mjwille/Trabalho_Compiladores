@@ -11,7 +11,10 @@
 // Função principal que chama todos os passos da análise semântica e possivelmente reporta erro semântico no fim
 void semanticAnalysis(AST_NODE *node);
 
-// Verifica se identificadores foram declarados, colocando o datatype do identificador caso sim
-void checkDeclarations(AST_NODE *node);
+// Verifica se o nodo é um dos nodos que declaram variável ou função
+int isDeclaration(AST_NODE *node);
+
+// Especifica semanticamente o tipo do identificador nas declarações de variáveis e funções, e define seu tipo (datatype)
+void redefineIdentifiers(AST_NODE *node);
 
 #endif
