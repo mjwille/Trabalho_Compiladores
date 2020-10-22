@@ -19,6 +19,7 @@ AST_NODE *astInsert(int type, HASH_NODE *symbol, AST_NODE *son0, AST_NODE *son1,
 	node->type = type;                    // o tipo definido em ast.h
 	node->symbol = symbol;                // o símbolo (ponteiro para um nodo na tabela hash)
 	node->lineNumber = getLineNumber();   // a linha em que o símbolo ocorre
+	node->dataType = DATATYPE_NULL;
 	// os filhos
 	node->son[0] = son0;
 	node->son[1] = son1;

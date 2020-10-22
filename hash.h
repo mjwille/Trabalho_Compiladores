@@ -27,11 +27,13 @@
 #define DATATYPE_INT   13
 #define DATATYPE_FLOAT 14
 
+#define DATATYPE_NULL 0
+
 typedef struct hash_node
 {
 	int type;
 	char *text;
-	int datatype;
+	int dataType;
 	struct hash_node *next;
 } HASH_NODE;
 
@@ -51,7 +53,7 @@ int hashAddress(char *text);
 HASH_NODE* hashFind(char *text);
 
 // Insere elemento dentro da tabela hash
-HASH_NODE* hashInsert(char *text, int type, int datatype);
+HASH_NODE* hashInsert(char *text, int type, int dataType);
 
 // Imprime todo elemento que a tabela hash contém dentro dela (índice a índice)
 void hashPrint();

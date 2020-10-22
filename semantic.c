@@ -15,9 +15,9 @@ void semanticAnalysis(AST_NODE *node) {
 	// Especifica semanticamente o tipo do identificador nas declarações de variáveis e funções, e define seu tipo (datatype)
 	redefineIdentifiers(node);
 	// Verifica se algum identificador usado no código não foi declarado
-	checkUndeclared(node);
+	// checkUndeclared(node);
 	// Verifica se o uso dos identificadores está compatível com sua declaração
-	checkUsage(node);
+	// checkUsage(node);
 	// Verifica se erros semânticos foram encontrados. Caso sim, retorna 4 conforme especificação do trabalho
 	if(SEMANTIC_ERRORS > 0) {
 		exit(4);
@@ -47,28 +47,29 @@ void redefineIdentifiers(AST_NODE *node) {
 			if(node->type == AST_DECL_FUNC) {
 				node->symbol->type = SYMBOL_FUNCTION;
 				switch(node->son[1]->type) {
-					case AST_BOOL:  node->symbol->datatype = DATATYPE_BOOL;   break;
-					case AST_CHAR:  node->symbol->datatype = DATATYPE_CHAR;   break;
-					case AST_INT:   node->symbol->datatype = DATATYPE_INT;    break;
-					case AST_FLOAT: node->symbol->datatype = DATATYPE_FLOAT;  break;
+					case AST_BOOL:  node->symbol->dataType = DATATYPE_BOOL;   break;
+					case AST_CHAR:  node->symbol->dataType = DATATYPE_CHAR;   break;
+					case AST_INT:   node->symbol->dataType = DATATYPE_INT;    break;
+					case AST_FLOAT: node->symbol->dataType = DATATYPE_FLOAT;  break;
+					// TODO: verificar qtd de parâmetros pra comparar depois na chamada, colocando eles pra SCALAR e ver se não tem iguais
 				}
 			}
 			if(node->type == AST_DECL_VAR) {
 				node->symbol->type = SYMBOL_SCALAR;
 				switch(node->son[0]->type) {
-					case AST_BOOL:  node->symbol->datatype = DATATYPE_BOOL;   break;
-					case AST_CHAR:  node->symbol->datatype = DATATYPE_CHAR;   break;
-					case AST_INT:   node->symbol->datatype = DATATYPE_INT;    break;
-					case AST_FLOAT: node->symbol->datatype = DATATYPE_FLOAT;  break;
+					case AST_BOOL:  node->symbol->dataType = DATATYPE_BOOL;   break;
+					case AST_CHAR:  node->symbol->dataType = DATATYPE_CHAR;   break;
+					case AST_INT:   node->symbol->dataType = DATATYPE_INT;    break;
+					case AST_FLOAT: node->symbol->dataType = DATATYPE_FLOAT;  break;
 				}
 			}
 			if(node->type == AST_DECL_VAR_VEC) {
 				node->symbol->type = SYMBOL_VECTOR;
 				switch(node->son[0]->type) {
-					case AST_BOOL:  node->symbol->datatype = DATATYPE_BOOL;   break;
-					case AST_CHAR:  node->symbol->datatype = DATATYPE_CHAR;   break;
-					case AST_INT:   node->symbol->datatype = DATATYPE_INT;    break;
-					case AST_FLOAT: node->symbol->datatype = DATATYPE_FLOAT;  break;
+					case AST_BOOL:  node->symbol->dataType = DATATYPE_BOOL;   break;
+					case AST_CHAR:  node->symbol->dataType = DATATYPE_CHAR;   break;
+					case AST_INT:   node->symbol->dataType = DATATYPE_INT;    break;
+					case AST_FLOAT: node->symbol->dataType = DATATYPE_FLOAT;  break;
 				}
 			}
 		}
@@ -158,6 +159,7 @@ void checkUsage(AST_NODE *node) {
 			SEMANTIC_ERRORS++;
 		}
 	}
+
 	// TODO: Atribuições... (escalar e vetor)
 
 	// Verifica os nodos filhos
