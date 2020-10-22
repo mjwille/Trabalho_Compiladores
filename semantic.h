@@ -50,4 +50,7 @@ int isBooleanIdentifier(AST_NODE *node);
 // Verifica se o nodo é um dos nodos que declaram variável ou função
 int isDeclaration(AST_NODE *node);
 
+// Função para pegar o primeiro filho dos operadores que não é um parênthesis
+AST_NODE* jumpParenthesis(AST_NODE *node);
+
 #endif

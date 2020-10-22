@@ -113,21 +113,17 @@ void checkUndeclared(AST_NODE *node) {
 void checkExprTypes(AST_NODE *node) {
 	// Se for operador booleano unário (só tem o NOT)
 	if(node->type == AST_NOT) {
-		checkBooleanSon(node->son[0], "\b");        // verifica único filho do NOT
+		checkBooleanSon(jumpParenthesis(node->son[0]), "\b");        // verifica único filho do NOT
 	}
 	// Se for operador booleano binário (todos eles vão ter a mesma avaliação de expressões)
 	else if(isBooleanOperator(node)) {
-		checkBooleanSon(node->son[0], "left");     // verifica filho da esquerda
-		checkBooleanSon(node->son[1], "right");    // verifica filho da direita
+		checkBooleanSon(jumpParenthesis(node->son[0]), "left");     // verifica filho da esquerda
+		checkBooleanSon(jumpParenthesis(node->son[1]), "right");    // verifica filho da direita
 	}
 	// Se for um nodo de operador numérico (todos eles vão ter a mesma avaliação de expressões)
 	else if(isNumericOperator(node)) {
-		checkNumericSon(node->son[0], "left");     // verifica filho da esquerda
-		checkNumericSon(node->son[1], "right");    // verifica filho da direita
-	}
-	// Se for a expressão que gera parênteses
-	else if(node->type == AST_PARENTHESIS) {
-
+		checkNumericSon(jumpParenthesis(node->son[0]), "left");     // verifica filho da esquerda
+		checkNumericSon(jumpParenthesis(node->son[1]), "right");    // verifica filho da direita
 	}
 
 	// Verifica os nodos filhos
@@ -203,12 +199,9 @@ void checkNumericSon(AST_NODE *node, char *sonSide) {
 		if(!isNumericLiteral(node)) {
 			// Se não for identificador de tipo numérico compatível (função, scalar e vetor)
 			if(!isNumericIdentifier(node)) {
-				// Se não for parênteses
-				if(!(node->type == AST_PARENTHESIS)) {
 					fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 					fprintf(stderr, "-------> Invalid %s operand for arithmetic operator.\n", sonSide);
 					SEMANTIC_ERRORS++;
-				}
 			}
 		}
 	}
@@ -223,12 +216,9 @@ void checkBooleanSon(AST_NODE *node, char *sonSide) {
 		if(!isBooleanLiteral(node)) {
 			// Se não for identificador de tipo numérico compatível (função, scalar e vetor)
 			if(!isBooleanIdentifier(node)) {
-				// Se não for parênteses
-				if(!(node->type == AST_PARENTHESIS)) {
 					fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 					fprintf(stderr, "-------> Invalid %s operand for boolean operator.\n", sonSide);
 					SEMANTIC_ERRORS++;
-				}
 			}
 		}
 	}
@@ -245,12 +235,6 @@ int isNumericOperator(AST_NODE *node) {
 		return 1;
 	if(node->type == AST_DIV)
 		return 1;
-	return 0;
-}
-
-
-// Verifica se o nodo é um dos nodos que representam operações booleanas
-int isBooleanOperator(AST_NODE *node) {
 	if(node->type == AST_LT)
 		return 1;
 	if(node->type == AST_GT)
@@ -259,6 +243,12 @@ int isBooleanOperator(AST_NODE *node) {
 		return 1;
 	if(node->type == AST_GE)
 		return 1;
+	return 0;
+}
+
+
+// Verifica se o nodo é um dos nodos que representam operações booleanas
+int isBooleanOperator(AST_NODE *node) {
 	if(node->type == AST_EQ)
 		return 1;
 	if(node->type == AST_DIF)
@@ -336,4 +326,15 @@ int isDeclaration(AST_NODE *node) {
 	if(node->type == AST_DECL_VAR_VEC)
 		return 1;
 	return 0;
+}
+
+
+// Função para pegar o primeiro filho dos operadores que não é um parênthesis
+AST_NODE* jumpParenthesis(AST_NODE *node) {
+	if(node->type != AST_PARENTHESIS) {
+		return node;
+	}
+	else {
+		return jumpParenthesis(node->son[0]);
+	}
 }
