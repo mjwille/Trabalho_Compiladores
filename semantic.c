@@ -19,7 +19,7 @@ void semanticAnalysis(AST_NODE *node) {
 	// Verifica os tipos de dados para expressões, percorrendo recursivamente as operações de baixo pra cima e anotando valor nos nodos
 	checkExprTypes(node);
 	// Verifica se o uso dos identificadores está compatível com sua declaração
-	// checkUsage(node);
+	checkUsage(node);
 
 	// Verifica se erros semânticos foram encontrados. Caso sim, retorna 4 conforme especificação do trabalho
 	if(SEMANTIC_ERRORS > 0) {
@@ -117,7 +117,8 @@ void checkExprTypes(AST_NODE *node) {
 	}
 	// Se for operador booleano binário (todos eles vão ter a mesma avaliação de expressões)
 	if(isBooleanOperator(node)) {
-
+		checkBooleanSon(node->son[0], "left");     // verifica filho da esquerda
+		checkBooleanSon(node->son[1], "right");    // verifica filho da direita
 	}
 	// Se for um nodo de operador numérico (todos eles vão ter a mesma avaliação de expressões)
 	if(isNumericOperator(node)) {
@@ -214,6 +215,26 @@ void checkNumericSon(AST_NODE *node, char *sonSide) {
 }
 
 
+// Função que analisa uso de tipo correto dos filhos de operadores booleanos
+void checkBooleanSon(AST_NODE *node, char *sonSide) {
+	// Se não for outro operador booleano
+	if(!isBooleanOperator(node)) {
+		// Se não for um literal booleano compatível (TRUE, FALSE)
+		if(!isBooleanLiteral(node)) {
+			// Se não for identificador de tipo numérico compatível (função, scalar e vetor)
+			if(!isBooleanIdentifier(node)) {
+				// Se não for parênteses
+				if(!(node->type == AST_PARENTHESIS)) {
+					fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+					fprintf(stderr, "-------> Invalid %s operando for boolean operator.\n", sonSide);
+					SEMANTIC_ERRORS++;
+				}
+			}
+		}
+	}
+}
+
+
 // Verifica se o nodo é um dos nodos que representam operações numéricas
 int isNumericOperator(AST_NODE *node) {
 	if(node->type == AST_ADD)
@@ -266,6 +287,18 @@ int isNumericLiteral(AST_NODE *node) {
 }
 
 
+// Verifica se o nodo é um literal booleano compatível (TRUE, FALSE)
+int isBooleanLiteral(AST_NODE *node) {
+	if(node->symbol != NULL) {
+		if(node->symbol->type == SYMBOL_LIT_TRUE)
+			return 1;
+		if(node->symbol->type == SYMBOL_LIT_FALSE)
+			return 1;
+	}
+	return 0;
+}
+
+
 // Verifica se o nodo é um identificador (chamada de função, variável escalar ou vetor) com tipo numérico compatível
 int isNumericIdentifier(AST_NODE *node) {
 	if(node->symbol != NULL) {
@@ -275,6 +308,18 @@ int isNumericIdentifier(AST_NODE *node) {
 			if(node->symbol->dataType == DATATYPE_INT)
 				return 1;
 			if(node->symbol->dataType == DATATYPE_FLOAT)
+				return 1;
+		}
+	}
+	return 0;
+}
+
+
+// Verifica se o nodo é um identificador (chamada de função, variável escalar ou vetor) com tipo booleano compatível
+int isBooleanIdentifier(AST_NODE *node) {
+	if(node->symbol != NULL) {
+		if(node->type == AST_FUNCALL || node->type == AST_SYMBOL || node->type == AST_VEC) {
+			if(node->symbol->dataType == DATATYPE_BOOL)
 				return 1;
 		}
 	}

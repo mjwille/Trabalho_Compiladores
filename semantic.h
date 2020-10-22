@@ -26,6 +26,9 @@ void checkUsage(AST_NODE *node);
 // Função que analisa uso de tipo correto dos filhos de operadores aritméticos
 void checkNumericSon(AST_NODE *node, char *sonSide);
 
+// Função que analisa uso de tipo correto dos filhos de operadores booleanos
+void checkBooleanSon(AST_NODE *node, char *sonSide);
+
 // Verifica se o nodo é um dos nodos que representam operações numéricas
 int isNumericOperator(AST_NODE *node);
 
@@ -35,8 +38,14 @@ int isBooleanOperator(AST_NODE *node);
 // Verifica se o nodo é um literal numérico compatível (CHAR, INTEGER, FLOAT)
 int isNumericLiteral(AST_NODE *node);
 
+// Verifica se o nodo é um literal booleano compatível (TRUE, FALSE)
+int isBooleanLiteral(AST_NODE *node);
+
 // Verifica se o nodo é um identificador (chamada de função, variável escalar ou vetor) com tipo numérico compatível
 int isNumericIdentifier(AST_NODE *node);
+
+// Verifica se o nodo é um identificador (chamada de função, variável escalar ou vetor) com tipo booleano compatível
+int isBooleanIdentifier(AST_NODE *node);
 
 // Verifica se o nodo é um dos nodos que declaram variável ou função
 int isDeclaration(AST_NODE *node);
