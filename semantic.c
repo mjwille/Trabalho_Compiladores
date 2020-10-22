@@ -13,11 +13,14 @@ int SEMANTIC_ERRORS = 0;
 // Função principal que chama todos os passos da análise semântica e possivelmente reporta erro semântico no fim
 void semanticAnalysis(AST_NODE *node) {
 	// Especifica semanticamente o tipo do identificador nas declarações de variáveis e funções, e define seu tipo (datatype)
-	redefineIdentifiers(node);
+	checkAndSetDeclarations(node);
 	// Verifica se algum identificador usado no código não foi declarado
-	// checkUndeclared(node);
+	checkUndeclared(node);
+	// Verifica os tipos de dados para expressões, percorrendo recursivamente as operações de baixo pra cima e anotando valor nos nodos
+	checkExprTypes(node);
 	// Verifica se o uso dos identificadores está compatível com sua declaração
 	// checkUsage(node);
+
 	// Verifica se erros semânticos foram encontrados. Caso sim, retorna 4 conforme especificação do trabalho
 	if(SEMANTIC_ERRORS > 0) {
 		exit(4);
@@ -25,20 +28,8 @@ void semanticAnalysis(AST_NODE *node) {
 }
 
 
-// Verifica se o nodo é um dos nodos que declaram variável ou função
-int isDeclaration(AST_NODE *node) {
-	if(node->type == AST_DECL_FUNC)
-		return 1;
-	if(node->type == AST_DECL_VAR)
-		return 1;
-	if(node->type == AST_DECL_VAR_VEC)
-		return 1;
-	return 0;
-}
-
-
 // Especifica semanticamente o tipo do identificador nas declarações de variáveis e funções, e define seu tipo (datatype)
-void redefineIdentifiers(AST_NODE *node) {
+void checkAndSetDeclarations(AST_NODE *node) {
 	// Se nodo for um dos nodos de declaração
 	if(isDeclaration(node)) {
 		// e tipo dele é ainda o tipo genético "identifier" (sem semântica nenhuma associada a ele)
@@ -86,7 +77,7 @@ void redefineIdentifiers(AST_NODE *node) {
 	int i;
 	for(i=0; i<MAX_SONS; i++) {
 		if(node->son[i] != NULL) {
-			redefineIdentifiers(node->son[i]);
+			checkAndSetDeclarations(node->son[i]);
 		}
 	}
 }
@@ -113,6 +104,36 @@ void checkUndeclared(AST_NODE *node) {
 	for(i=0; i<MAX_SONS; i++) {
 		if(node->son[i] != NULL) {
 			checkUndeclared(node->son[i]);
+		}
+	}
+}
+
+
+// Verifica os tipos de dados para expressões, percorrendo recursivamente as operações de baixo pra cima e anotando valor nos nodos
+void checkExprTypes(AST_NODE *node) {
+	// Se for operador booleano unário (só tem o NOT)
+	if(node->type == AST_NOT) {
+
+	}
+	// Se for operador booleano binário (todos eles vão ter a mesma avaliação de expressões)
+	if(isBooleanOperator(node)) {
+
+	}
+	// Se for um nodo de operador numérico (todos eles vão ter a mesma avaliação de expressões)
+	if(isNumericOperator(node)) {
+		checkNumericSon(node->son[0], "left");     // verifica filho da esquerda
+		checkNumericSon(node->son[1], "right");    // verifica filho da direita
+	}
+	// Se for a expressão que gera parênteses
+	if(node->type == AST_PARENTHESIS) {
+
+	}
+
+	// Verifica os nodos filhos
+	int i;
+	for(i=0; i<MAX_SONS; i++) {
+		if(node->son[i] != NULL) {
+			checkExprTypes(node->son[i]);
 		}
 	}
 }
@@ -160,6 +181,7 @@ void checkUsage(AST_NODE *node) {
 		}
 	}
 
+	// TODO: verificação do índice do vetor como inteiro tanto na atribuição como no uso em expressões
 	// TODO: Atribuições... (escalar e vetor)
 
 	// Verifica os nodos filhos
@@ -169,4 +191,104 @@ void checkUsage(AST_NODE *node) {
 			checkUsage(node->son[i]);
 		}
 	}
+}
+
+
+// Função que analisa uso de tipo correto dos filhos de operadores aritméticos
+void checkNumericSon(AST_NODE *node, char *sonSide) {
+	// Se não for outro operador numérico
+	if(!isNumericOperator(node)) {
+		// Se não for um literal numérico compatível (CHAR, INTEGER, FLOAT)
+		if(!isNumericLiteral(node)) {
+			// Se não for identificador de tipo numérico compatível (função, scalar e vetor)
+			if(!isNumericIdentifier(node)) {
+				// Se não for parênteses
+				if(!(node->type == AST_PARENTHESIS)) {
+					fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+					fprintf(stderr, "-------> Invalid %s operando for arithmetic operator.\n", sonSide);
+					SEMANTIC_ERRORS++;
+				}
+			}
+		}
+	}
+}
+
+
+// Verifica se o nodo é um dos nodos que representam operações numéricas
+int isNumericOperator(AST_NODE *node) {
+	if(node->type == AST_ADD)
+		return 1;
+	if(node->type == AST_SUB)
+		return 1;
+	if(node->type == AST_MUL)
+		return 1;
+	if(node->type == AST_DIV)
+		return 1;
+	return 0;
+}
+
+
+// Verifica se o nodo é um dos nodos que representam operações booleanas
+int isBooleanOperator(AST_NODE *node) {
+	if(node->type == AST_LT)
+		return 1;
+	if(node->type == AST_GT)
+		return 1;
+	if(node->type == AST_LE)
+		return 1;
+	if(node->type == AST_GE)
+		return 1;
+	if(node->type == AST_EQ)
+		return 1;
+	if(node->type == AST_DIF)
+		return 1;
+	if(node->type == AST_XOR)
+		return 1;
+	if(node->type == AST_OR)
+		return 1;
+	if(node->type == AST_NOT)
+		return 1;
+	return 0;
+}
+
+
+// Verifica se o nodo é um literal numérico compatível (CHAR, INTEGER, FLOAT)
+int isNumericLiteral(AST_NODE *node) {
+	if(node->symbol != NULL) {
+		if(node->symbol->type == SYMBOL_LIT_CHAR)
+			return 1;
+		if(node->symbol->type == SYMBOL_LIT_INTEGER)
+			return 1;
+		if(node->symbol->type == SYMBOL_LIT_FLOAT)
+			return 1;
+	}
+	return 0;
+}
+
+
+// Verifica se o nodo é um identificador (chamada de função, variável escalar ou vetor) com tipo numérico compatível
+int isNumericIdentifier(AST_NODE *node) {
+	if(node->symbol != NULL) {
+		if(node->type == AST_FUNCALL || node->type == AST_SYMBOL || node->type == AST_VEC) {
+			if(node->symbol->dataType == DATATYPE_CHAR)
+				return 1;
+			if(node->symbol->dataType == DATATYPE_INT)
+				return 1;
+			if(node->symbol->dataType == DATATYPE_FLOAT)
+				return 1;
+		}
+	}
+	return 0;
+}
+
+
+// Verifica se o nodo é um dos nodos que declaram variável ou função
+int isDeclaration(AST_NODE *node) {
+	if(node->type == AST_DECL_FUNC)
+		return 1;
+	if(node->type == AST_DECL_VAR)
+		return 1;
+	if(node->type == AST_DECL_VAR_VEC)
+		return 1;
+	return 0;
 }
