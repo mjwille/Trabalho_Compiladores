@@ -113,20 +113,20 @@ void checkUndeclared(AST_NODE *node) {
 void checkExprTypes(AST_NODE *node) {
 	// Se for operador booleano unário (só tem o NOT)
 	if(node->type == AST_NOT) {
-
+		checkBooleanSon(node->son[0], "\b");        // verifica único filho do NOT
 	}
 	// Se for operador booleano binário (todos eles vão ter a mesma avaliação de expressões)
-	if(isBooleanOperator(node)) {
+	else if(isBooleanOperator(node)) {
 		checkBooleanSon(node->son[0], "left");     // verifica filho da esquerda
 		checkBooleanSon(node->son[1], "right");    // verifica filho da direita
 	}
 	// Se for um nodo de operador numérico (todos eles vão ter a mesma avaliação de expressões)
-	if(isNumericOperator(node)) {
+	else if(isNumericOperator(node)) {
 		checkNumericSon(node->son[0], "left");     // verifica filho da esquerda
 		checkNumericSon(node->son[1], "right");    // verifica filho da direita
 	}
 	// Se for a expressão que gera parênteses
-	if(node->type == AST_PARENTHESIS) {
+	else if(node->type == AST_PARENTHESIS) {
 
 	}
 
@@ -206,7 +206,7 @@ void checkNumericSon(AST_NODE *node, char *sonSide) {
 				// Se não for parênteses
 				if(!(node->type == AST_PARENTHESIS)) {
 					fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
-					fprintf(stderr, "-------> Invalid %s operando for arithmetic operator.\n", sonSide);
+					fprintf(stderr, "-------> Invalid %s operand for arithmetic operator.\n", sonSide);
 					SEMANTIC_ERRORS++;
 				}
 			}
@@ -226,7 +226,7 @@ void checkBooleanSon(AST_NODE *node, char *sonSide) {
 				// Se não for parênteses
 				if(!(node->type == AST_PARENTHESIS)) {
 					fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
-					fprintf(stderr, "-------> Invalid %s operando for boolean operator.\n", sonSide);
+					fprintf(stderr, "-------> Invalid %s operand for boolean operator.\n", sonSide);
 					SEMANTIC_ERRORS++;
 				}
 			}
