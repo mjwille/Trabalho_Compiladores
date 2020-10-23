@@ -115,13 +115,19 @@ void checkExprTypes(AST_NODE *node) {
 	if(node->type == AST_NOT) {
 		checkBooleanSon(jumpParenthesis(node->son[0]), "\b");        // verifica único filho do NOT
 	}
-	// Se for operador booleano binário (todos eles vão ter a mesma avaliação de expressões)
+	// Se for nodo de operador booleano ou numérico (EQ, DIF)
+	else if(isBooleanOperator(node) && isNumericOperator(node)) {
+		// os 2 nodos filhos podem ser qualquer tipo, contanto que os 2 sejam de tipos compatíveis entre sí (iguais em tipo)
+	}
+	// Se for nodo exclusivamente de operadores booleano binário (XOR, OR)
 	else if(isBooleanOperator(node)) {
+		// os 2 nodos filhos precisam ser de tipo booleano ou de operador que resulta em um valor booleano
 		checkBooleanSon(jumpParenthesis(node->son[0]), "left");     // verifica filho da esquerda
 		checkBooleanSon(jumpParenthesis(node->son[1]), "right");    // verifica filho da direita
 	}
-	// Se for um nodo de operador numérico (todos eles vão ter a mesma avaliação de expressões)
+	// Se for nodo exclusivamente de operadores exclusivamente numérico (ADD, SUB, MUL, DIV, LT, GT, LE, GE)
 	else if(isNumericOperator(node)) {
+		// os 2 nodos filhos precisam ser de tipo numérico ou de operador que resulta em um valor numérico
 		checkNumericSon(jumpParenthesis(node->son[0]), "left");     // verifica filho da esquerda
 		checkNumericSon(jumpParenthesis(node->son[1]), "right");    // verifica filho da direita
 	}
@@ -163,6 +169,8 @@ void checkUsage(AST_NODE *node) {
 			fprintf(stderr, "-------> Function '%s' used as a vector.\n", node->symbol->text);
 			SEMANTIC_ERRORS++;
 		}
+
+		// TODO: é inteiro o índice de acesso?
 	}
 	// Função usada como função
 	if(node->type == AST_FUNCALL) {
@@ -198,8 +206,6 @@ void checkUsage(AST_NODE *node) {
 		}
 	}
 
-	// TODO: verificação do índice do vetor como inteiro tanto na atribuição como no uso em expressões
-
 	// Atribuições de vetor
 	if(node->type == AST_DECL_VAR_VEC) {
 		// Se declaração do vetor possui valores com inicialização
@@ -226,8 +232,8 @@ void checkUsage(AST_NODE *node) {
 
 // Função que analisa uso de tipo correto dos filhos de operadores aritméticos
 void checkNumericSon(AST_NODE *node, char *sonSide) {
-	// Se não for outro operador numérico
-	if(!isNumericOperator(node)) {
+	// Se não for outro operador que retorna um numérico
+	if(!isNumericResultantOperator(node)) {
 		// Se não for um literal numérico compatível (CHAR, INTEGER, FLOAT)
 		if(!isNumericLiteral(node)) {
 			// Se não for identificador de tipo numérico compatível (função, scalar e vetor)
@@ -243,8 +249,8 @@ void checkNumericSon(AST_NODE *node, char *sonSide) {
 
 // Função que analisa uso de tipo correto dos filhos de operadores booleanos
 void checkBooleanSon(AST_NODE *node, char *sonSide) {
-	// Se não for outro operador booleano
-	if(!isBooleanOperator(node)) {
+	// Se não for outro operador que retorna um booleano
+	if(!isBooleanResultantOperator(node)) {
 		// Se não for um literal booleano compatível (TRUE, FALSE)
 		if(!isBooleanLiteral(node)) {
 			// Se não for identificador de tipo numérico compatível (função, scalar e vetor)
@@ -256,6 +262,35 @@ void checkBooleanSon(AST_NODE *node, char *sonSide) {
 		}
 	}
 }
+
+
+// Função que verifica se operações e valores são inteiros para acesso a um vetor
+// void checkIntegerIndex(AST_NODE *node) {
+// 	// Se for símbolo
+// 	if(node->type == AST_SYMBOL) {
+// 		// Ele deve ser inteiro, senão é erro
+// 		if(node->symbol->type != SYMBOL_LIT_INTEGER) {
+// 			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+// 			fprintf(stderr, "-------> Invalid vector index.\n");
+// 			SEMANTIC_ERRORS++;
+// 		}
+// 	}
+
+// 	// Se não for uma operação que resulta em inteiro, também é erro
+// 	else if(!isNumericOperator(node)) {
+// 		fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+// 		fprintf(stderr, "-------> Invalid vector index.\n");
+// 		SEMANTIC_ERRORS++;
+// 	}
+
+// 	// Verifica os nodos filhos
+// 	int i;
+// 	for(i=0; i<MAX_SONS; i++) {
+// 		if(node->son[i] != NULL) {
+// 			checkIntegerIndex(node->son[i]);
+// 		}
+// 	}
+// }
 
 
 // Compara valores do vetor com tipo de inicialização do vetor e retorna o total de valores inicializados
@@ -294,7 +329,7 @@ int checkVectorInitValues(AST_NODE *node, int dataType) {
 }
 
 
-// Verifica se o nodo é um dos nodos que representam operações numéricas
+// Verifica se o nodo é um dos nodos que representam operações com operandos numéricos
 int isNumericOperator(AST_NODE *node) {
 	if(node->type == AST_ADD)
 		return 1;
@@ -312,12 +347,54 @@ int isNumericOperator(AST_NODE *node) {
 		return 1;
 	if(node->type == AST_GE)
 		return 1;
+	if(node->type == AST_EQ)
+		return 1;
+	if(node->type == AST_DIF)
+		return 1;
 	return 0;
 }
 
 
-// Verifica se o nodo é um dos nodos que representam operações booleanas
+// Verifica se o nodo é um dos nodos que representam operações com operandos booleanos
 int isBooleanOperator(AST_NODE *node) {
+	if(node->type == AST_EQ)
+		return 1;
+	if(node->type == AST_DIF)
+		return 1;
+	if(node->type == AST_XOR)
+		return 1;
+	if(node->type == AST_OR)
+		return 1;
+	if(node->type == AST_NOT)
+		return 1;
+	return 0;
+}
+
+
+// Verifica se o nodo é um dos nodos que representam operações com resultados numéricos
+int isNumericResultantOperator(AST_NODE *node) {
+	if(node->type == AST_ADD)
+		return 1;
+	if(node->type == AST_SUB)
+		return 1;
+	if(node->type == AST_MUL)
+		return 1;
+	if(node->type == AST_DIV)
+		return 1;
+	return 0;
+}
+
+
+// Verifica se o nodo é um dos nodos que representam operações com resultados booleanos
+int isBooleanResultantOperator(AST_NODE *node) {
+	if(node->type == AST_LT)
+		return 1;
+	if(node->type == AST_GT)
+		return 1;
+	if(node->type == AST_LE)
+		return 1;
+	if(node->type == AST_GE)
+		return 1;
 	if(node->type == AST_EQ)
 		return 1;
 	if(node->type == AST_DIF)
