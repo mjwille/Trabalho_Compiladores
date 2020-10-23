@@ -113,23 +113,30 @@ void checkUndeclared(AST_NODE *node) {
 void checkExprTypes(AST_NODE *node) {
 	// Se for operador booleano unário (só tem o NOT)
 	if(node->type == AST_NOT) {
-		checkBooleanSon(jumpParenthesis(node->son[0]), "\b");        // verifica único filho do NOT
+		checkBooleanSon(jumpParenthesis(node->son[0]), "\b", 1);        // verifica único filho do NOT
 	}
 	// Se for nodo de operador booleano ou numérico (EQ, DIF)
 	else if(isBooleanOperator(node) && isNumericOperator(node)) {
 		// os 2 nodos filhos podem ser qualquer tipo, contanto que os 2 sejam de tipos compatíveis entre sí (iguais em tipo)
+		int leftSon  = checkBooleanSon(jumpParenthesis(node->son[0]), "left",   0);     // verifica filho da esquerda
+		int rightSon = checkBooleanSon(jumpParenthesis(node->son[1]), "right",  0);     // verifica filho da direita
+		if(leftSon != rightSon) {
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> Incompatible types in operation.\n");
+			SEMANTIC_ERRORS++;
+		}
 	}
 	// Se for nodo exclusivamente de operadores booleano binário (XOR, OR)
 	else if(isBooleanOperator(node)) {
 		// os 2 nodos filhos precisam ser de tipo booleano ou de operador que resulta em um valor booleano
-		checkBooleanSon(jumpParenthesis(node->son[0]), "left");     // verifica filho da esquerda
-		checkBooleanSon(jumpParenthesis(node->son[1]), "right");    // verifica filho da direita
+		checkBooleanSon(jumpParenthesis(node->son[0]), "left",  1);     // verifica filho da esquerda
+		checkBooleanSon(jumpParenthesis(node->son[1]), "right", 1);     // verifica filho da direita
 	}
 	// Se for nodo exclusivamente de operadores exclusivamente numérico (ADD, SUB, MUL, DIV, LT, GT, LE, GE)
 	else if(isNumericOperator(node)) {
 		// os 2 nodos filhos precisam ser de tipo numérico ou de operador que resulta em um valor numérico
-		checkNumericSon(jumpParenthesis(node->son[0]), "left");     // verifica filho da esquerda
-		checkNumericSon(jumpParenthesis(node->son[1]), "right");    // verifica filho da direita
+		checkNumericSon(jumpParenthesis(node->son[0]), "left",  1);     // verifica filho da esquerda
+		checkNumericSon(jumpParenthesis(node->son[1]), "right", 1);     // verifica filho da direita
 	}
 
 	// Verifica os nodos filhos
@@ -157,6 +164,7 @@ void checkUsage(AST_NODE *node) {
 			SEMANTIC_ERRORS++;
 		}
 	}
+
 	// Vetor usado como vetor
 	if(node->type == AST_VEC) {
 		if(node->symbol->type == SYMBOL_SCALAR) {
@@ -172,6 +180,7 @@ void checkUsage(AST_NODE *node) {
 
 		// TODO: é inteiro o índice de acesso?
 	}
+
 	// Função usada como função
 	if(node->type == AST_FUNCALL) {
 		if(node->symbol->type == SYMBOL_SCALAR) {
@@ -231,36 +240,44 @@ void checkUsage(AST_NODE *node) {
 
 
 // Função que analisa uso de tipo correto dos filhos de operadores aritméticos
-void checkNumericSon(AST_NODE *node, char *sonSide) {
+int checkNumericSon(AST_NODE *node, char *sonSide, int displayErrorMessage) {
 	// Se não for outro operador que retorna um numérico
 	if(!isNumericResultantOperator(node)) {
 		// Se não for um literal numérico compatível (CHAR, INTEGER, FLOAT)
 		if(!isNumericLiteral(node)) {
 			// Se não for identificador de tipo numérico compatível (função, scalar e vetor)
 			if(!isNumericIdentifier(node)) {
+				if(displayErrorMessage) {
 					fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 					fprintf(stderr, "-------> Invalid %s operand for arithmetic operator.\n", sonSide);
 					SEMANTIC_ERRORS++;
+				}
+				return 0;
 			}
 		}
 	}
+	return 1;
 }
 
 
 // Função que analisa uso de tipo correto dos filhos de operadores booleanos
-void checkBooleanSon(AST_NODE *node, char *sonSide) {
+int checkBooleanSon(AST_NODE *node, char *sonSide, int displayErrorMessage) {
 	// Se não for outro operador que retorna um booleano
 	if(!isBooleanResultantOperator(node)) {
 		// Se não for um literal booleano compatível (TRUE, FALSE)
 		if(!isBooleanLiteral(node)) {
 			// Se não for identificador de tipo numérico compatível (função, scalar e vetor)
 			if(!isBooleanIdentifier(node)) {
+				if(displayErrorMessage) {
 					fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 					fprintf(stderr, "-------> Invalid %s operand for boolean operator.\n", sonSide);
 					SEMANTIC_ERRORS++;
+				}
+				return 0;
 			}
 		}
 	}
+	return 1;
 }
 
 

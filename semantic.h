@@ -24,10 +24,10 @@ void checkExprTypes(AST_NODE *node);
 void checkUsage(AST_NODE *node);
 
 // Função que analisa uso de tipo correto dos filhos de operadores aritméticos
-void checkNumericSon(AST_NODE *node, char *sonSide);
+int checkNumericSon(AST_NODE *node, char *sonSide, int displayErrorMessage);
 
 // Função que analisa uso de tipo correto dos filhos de operadores booleanos
-void checkBooleanSon(AST_NODE *node, char *sonSide);
+int checkBooleanSon(AST_NODE *node, char *sonSide, int displayErrorMessage);
 
 // Função que verifica se operações e valores são inteiros para acesso a um vetor
 void checkIntegerIndex(AST_NODE *node);
