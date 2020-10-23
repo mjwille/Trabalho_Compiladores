@@ -178,8 +178,41 @@ void checkUsage(AST_NODE *node) {
 		}
 	}
 
+	// Atribuições de escalar
+	if(node->type == AST_DECL_VAR) {
+		// Atribuição com tipo numérico (CHAR, INT, FLOAT)
+		if(node->symbol->dataType == DATATYPE_CHAR || node->symbol->dataType == DATATYPE_INT || node->symbol->dataType == DATATYPE_FLOAT) {
+			if(!isNumericLiteral(node->son[1])) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> Numeric variable '%s' not initialized with numeric value.\n", node->symbol->text);
+				SEMANTIC_ERRORS++;
+			}
+		}
+		// Atribuição com tipo booleano (BOOL)
+		if(node->symbol->dataType == DATATYPE_BOOL) {
+			if(!isBooleanLiteral(node->son[1])) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> Boolean variable '%s' not initialized with boolean value.\n", node->symbol->text);
+				SEMANTIC_ERRORS++;
+			}
+		}
+	}
+
 	// TODO: verificação do índice do vetor como inteiro tanto na atribuição como no uso em expressões
-	// TODO: Atribuições... (escalar e vetor)
+
+	// Atribuições de vetor
+	if(node->type == AST_DECL_VAR_VEC) {
+		// Se declaração do vetor possui valores com inicialização
+		if(node->son[2] != NULL) {
+			int initValues = checkVectorInitValues(node->son[2], node->symbol->dataType);
+			// Verifica se total de valores na inicialização corresponde ao tamanho do vetor
+			if(initValues != atoi(node->son[1]->symbol->text)) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> In vector '%s': quantity of init values differs from vector size.\n", node->symbol->text);
+				SEMANTIC_ERRORS++;
+			}
+		}
+	}
 
 	// Verifica os nodos filhos
 	int i;
@@ -222,6 +255,42 @@ void checkBooleanSon(AST_NODE *node, char *sonSide) {
 			}
 		}
 	}
+}
+
+
+// Compara valores do vetor com tipo de inicialização do vetor e retorna o total de valores inicializados
+int checkVectorInitValues(AST_NODE *node, int dataType) {
+	// Condição de parada da recursão onde não achou um valor de inicialização
+	if(node == NULL) {
+		// Retorna 0 indicando que não encontrou valor (função retorna tatal de valore encontrados)
+		return 0;
+	}
+
+	// Condição de parada da recursão onde achou um valor de inicialização
+	if(node->type == AST_SYMBOL) {
+		// Inicialização de vetor com tipo numérico (CHAR, INT, FLOAT)
+		if(dataType == DATATYPE_CHAR || dataType == DATATYPE_INT || dataType == DATATYPE_FLOAT) {
+			// Mas não é valor numérico
+			if(!isNumericLiteral(node)) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> Numeric vector not initialized with numeric value.\n");
+				SEMANTIC_ERRORS++;
+			}
+		}
+		// Inicialização de vetor com tipo booleano (BOOL)
+		if(dataType == DATATYPE_BOOL) {
+			// Mas não é valor booleano
+			if(!isBooleanLiteral(node)) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> Boolean vector not initialized with boolean value.\n");
+				SEMANTIC_ERRORS++;
+			}
+		}
+		// Retorna 1 indicando que encontrou valor (função retorna tatal de valore encontrados)
+		return 1;
+	}
+
+	return checkVectorInitValues(node->son[0], dataType) + checkVectorInitValues(node->son[1], dataType);
 }
 
 

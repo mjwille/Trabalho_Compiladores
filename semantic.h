@@ -29,6 +29,9 @@ void checkNumericSon(AST_NODE *node, char *sonSide);
 // Função que analisa uso de tipo correto dos filhos de operadores booleanos
 void checkBooleanSon(AST_NODE *node, char *sonSide);
 
+// Compara valores do vetor com tipo de inicialização do vetor e retorna o total de valores inicializados
+int checkVectorInitValues(AST_NODE *node, int dataType);
+
 // Verifica se o nodo é um dos nodos que representam operações numéricas
 int isNumericOperator(AST_NODE *node);
 
