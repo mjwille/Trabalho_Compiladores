@@ -151,13 +151,15 @@ void checkExprTypes(AST_NODE *node) {
 
 // Verifica se o uso dos identificadores está compatível com sua declaração
 void checkUsage(AST_NODE *node) {
-	// Vetor usado como vetor
+	// Escalar usado como escalar
 	if(node->type == AST_SYMBOL) {
+		// Se usado como vetor
 		if(node->symbol->type == SYMBOL_VECTOR) {
 			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 			fprintf(stderr, "-------> Vector '%s' used as a scalar.\n", node->symbol->text);
 			SEMANTIC_ERRORS++;
 		}
+		// Se usado como função
 		if(node->symbol->type == SYMBOL_FUNCTION) {
 			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 			fprintf(stderr, "-------> Function '%s' used as a scalar.\n", node->symbol->text);
@@ -167,27 +169,34 @@ void checkUsage(AST_NODE *node) {
 
 	// Vetor usado como vetor
 	if(node->type == AST_VEC) {
+		// Se usado como escalar
 		if(node->symbol->type == SYMBOL_SCALAR) {
 			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 			fprintf(stderr, "-------> Scalar '%s' used as a vector.\n", node->symbol->text);
 			SEMANTIC_ERRORS++;
 		}
-		if(node->symbol->type == SYMBOL_FUNCTION) {
+		// Se usado como função
+		else if(node->symbol->type == SYMBOL_FUNCTION) {
 			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 			fprintf(stderr, "-------> Function '%s' used as a vector.\n", node->symbol->text);
 			SEMANTIC_ERRORS++;
 		}
-
-		// TODO: é inteiro o índice de acesso?
+		// Se foi usado corretamente (ie. é um vetor)
+		else {
+			// Verifica se o índice é um inteiro ou uma expressão que resulta em um inteiro
+			checkIntegerIndex(node->son[0]);
+		}
 	}
 
 	// Função usada como função
 	if(node->type == AST_FUNCALL) {
+		// Se usado como escalar
 		if(node->symbol->type == SYMBOL_SCALAR) {
 			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 			fprintf(stderr, "-------> Scalar '%s' used as a function.\n", node->symbol->text);
 			SEMANTIC_ERRORS++;
 		}
+		// Se usado como vetor
 		if(node->symbol->type == SYMBOL_VECTOR) {
 			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 			fprintf(stderr, "-------> Vector '%s' used as a function.\n", node->symbol->text);
@@ -282,32 +291,31 @@ int checkBooleanSon(AST_NODE *node, char *sonSide, int displayErrorMessage) {
 
 
 // Função que verifica se operações e valores são inteiros para acesso a um vetor
-// void checkIntegerIndex(AST_NODE *node) {
-// 	// Se for símbolo
-// 	if(node->type == AST_SYMBOL) {
-// 		// Ele deve ser inteiro, senão é erro
-// 		if(node->symbol->type != SYMBOL_LIT_INTEGER) {
-// 			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
-// 			fprintf(stderr, "-------> Invalid vector index.\n");
-// 			SEMANTIC_ERRORS++;
-// 		}
-// 	}
+void checkIntegerIndex(AST_NODE *node) {
+	// Se for símbolo
+	if(node->type == AST_SYMBOL) {
+		// Ele deve ser inteiro, senão é erro (índice não pode ser CHAR nem FLOAT)
+		if(node->symbol->dataType != DATATYPE_INT && node->symbol->type != SYMBOL_LIT_INTEGER) {
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> Invalid vector index expression.\n");
+			SEMANTIC_ERRORS++;
+		}
+	}
+	// Se não for uma operação que resulta em inteiro, também é erro
+	else if(!isNumericResultantOperator(node)) {
+		fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+		fprintf(stderr, "-------> Invalid vector index expression.\n");
+		SEMANTIC_ERRORS++;
+	}
 
-// 	// Se não for uma operação que resulta em inteiro, também é erro
-// 	else if(!isNumericOperator(node)) {
-// 		fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
-// 		fprintf(stderr, "-------> Invalid vector index.\n");
-// 		SEMANTIC_ERRORS++;
-// 	}
-
-// 	// Verifica os nodos filhos
-// 	int i;
-// 	for(i=0; i<MAX_SONS; i++) {
-// 		if(node->son[i] != NULL) {
-// 			checkIntegerIndex(node->son[i]);
-// 		}
-// 	}
-// }
+	// Verifica os nodos filhos
+	int i;
+	for(i=0; i<MAX_SONS; i++) {
+		if(node->son[i] != NULL) {
+			checkIntegerIndex(node->son[i]);
+		}
+	}
+}
 
 
 // Compara valores do vetor com tipo de inicialização do vetor e retorna o total de valores inicializados
