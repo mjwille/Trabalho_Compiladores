@@ -62,4 +62,7 @@ HASH_NODE* hashInsert(char *text, int type, int dataType);
 // Imprime todo elemento que a tabela hash contém dentro dela (índice a índice)
 void hashPrint();
 
+// Função auxiliar que retorna o tipo ou dataType em uma melhor formatação para a impressão em hashPrint
+char* formatType(int type);
+
 #endif

@@ -99,10 +99,34 @@ void hashPrint()
 		{
 			printf("[%d]", i);
 			for(node=HASH_TABLE[i]; node; node=node->next)
-				printf(" <- [ Type: %d | Text: %s | Datatype: %d ]", node->type, node->text, node->dataType);
+				printf(" <- [ Type: %s | Text: %s | Datatype: %s ]", formatType(node->type), node->text, formatType(node->dataType));
 			printf("\n");
 		}
 	}
 
 	printf("------------------------------ SYMBOL TABLE END ------------------------------\n");
+}
+
+
+// Função auxiliar que retorna o tipo ou dataType em uma melhor formatação para a impressão em hashPrint
+char* formatType(int type)
+{
+	switch(type) {
+		case DATATYPE_NULL:        return "NULL";
+		case SYMBOL_LIT_INTEGER:   return "LIT_INT";
+		case SYMBOL_LIT_FLOAT:     return "LIT_FLOAT";
+		case SYMBOL_LIT_TRUE:      return "LIT_TRUE";
+		case SYMBOL_LIT_FALSE:     return "LIT_FALSE";
+		case SYMBOL_LIT_CHAR:      return "LIT_CHAR";
+		case SYMBOL_LIT_STRING:    return "LIT_STRING";
+		case SYMBOL_IDENTIFIER:    return "IDENTIFIER";
+		case SYMBOL_SCALAR:        return "SCALAR";
+		case SYMBOL_VECTOR:        return "VECTOR";
+		case SYMBOL_FUNCTION:      return "FUNCTION";
+		case DATATYPE_BOOL:        return "BOOL";
+		case DATATYPE_CHAR:        return "CHAR";
+		case DATATYPE_INT:         return "INT";
+		case DATATYPE_FLOAT:       return "FLOAT";
+		default:                   return "UNKNOWN";
+	}
 }
