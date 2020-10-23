@@ -8,7 +8,7 @@
 
 #include "hash.h"
 
-FILE *outputFile;
+FILE *outputFile;      // arquivo de saída para a descompilação da etapa 3
 
 // Definição dos tipos que um AST_NODE pode ter
 #define AST_SYMBOL         1
