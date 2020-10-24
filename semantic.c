@@ -241,7 +241,7 @@ void checkUsage(AST_NODE *node) {
 
 	// Atribuição de escalar
 	if(node->type == AST_ATTR) {
-		// Se for do tipo numérico
+		// Se escalar for do tipo numérico
 		if(isNumericDataType(node)) {
 			// Verifica se o que está tentando atribuir é compatível com numérico
 			int isNumeric = checkNumericSon(node->son[0], "\b", 0);
@@ -251,7 +251,7 @@ void checkUsage(AST_NODE *node) {
 				SEMANTIC_ERRORS++;
 			}
 		}
-		// Se for do tipo booleano
+		// Se escalar for do tipo booleano
 		if(isBooleanDataType(node)) {
 			// Verifica se o que está tentando atribuir é compatível com booleano
 			int isBoolean = checkBooleanSon(node->son[0], "\b", 0);
@@ -265,7 +265,29 @@ void checkUsage(AST_NODE *node) {
 
 	// Atribuição de vetor
 	if(node->type == AST_ATTR_VEC) {
+		// Se vetor for do tipo numérico
+		if(isNumericDataType(node)) {
+			// Verifica se o que está tentando atribuir é compatível com numérico
+			int isNumeric = checkNumericSon(node->son[1], "\b", 0);
+			if(!isNumeric) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> Boolean assignment to numeric vector variable '%s'.\n", node->symbol->text);
+				SEMANTIC_ERRORS++;
+			}
+		}
+		// Se escalar for do tipo booleano
+		if(isBooleanDataType(node)) {
+			// Verifica se o que está tentando atribuir é compatível com booleano
+			int isBoolean = checkBooleanSon(node->son[1], "\b", 0);
+			if(!isBoolean) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> Numeric assignment to boolean vector variable '%s'.\n", node->symbol->text);
+				SEMANTIC_ERRORS++;
+			}
+		}
 
+		// Verifica também se a expressão para acesso ao índice do vetor é inteira
+		checkIntegerIndex(node->son[0]);
 	}
 
 	// Verifica os nodos filhos
