@@ -80,4 +80,13 @@ AST_NODE* jumpParenthesis(AST_NODE *node);
 // Função que percorre a AST buscando a declaração da função com mesmo nome
 AST_NODE* getFuncDecl(AST_NODE *node, char *funcName);
 
+// Função que pega o total de argumentos passados na chamada de função
+int getTotalArgs(AST_NODE *node);
+
+// Função que pega o total de parâmetros da declaração de uma função
+int getTotalParams(AST_NODE *node);
+
+// Função que compara tipos dos parâmetros da definição da função com os tipos dos argumentos da chamada da função
+void compareFuncTypes(AST_NODE *funcdefNode, AST_NODE *funcallNode);
+
 #endif

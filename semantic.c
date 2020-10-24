@@ -360,8 +360,19 @@ void checkFunctions(AST_NODE *node) {
 		AST_NODE *funcDecl = getFuncDecl(ROOT, node->symbol->text);
 		// Se encontrou a declaração da função
 		if(funcDecl != NULL) {
-			printf("%s found!\n", funcDecl->symbol->text);
-			// TODO: compara número de parâmetros com argumentos, e os tipos
+			// Pega total de argumentos e parâmetros
+			int totalArgs   = getTotalArgs(node->son[0]);
+			int totalParams = getTotalParams(funcDecl->son[0]);
+			// Se diferentes é um erro semântico
+			if(totalArgs != totalParams) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> Invalid number of arguments in function call '%s' .\n", node->symbol->text);
+				SEMANTIC_ERRORS++;
+			}
+			// Se iguais, compara tipos dos parâmetros com tipos dos argumentos
+			else {
+				compareFuncTypes(funcDecl->son[0], node->son[0]);
+			}
 		}
 	}
 
@@ -677,4 +688,66 @@ AST_NODE* getFuncDecl(AST_NODE *node, char *funcName) {
 
 	// Se não é declaração de função e já passou por todos os filhos
 	return NULL;
+}
+
+
+// Função que pega o total de argumentos passados na chamada de função
+int getTotalArgs(AST_NODE *node) {
+	if(node == NULL) {
+		return 0;
+	}
+	if(node->type != AST_ARGS) {
+		return 1;
+	}
+	return getTotalArgs(node->son[0]) + getTotalArgs(node->son[1]);
+}
+
+
+// Função que pega o total de parâmetros da declaração de uma função
+int getTotalParams(AST_NODE *node) {
+	if(node == NULL) {
+		return 0;
+	}
+	if(node->type != AST_PARAMS) {
+		return 1;
+	}
+	return getTotalParams(node->son[0]) + getTotalParams(node->son[1]);
+}
+
+
+// Função que compara tipos dos parâmetros da definição da função com os tipos dos argumentos da chamada da função
+void compareFuncTypes(AST_NODE *funcdefNode, AST_NODE *funcallNode) {
+	if(funcallNode == NULL) {
+		return;
+	}
+	if(funcallNode->type != AST_ARGS) {
+		// Tanto o parâmetro como o argumento precisam ser iguais em tipos compatíveis
+		AST_NODE *paramNode = funcdefNode->son[0];
+		// Se parâmetro é booleano
+		if(paramNode->type == AST_BOOL) {
+			// Verifica se argumento é booleano também
+			int arg   = checkBooleanSon(jumpParenthesis(funcallNode), "",   0);
+			if(!arg) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", funcallNode->lineNumber);
+				fprintf(stderr, "-------> Invalid argument type in function call.\n");
+				SEMANTIC_ERRORS++;
+			}
+		}
+		// Se parâmetro é numérico
+		else {
+			// Verifica se argumento é numérico também
+			int arg   = checkNumericSon(jumpParenthesis(funcallNode), "",   0);
+			if(!arg) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", funcallNode->lineNumber);
+				fprintf(stderr, "-------> Invalid argument type in function call.\n");
+				SEMANTIC_ERRORS++;
+			}
+		}
+		// Retorna, não indo para os filhos pois não tem nada
+		return;
+	}
+
+	// Vai andando junto na AST dos argumentos e na AST dos parâmetros
+	compareFuncTypes(funcdefNode->son[0], funcallNode->son[0]);
+	compareFuncTypes(funcdefNode->son[1], funcallNode->son[1]);
 }
