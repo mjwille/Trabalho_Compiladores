@@ -204,9 +204,9 @@ void checkUsage(AST_NODE *node) {
 		}
 	}
 
-	// Atribuições de escalar
+	// Inicialização de escalar na declaração
 	if(node->type == AST_DECL_VAR) {
-		// Atribuição com tipo numérico (CHAR, INT, FLOAT)
+		// Se variável é tipo numérico (CHAR, INT, FLOAT)
 		if(node->symbol->dataType == DATATYPE_CHAR || node->symbol->dataType == DATATYPE_INT || node->symbol->dataType == DATATYPE_FLOAT) {
 			if(!isNumericLiteral(node->son[1])) {
 				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
@@ -224,10 +224,11 @@ void checkUsage(AST_NODE *node) {
 		}
 	}
 
-	// Atribuições de vetor
+	// Inicialização de vetor na declaração
 	if(node->type == AST_DECL_VAR_VEC) {
 		// Se declaração do vetor possui valores com inicialização
 		if(node->son[2] != NULL) {
+			// Verifica se valores correspondem ao datatype da variável e retorna a quantidade de valores inicializados
 			int initValues = checkVectorInitValues(node->son[2], node->symbol->dataType);
 			// Verifica se total de valores na inicialização corresponde ao tamanho do vetor
 			if(initValues != atoi(node->son[1]->symbol->text)) {
@@ -236,6 +237,35 @@ void checkUsage(AST_NODE *node) {
 				SEMANTIC_ERRORS++;
 			}
 		}
+	}
+
+	// Atribuição de escalar
+	if(node->type == AST_ATTR) {
+		// Se for do tipo numérico
+		if(isNumericDataType(node)) {
+			// Verifica se o que está tentando atribuir é compatível com numérico
+			int isNumeric = checkNumericSon(node->son[0], "\b", 0);
+			if(!isNumeric) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> Boolean assignment to numeric variable '%s'.\n", node->symbol->text);
+				SEMANTIC_ERRORS++;
+			}
+		}
+		// Se for do tipo booleano
+		if(isBooleanDataType(node)) {
+			// Verifica se o que está tentando atribuir é compatível com booleano
+			int isBoolean = checkBooleanSon(node->son[0], "\b", 0);
+			if(!isBoolean) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> Numeric assignment to boolean variable '%s'.\n", node->symbol->text);
+				SEMANTIC_ERRORS++;
+			}
+		}
+	}
+
+	// Atribuição de vetor
+	if(node->type == AST_ATTR_VEC) {
+
 	}
 
 	// Verifica os nodos filhos
@@ -484,6 +514,26 @@ int isBooleanIdentifier(AST_NODE *node) {
 				return 1;
 		}
 	}
+	return 0;
+}
+
+
+// Verifica se o nodo é de um datatype numérico compatível (CHAR, INT, FLOAT)
+int isNumericDataType(AST_NODE *node) {
+	if(node->symbol->dataType == DATATYPE_CHAR)
+		return 1;
+	if(node->symbol->dataType == DATATYPE_INT)
+		return 1;
+	if(node->symbol->dataType == DATATYPE_FLOAT)
+		return 1;
+	return 0;
+}
+
+
+// Verifica se o nodo é de um datatype booleano compatível (BOOL)
+int isBooleanDataType(AST_NODE *node) {
+	if(node->symbol->dataType == DATATYPE_BOOL)
+		return 1;
 	return 0;
 }
 

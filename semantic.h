@@ -59,6 +59,12 @@ int isNumericIdentifier(AST_NODE *node);
 // Verifica se o nodo é um identificador (chamada de função, variável escalar ou vetor) com tipo booleano compatível
 int isBooleanIdentifier(AST_NODE *node);
 
+// Verifica se o nodo é de um datatype numérico compatível (CHAR, INT, FLOAT)
+int isNumericDataType(AST_NODE *node);
+
+// Verifica se o nodo é de um datatype booleano compatível (BOOL)
+int isBooleanDataType(AST_NODE *node);
+
 // Verifica se o nodo é um dos nodos que declaram variável ou função
 int isDeclaration(AST_NODE *node);
 
