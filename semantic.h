@@ -77,4 +77,7 @@ int isDeclaration(AST_NODE *node);
 // Função para pegar o primeiro filho dos operadores que não é um parênthesis
 AST_NODE* jumpParenthesis(AST_NODE *node);
 
+// Função que percorre a AST buscando a declaração da função com mesmo nome
+AST_NODE* getFuncDecl(AST_NODE *node, char *funcName);
+
 #endif

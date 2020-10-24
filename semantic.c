@@ -8,10 +8,14 @@
 #include <string.h>
 #include "semantic.h"
 
+AST_NODE *ROOT;
+
 int SEMANTIC_ERRORS = 0;
 
 // Função principal que chama todos os passos da análise semântica e possivelmente reporta erro semântico no fim
 void semanticAnalysis(AST_NODE *node) {
+	ROOT = node;
+
 	// Especifica semanticamente o tipo do identificador nas declarações de variáveis e funções, e define seu tipo (datatype)
 	checkAndSetDeclarations(node);
 	// Verifica se algum identificador usado no código não foi declarado
@@ -351,7 +355,15 @@ void checkFunctions(AST_NODE *node) {
 		checkReturnNode(node, node);
 	}
 
-	// TODO: Verifica se chamda de função tem número de parâmetros e tipos de parâmetros corretos
+	// Se for uma chamda de função, compara com a declaração da função
+	if(node->type == AST_FUNCALL) {
+		AST_NODE *funcDecl = getFuncDecl(ROOT, node->symbol->text);
+		// Se encontrou a declaração da função
+		if(funcDecl != NULL) {
+			printf("%s found!\n", funcDecl->symbol->text);
+			// TODO: compara número de parâmetros com argumentos, e os tipos
+		}
+	}
 
 	// Verifica os nodos filhos
 	int i;
@@ -631,10 +643,38 @@ int isDeclaration(AST_NODE *node) {
 
 // Função para pegar o primeiro filho dos operadores que não é um parênthesis
 AST_NODE* jumpParenthesis(AST_NODE *node) {
+	// Não precisa testar nodo NULL pois, pela gramática, a expressão dentro dos parênteses não pode ser vazio
 	if(node->type != AST_PARENTHESIS) {
 		return node;
 	}
 	else {
 		return jumpParenthesis(node->son[0]);
 	}
+}
+
+// Função que percorre a AST buscando a declaração da função com mesmo nome
+AST_NODE* getFuncDecl(AST_NODE *node, char *funcName) {
+
+	AST_NODE *funcDecl;
+
+	// Se for uma declaração de função
+	if(node->type == AST_DECL_FUNC) {
+		// Com mesmo nome do que na chamada da função
+		if(!strcmp(funcName, node->symbol->text)) {
+			return node;
+		}
+	}
+	// Verifica os nodos filhos
+	int i;
+	for(i=0; i<MAX_SONS; i++) {
+		if(node->son[i] != NULL) {
+			funcDecl = getFuncDecl(node->son[i], funcName);
+			// Se achou a declaração na recursão, retorna
+			if(funcDecl != NULL)
+				return funcDecl;
+		}
+	}
+
+	// Se não é declaração de função e já passou por todos os filhos
+	return NULL;
 }
