@@ -20,6 +20,8 @@ void semanticAnalysis(AST_NODE *node) {
 	checkExprTypes(node);
 	// Verifica se o uso dos identificadores está compatível com sua declaração
 	checkUsage(node);
+	// Verifica se o uso das funções está correto (valor de retorno, quantidade de parâmetros e tipos dos parâmetros)
+	checkFunctions(node);
 
 	// Verifica se erros semânticos foram encontrados. Caso sim, retorna 4 conforme especificação do trabalho
 	if(SEMANTIC_ERRORS > 0) {
@@ -42,7 +44,7 @@ void checkAndSetDeclarations(AST_NODE *node) {
 					case AST_CHAR:  node->symbol->dataType = DATATYPE_CHAR;   break;
 					case AST_INT:   node->symbol->dataType = DATATYPE_INT;    break;
 					case AST_FLOAT: node->symbol->dataType = DATATYPE_FLOAT;  break;
-					// TODO: verificar qtd de parâmetros pra comparar depois na chamada, colocando eles pra SCALAR e ver se não tem iguais
+					// TODO: colocar parâmetros pra SCALAR também
 				}
 			}
 			if(node->type == AST_DECL_VAR) {
@@ -339,6 +341,61 @@ int checkBooleanSon(AST_NODE *node, char *sonSide, int displayErrorMessage) {
 		}
 	}
 	return 1;
+}
+
+
+// Verifica se o uso das funções está correto (valor de retorno, quantidade de parâmetros e tipos dos parâmetros)
+void checkFunctions(AST_NODE *node) {
+	// Se for uma declaração de função, verifica se o valor retornado é o mesmo tipo da função (datatype)
+	if(node->type == AST_DECL_FUNC) {
+		checkReturnNode(node, node);
+	}
+
+	// TODO: Verifica se chamda de função tem número de parâmetros e tipos de parâmetros corretos
+
+	// Verifica os nodos filhos
+	int i;
+	for(i=0; i<MAX_SONS; i++) {
+		if(node->son[i] != NULL) {
+			checkFunctions(node->son[i]);
+		}
+	}
+}
+
+
+// Função para verificar se os retornos dados dentro da declaração da função são do mesmo tipo da função (datatype)
+void checkReturnNode(AST_NODE *node, AST_NODE *functionNode) {
+	// Se encontrou um nodo de return
+	if(node->type == AST_RETURN) {
+		// Se datatype da função sendo declarada é numérico
+		if(isNumericDataType(functionNode)) {
+			// Verifica se o que está tentando retornar é compatível com numérico
+			int isNumeric = checkNumericSon(node->son[0], "\b", 0);
+			if(!isNumeric) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> Return expression inside function '%s' is not numeric.\n", functionNode->symbol->text);
+				SEMANTIC_ERRORS++;
+			}
+		}
+		// Se datatype da função sendo declarada é booleano
+		else {
+			// Verifica se o que está tentando retornar é compatível com booleano
+			int isBoolean = checkBooleanSon(node->son[0], "\b", 0);
+			if(!isBoolean) {
+				fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+				fprintf(stderr, "-------> Return expression inside function '%s' is not boolean.\n", functionNode->symbol->text);
+				SEMANTIC_ERRORS++;
+			}
+		}
+	}
+
+	// Verifica os nodos filhos
+	int i;
+	for(i=0; i<MAX_SONS; i++) {
+		if(node->son[i] != NULL) {
+			checkReturnNode(node->son[i], functionNode);
+		}
+	}
 }
 
 

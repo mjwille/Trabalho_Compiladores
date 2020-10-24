@@ -29,6 +29,12 @@ int checkNumericSon(AST_NODE *node, char *sonSide, int displayErrorMessage);
 // Função que analisa uso de tipo correto dos filhos de operadores booleanos
 int checkBooleanSon(AST_NODE *node, char *sonSide, int displayErrorMessage);
 
+// Verifica se o uso das funções está correto (valor de retorno, quantidade de parâmetros e tipos dos parâmetros)
+void checkFunctions(AST_NODE *node);
+
+// Função para verificar se os retornos dados dentro da declaração da função são do mesmo tipo da função (datatype)
+void checkReturnNode(AST_NODE *node, AST_NODE *functionNode);
+
 // Função que verifica se operações e valores são inteiros para acesso a um vetor
 void checkIntegerIndex(AST_NODE *node);
 
