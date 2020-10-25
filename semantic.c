@@ -15,21 +15,22 @@ int SEMANTIC_ERRORS = 0;
 // Função principal que chama todos os passos da análise semântica e possivelmente reporta erro semântico no fim
 void semanticAnalysis(AST_NODE *node) {
 	ROOT = node;
+	if(node != NULL) {
+		// Especifica semanticamente o tipo do identificador nas declarações de variáveis e funções, e define seu tipo (datatype)
+		checkAndSetDeclarations(node);
+		// Verifica se algum identificador usado no código não foi declarado
+		checkUndeclared(node);
+		// Verifica os tipos de dados para expressões, percorrendo recursivamente as operações de baixo pra cima e anotando valor nos nodos
+		checkExprTypes(node);
+		// Verifica se o uso dos identificadores está compatível com sua declaração
+		checkUsage(node);
+		// Verifica se o uso das funções está correto (valor de retorno, quantidade de parâmetros e tipos dos parâmetros)
+		checkFunctions(node);
 
-	// Especifica semanticamente o tipo do identificador nas declarações de variáveis e funções, e define seu tipo (datatype)
-	checkAndSetDeclarations(node);
-	// Verifica se algum identificador usado no código não foi declarado
-	checkUndeclared(node);
-	// Verifica os tipos de dados para expressões, percorrendo recursivamente as operações de baixo pra cima e anotando valor nos nodos
-	checkExprTypes(node);
-	// Verifica se o uso dos identificadores está compatível com sua declaração
-	checkUsage(node);
-	// Verifica se o uso das funções está correto (valor de retorno, quantidade de parâmetros e tipos dos parâmetros)
-	checkFunctions(node);
-
-	// Verifica se erros semânticos foram encontrados. Caso sim, retorna 4 conforme especificação do trabalho
-	if(SEMANTIC_ERRORS > 0) {
-		exit(4);
+		// Verifica se erros semânticos foram encontrados. Caso sim, retorna 4 conforme especificação do trabalho
+		if(SEMANTIC_ERRORS > 0) {
+			exit(4);
+		}
 	}
 }
 
