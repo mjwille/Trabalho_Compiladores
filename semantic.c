@@ -48,7 +48,7 @@ void checkAndSetDeclarations(AST_NODE *node) {
 					case AST_CHAR:  node->symbol->dataType = DATATYPE_CHAR;   break;
 					case AST_INT:   node->symbol->dataType = DATATYPE_INT;    break;
 					case AST_FLOAT: node->symbol->dataType = DATATYPE_FLOAT;  break;
-					// TODO: colocar parâmetros pra SCALAR também (AST_PARAM é SYMBOL_IDENTIFIER?)
+					// TODO: colocar parâmetros pra SCALAR também (AST_PARAM é SYMBOL_IDENTIFIER?) E devem ficar confinados a função
 				}
 			}
 			if(node->type == AST_DECL_VAR) {
@@ -437,8 +437,8 @@ void checkReturnNode(AST_NODE *node, AST_NODE *functionNode) {
 void checkIntegerIndex(AST_NODE *node) {
 	// Se for símbolo
 	if(node->type == AST_SYMBOL) {
-		// Ele deve ser inteiro, senão é erro (índice não pode ser CHAR nem FLOAT)
-		if(node->symbol->dataType != DATATYPE_INT && node->symbol->type != SYMBOL_LIT_INTEGER) {
+		// Ele deve ser inteiro ou char, senão é erro (índice não pode ser CHAR nem FLOAT)
+		if(node->symbol->dataType != DATATYPE_INT && node->symbol->type != SYMBOL_LIT_INTEGER && node->symbol->dataType != DATATYPE_CHAR && node->symbol->type != SYMBOL_LIT_CHAR) {
 			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 			fprintf(stderr, "-------> Invalid vector index expression.\n");
 			SEMANTIC_ERRORS++;
