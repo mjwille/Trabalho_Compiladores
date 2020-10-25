@@ -48,7 +48,6 @@ void checkAndSetDeclarations(AST_NODE *node) {
 					case AST_CHAR:  node->symbol->dataType = DATATYPE_CHAR;   break;
 					case AST_INT:   node->symbol->dataType = DATATYPE_INT;    break;
 					case AST_FLOAT: node->symbol->dataType = DATATYPE_FLOAT;  break;
-					// TODO: colocar parâmetros pra SCALAR também (AST_PARAM é SYMBOL_IDENTIFIER?) E devem ficar confinados a função
 				}
 			}
 			if(node->type == AST_DECL_VAR) {
@@ -76,6 +75,27 @@ void checkAndSetDeclarations(AST_NODE *node) {
 			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
 			fprintf(stderr, "-------> Redeclaration of symbol '%s'.\n", node->symbol->text);
 			SEMANTIC_ERRORS++;
+		}
+	}
+
+	// Verifica de forma básica (não estava no enunciado) os parâmetros da funções
+	// (sem comparar diferentes funções, assumindo que o programador não vai repetir nome dos parâmetros entre elas)
+	if(node->type == AST_PARAM) {
+		// Se parâmetro já não é mais um identifier, foi também redeclarado
+		if(node->symbol->type != SYMBOL_IDENTIFIER) {
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> Redeclaration of symbol '%s'.\n", node->symbol->text);
+			SEMANTIC_ERRORS++;
+		}
+		// Senão, coloca ele pra escalar (unico tipo que um parâmetro pode assumir) e define o dataType
+		else {
+			node->symbol->type = SYMBOL_SCALAR;
+			switch(node->son[0]->type) {
+				case AST_BOOL:  node->symbol->dataType = DATATYPE_BOOL;   break;
+				case AST_CHAR:  node->symbol->dataType = DATATYPE_CHAR;   break;
+				case AST_INT:   node->symbol->dataType = DATATYPE_INT;    break;
+				case AST_FLOAT: node->symbol->dataType = DATATYPE_FLOAT;  break;
+			}
 		}
 	}
 
