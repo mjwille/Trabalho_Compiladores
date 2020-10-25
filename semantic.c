@@ -48,7 +48,7 @@ void checkAndSetDeclarations(AST_NODE *node) {
 					case AST_CHAR:  node->symbol->dataType = DATATYPE_CHAR;   break;
 					case AST_INT:   node->symbol->dataType = DATATYPE_INT;    break;
 					case AST_FLOAT: node->symbol->dataType = DATATYPE_FLOAT;  break;
-					// TODO: colocar parâmetros pra SCALAR também
+					// TODO: colocar parâmetros pra SCALAR também (AST_PARAM é SYMBOL_IDENTIFIER?)
 				}
 			}
 			if(node->type == AST_DECL_VAR) {
@@ -294,6 +294,17 @@ void checkUsage(AST_NODE *node) {
 
 		// Verifica também se a expressão para acesso ao índice do vetor é inteira
 		checkIntegerIndex(node->son[0]);
+	}
+
+	// Verifica se condição do if é booleano
+	if(node->type == AST_IF || node->type == AST_IF_ELSE) {
+		// Verifica se a condição entre parênteses é booleana
+		int isBoolean = checkBooleanSon(node->son[0], "\b", 0);
+		if(!isBoolean) {
+			fprintf(stderr, "Line %d: Semantic Error.\n", node->lineNumber);
+			fprintf(stderr, "-------> If expression should be boolean.\n");
+			SEMANTIC_ERRORS++;
+		}
 	}
 
 	// Verifica os nodos filhos
