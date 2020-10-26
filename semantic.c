@@ -15,6 +15,7 @@ int SEMANTIC_ERRORS = 0;
 // Função principal que chama todos os passos da análise semântica e possivelmente reporta erro semântico no fim
 void semanticAnalysis(AST_NODE *node) {
 	ROOT = node;
+	// Caso o programa não seja o programa vazio
 	if(node != NULL) {
 		// Especifica semanticamente o tipo do identificador nas declarações de variáveis e funções, e define seu tipo (datatype)
 		checkAndSetDeclarations(node);

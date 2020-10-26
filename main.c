@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 {
 	// Faz verificações de número de argumentos
 	if(argc < 3) {
-		fprintf(stderr, "ERROR!\nUsage: ./etapa4 <input_filename>\n");
+		fprintf(stderr, "ERROR!\nUsage: ./etapa4 <input_filename> <output_filename>\n");
 		exit(1);
 	}
 
