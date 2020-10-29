@@ -39,6 +39,7 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
       case AST_DIF:    tac = tacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);             break;
       case AST_XOR:    tac = tacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);             break;
       case AST_OR:     tac = tacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);             break;
+      case AST_NOT:    tac = tacUnaryOperation(TAC_NOT,  tacSon[0]);                        break;
 
       // Caso nodo da AST não tenha opcode TAC, junta os TACs filhos maior unificado
       default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3]))); break;
@@ -125,6 +126,18 @@ TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son1, TAC_NODE *son2) {
    TAC_NODE *tacSons = tacJoin(son1, son2);
    // Junta por fim o código dos filhos (que vem antes da operação) com o código da própria operação
    return tacJoin(tacSons, tacOperation);
+}
+
+
+// Cria uma TAC para operadores unários
+TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son1) {
+   // Cria um temporário na hash table para onde o resultado da operação será colocado
+   HASH_NODE *temp = makeTemp();
+   // Cria o código TAC da operação, que tem como operandos os resultados dos códigos dos filhos
+   HASH_NODE *op1 = (son1->res) ? son1->res : 0;
+   TAC_NODE *tacOperation = tacCreate(opcode, temp, op1, NULL);
+   // Junta por fim o código do filho (que vem antes da operação) com o código da própria operação
+   return tacJoin(son1, tacOperation);
 }
 
 

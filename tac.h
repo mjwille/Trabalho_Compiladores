@@ -50,6 +50,9 @@ void tacPrintNode(TAC_NODE *tac);
 // Cria uma TAC para operadores binários
 TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son1, TAC_NODE *son2);
 
+// Cria uma TAC para operadores unários
+TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son1);
+
 // Junta 2 TACs em uma TAC única maior
 TAC_NODE* tacJoin(TAC_NODE *tac1, TAC_NODE *tac2);
 
