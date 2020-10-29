@@ -31,6 +31,15 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
       case AST_SUB:    tac = tacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);             break;
       case AST_MUL:    tac = tacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);             break;
       case AST_DIV:    tac = tacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);             break;
+      case AST_LT:     tac = tacBinaryOperation(TAC_LT,  tacSon[0], tacSon[1]);             break;
+      case AST_GT:     tac = tacBinaryOperation(TAC_GT,  tacSon[0], tacSon[1]);             break;
+      case AST_LE:     tac = tacBinaryOperation(TAC_LE,  tacSon[0], tacSon[1]);             break;
+      case AST_GE:     tac = tacBinaryOperation(TAC_GE,  tacSon[0], tacSon[1]);             break;
+      case AST_EQ:     tac = tacBinaryOperation(TAC_EQ,  tacSon[0], tacSon[1]);             break;
+      case AST_DIF:    tac = tacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);             break;
+      case AST_XOR:    tac = tacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);             break;
+      case AST_OR:     tac = tacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);             break;
+
       // Caso nodo da AST não tenha opcode TAC, junta os TACs filhos maior unificado
       default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3]))); break;
    }
@@ -71,8 +80,8 @@ void tacPrint(TAC_NODE *tac) {
 
 // Imprime um nodo do tipo TAC
 void tacPrintNode(TAC_NODE *tac) {
-   // Não imprime nodo vazio
-   if(tac == NULL)
+   // Não imprime nodo vazio ou nodo que seja símbolo
+   if(tac == NULL || tac->opcode == TAC_SYMBOL)
       return;
 
    // Faz a impressão do nodo baseado no seu opcode
@@ -80,11 +89,19 @@ void tacPrintNode(TAC_NODE *tac) {
    printf("TAC(");
 
    switch(tac->opcode) {
-      case TAC_SYMBOL:  printf("TAC_SYMBOL");   break;
       case TAC_ADD:     printf("TAC_ADD");      break;
       case TAC_SUB:     printf("TAC_SUB");      break;
       case TAC_MUL:     printf("TAC_MUL");      break;
       case TAC_DIV:     printf("TAC_DIV");      break;
+      case TAC_LT:      printf("TAC_LT");       break;
+      case TAC_GT:      printf("TAC_GT");       break;
+      case TAC_LE:      printf("TAC_LE");       break;
+      case TAC_GE:      printf("TAC_GE");       break;
+      case TAC_EQ:      printf("TAC_EQ");       break;
+      case TAC_DIF:     printf("TAC_DIF");      break;
+      case TAC_XOR:     printf("TAC_XOR");      break;
+      case TAC_OR:      printf("TAC_OR");       break;
+      case TAC_NOT:     printf("TAC_NOT");      break;
       default:          printf("TAC_UNKNOWN");  break;
    }
 

@@ -217,26 +217,26 @@ expr: operand                                     { $$ = $1; }
     | '~' expr                                    { $$ = astInsert(AST_NOT,         NULL, $2, NULL, NULL, NULL); }
     ;
 
-operand: TK_IDENTIFIER                             { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
-       | TK_IDENTIFIER '[' expr ']'                { $$ = astInsert(   AST_VEC, $1,   $3, NULL, NULL, NULL); }
-       | LIT_INTEGER                               { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
-       | LIT_FLOAT                                 { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
-       | LIT_CHAR                                  { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
-       | func_call                                 { $$ = $1; }
+operand: TK_IDENTIFIER                            { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
+       | TK_IDENTIFIER '[' expr ']'               { $$ = astInsert(   AST_VEC, $1,   $3, NULL, NULL, NULL); }
+       | LIT_INTEGER                              { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
+       | LIT_FLOAT                                { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
+       | LIT_CHAR                                 { $$ = astInsert(AST_SYMBOL, $1, NULL, NULL, NULL, NULL); }
+       | func_call                                { $$ = $1; }
        ;
 
-func_call: TK_IDENTIFIER '(' arguments_list ')'    { $$ = astInsert(AST_FUNCALL, $1, $3, NULL, NULL, NULL); }
+func_call: TK_IDENTIFIER '(' arguments_list ')'   { $$ = astInsert(AST_FUNCALL, $1, $3, NULL, NULL, NULL); }
          ;
 
-arguments_list: arguments                          { $$ =   $1; }
-              |                                    { $$ = NULL; }
+arguments_list: arguments                         { $$ =   $1; }
+              |                                   { $$ = NULL; }
               ;
 
-arguments: argument                                { $$ = $1; }
-         | argument ',' arguments                  { $$ = astInsert(AST_ARGS, NULL, $1, $3, NULL, NULL);   }
+arguments: argument                               { $$ = $1; }
+         | argument ',' arguments                 { $$ = astInsert(AST_ARGS, NULL, $1, $3, NULL, NULL);   }
          ;
 
-argument: expr                                     { $$ = $1; }
+argument: expr                                    { $$ = $1; }
         ;
 
 /* Comandos de Controle de Fluxo */

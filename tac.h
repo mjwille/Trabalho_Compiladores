@@ -15,6 +15,15 @@
 #define TAC_SUB    3
 #define TAC_MUL    4
 #define TAC_DIV    5
+#define TAC_LT     6
+#define TAC_GT     7
+#define TAC_LE     8
+#define TAC_GE     9
+#define TAC_EQ    10
+#define TAC_DIF   11
+#define TAC_XOR   12
+#define TAC_OR    13
+#define TAC_NOT   14
 
 typedef struct tac_node
 {
