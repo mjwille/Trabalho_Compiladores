@@ -27,7 +27,7 @@ typedef struct tac_node
 } TAC_NODE;
 
 // Percorre recursivamente a AST para gerar os códigos TAC
-TAC_NODE* codeGenerate(AST_NODE *node);
+TAC_NODE* tacCodeGenerate(AST_NODE *node);
 
 // Cria nodo do tipo TAC e coloca 'prev' e 'next' para NULL
 TAC_NODE* tacCreate(int opcode, HASH_NODE *res, HASH_NODE *op1, HASH_NODE *op2);
@@ -37,5 +37,8 @@ void tacPrint(TAC_NODE *tac);
 
 // Imprime um nodo do tipo TAC
 void tacPrintNode(TAC_NODE *tac);
+
+// Junta 2 TACs em uma TAC única maior
+TAC_NODE* tacJoin(TAC_NODE *tac1, TAC_NODE *tac2);
 
 #endif
