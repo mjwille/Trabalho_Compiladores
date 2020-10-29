@@ -27,6 +27,10 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
    // Processa então o nodo atual
    switch(node->type) {
       case AST_SYMBOL: tac = tacCreate(TAC_SYMBOL, node->symbol, NULL, NULL);               break;
+      case AST_ADD:    tac = tacBinaryOperation(TAC_ADD, tacSon[0], tacSon[1]);             break;
+      case AST_SUB:    tac = tacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);             break;
+      case AST_MUL:    tac = tacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);             break;
+      case AST_DIV:    tac = tacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);             break;
       // Caso nodo da AST não tenha opcode TAC, junta os TACs filhos maior unificado
       default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3]))); break;
    }
@@ -85,10 +89,25 @@ void tacPrintNode(TAC_NODE *tac) {
    }
 
    // Impressão dos campos de resposta e operandos dos nodos (caso tenha um ponteiro para a tabela hash)
-   printf(",%s", (tac->res) ? tac->res->text : "0");
-   printf(",%s", (tac->op1) ? tac->op1->text : "0");
-   printf(",%s", (tac->op2) ? tac->op2->text : "0");
+   printf(", %s", (tac->res) ? tac->res->text : "0");
+   printf(", %s", (tac->op1) ? tac->op1->text : "0");
+   printf(", %s", (tac->op2) ? tac->op2->text : "0");
    printf(");\n");
+}
+
+
+// Cria uma TAC para operadores binários
+TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son1, TAC_NODE *son2) {
+   // Cria um temporário na hash table para onde o resultado da operação será colocado
+   HASH_NODE *temp = makeTemp();
+   // Cria o código TAC da operação, que tem como operandos os resultados dos códigos dos filhos
+   HASH_NODE *op1 = (son1->res) ? son1->res : 0;
+   HASH_NODE *op2 = (son2->res) ? son2->res : 0;
+   TAC_NODE *tacOperation = tacCreate(opcode, temp, op1, op2);
+   // Junta o código dos filhos para os quais a operação binária será aplicada
+   TAC_NODE *tacSons = tacJoin(son1, son2);
+   // Junta por fim o código dos filhos (que vem antes da operação) com o código da própria operação
+   return tacJoin(tacSons, tacOperation);
 }
 
 

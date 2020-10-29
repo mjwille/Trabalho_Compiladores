@@ -65,4 +65,7 @@ void hashPrint();
 // Função auxiliar que retorna o tipo ou dataType em uma melhor formatação para a impressão em hashPrint
 char* formatType(int type);
 
+// Cria um nodo com um temporário para a geração de TACs
+HASH_NODE* makeTemp();
+
 #endif

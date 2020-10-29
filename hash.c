@@ -92,7 +92,7 @@ void hashPrint()
 	int i;
 	HASH_NODE *node;
 
-	printf("----------------------------- SYMBOL TABLE BEGIN -----------------------------\n");
+	printf("---------------------------------- SYMBOL TABLE BEGIN ----------------------------------\n");
 
 	for(i=0; i<HASH_SIZE; i++) {
 		if(HASH_TABLE[i] != NULL)
@@ -104,7 +104,7 @@ void hashPrint()
 		}
 	}
 
-	printf("------------------------------ SYMBOL TABLE END ------------------------------\n");
+	printf("---------------------------------- SYMBOL TABLE END ------------------------------------\n");
 }
 
 
@@ -129,4 +129,13 @@ char* formatType(int type)
 		case DATATYPE_FLOAT:       return "FLOAT";
 		default:                   return "UNKNOWN";
 	}
+}
+
+
+// Cria um nodo com um temporário para a geração de TACs
+HASH_NODE* makeTemp() {
+	static int serial = 0;
+	char str[60];
+	sprintf(str, "__temp__%d", serial++);
+	return hashInsert(str, SYMBOL_SCALAR, DATATYPE_NULL);
 }
