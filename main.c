@@ -16,21 +16,21 @@ int main(int argc, char *argv[])
 {
 	// Faz verificações de número de argumentos
 	if(argc < 3) {
-		fprintf(stderr, "ERROR!\nUsage: ./etapa5 <input_filename> <output_filename>\n");
+		fprintf(stderr, "Error.\nUsage: ./etapa5 <input_filename> <output_filename>\n");
 		exit(1);
 	}
 
 	// Faz verificação de abertura correta do arquivo de input
 	yyin = fopen(argv[1], "r");
 	if(yyin == 0) {
-		fprintf(stderr, "ERROR!\nInput file %s could not be opened.\n", argv[1]);
+		fprintf(stderr, "Error.\nInput file %s could not be opened.\n", argv[1]);
 		exit(2);
 	}
 
 	// Faz verificação de abertura correta do arquivo de output
 	outputFile = fopen(argv[2], "w");
 	if(outputFile == 0) {
-		fprintf(stderr, "ERROR!\nOutput file %s could not be opened.\n", argv[2]);
+		fprintf(stderr, "Error.\nOutput file %s could not be opened.\n", argv[2]);
 		exit(2);
 	}
 
