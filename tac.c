@@ -26,23 +26,24 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
 
    // Processa então o nodo atual
    switch(node->type) {
-      case AST_SYMBOL: tac = tacCreate(TAC_SYMBOL, node->symbol, NULL, NULL);               break;
-      case AST_ADD:    tac = tacBinaryOperation(TAC_ADD, tacSon[0], tacSon[1]);             break;
-      case AST_SUB:    tac = tacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);             break;
-      case AST_MUL:    tac = tacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);             break;
-      case AST_DIV:    tac = tacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);             break;
-      case AST_LT:     tac = tacBinaryOperation(TAC_LT,  tacSon[0], tacSon[1]);             break;
-      case AST_GT:     tac = tacBinaryOperation(TAC_GT,  tacSon[0], tacSon[1]);             break;
-      case AST_LE:     tac = tacBinaryOperation(TAC_LE,  tacSon[0], tacSon[1]);             break;
-      case AST_GE:     tac = tacBinaryOperation(TAC_GE,  tacSon[0], tacSon[1]);             break;
-      case AST_EQ:     tac = tacBinaryOperation(TAC_EQ,  tacSon[0], tacSon[1]);             break;
-      case AST_DIF:    tac = tacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);             break;
-      case AST_XOR:    tac = tacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);             break;
-      case AST_OR:     tac = tacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);             break;
-      case AST_NOT:    tac = tacUnaryOperation(TAC_NOT,  tacSon[0]);                        break;
+      case AST_SYMBOL: tac = tacCreate(TAC_SYMBOL, node->symbol, NULL, NULL);                             break;
+      case AST_ADD:    tac = tacBinaryOperation(TAC_ADD, tacSon[0], tacSon[1]);                           break;
+      case AST_SUB:    tac = tacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);                           break;
+      case AST_MUL:    tac = tacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);                           break;
+      case AST_DIV:    tac = tacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);                           break;
+      case AST_LT:     tac = tacBinaryOperation(TAC_LT,  tacSon[0], tacSon[1]);                           break;
+      case AST_GT:     tac = tacBinaryOperation(TAC_GT,  tacSon[0], tacSon[1]);                           break;
+      case AST_LE:     tac = tacBinaryOperation(TAC_LE,  tacSon[0], tacSon[1]);                           break;
+      case AST_GE:     tac = tacBinaryOperation(TAC_GE,  tacSon[0], tacSon[1]);                           break;
+      case AST_EQ:     tac = tacBinaryOperation(TAC_EQ,  tacSon[0], tacSon[1]);                           break;
+      case AST_DIF:    tac = tacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);                           break;
+      case AST_XOR:    tac = tacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);                           break;
+      case AST_OR:     tac = tacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);                           break;
+      case AST_NOT:    tac = tacUnaryOperation(TAC_NOT,  tacSon[0]);                                      break;
+      case AST_ATTR:   tac = tacJoin(tacSon[0], tacCreate(TAC_COPY, node->symbol, tacSon[0]->res, NULL)); break;
 
-      // Caso nodo da AST não tenha opcode TAC, junta os TACs filhos maior unificado
-      default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3]))); break;
+      // Caso nodo da AST não tenha opcode TAC, junta os TACs dos filhos na AST de forma unificada
+      default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3])));               break;
    }
 
    return tac;
@@ -103,6 +104,7 @@ void tacPrintNode(TAC_NODE *tac) {
       case TAC_XOR:     printf("TAC_XOR");      break;
       case TAC_OR:      printf("TAC_OR");       break;
       case TAC_NOT:     printf("TAC_NOT");      break;
+      case TAC_COPY:    printf("TAC_COPY");     break;
       default:          printf("TAC_UNKNOWN");  break;
    }
 

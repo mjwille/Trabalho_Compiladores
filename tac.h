@@ -24,6 +24,7 @@
 #define TAC_XOR   12
 #define TAC_OR    13
 #define TAC_NOT   14
+#define TAC_COPY  15
 
 typedef struct tac_node
 {
