@@ -3,8 +3,8 @@
 # Universidade Federal do Rio Grande do Sul
 
 
-etapa4: main.o y.tab.o lex.yy.o hash.o semantic.o ast.o
-	gcc main.o y.tab.o lex.yy.o hash.o semantic.o ast.o -o etapa4
+etapa5: main.o y.tab.o lex.yy.o hash.o ast.o semantic.o tac.o
+	gcc main.o y.tab.o lex.yy.o hash.o ast.o semantic.o tac.o -o etapa5
 
 main.o: main.c
 	gcc -c main.c
@@ -12,11 +12,14 @@ main.o: main.c
 hash.o: hash.c
 	gcc -c hash.c
 
+ast.o: ast.c
+	gcc -c ast.c
+
 semantic.o: semantic.c
 	gcc -c semantic.c
 
-ast.o: ast.c
-	gcc -c ast.c
+tac.o: tac.c
+	gcc -c tac.c
 
 y.yab.o: y.tab.c
 	gcc -c y.tab.c
@@ -31,4 +34,4 @@ y.tab.c: parser.y
 	yacc -d parser.y
 
 clean:
-	rm etapa4 *.o lex.yy.c y.tab.c y.tab.h
+	rm etapa5 *.o lex.yy.c y.tab.c y.tab.h
