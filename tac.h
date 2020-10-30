@@ -10,24 +10,26 @@
 #include "ast.h"
 
 // Definição das operações (opcodes possíveis) para um nodo de "Three Address Code" (TAC)
-#define TAC_SYMBOL 1
-#define TAC_ADD    2
-#define TAC_SUB    3
-#define TAC_MUL    4
-#define TAC_DIV    5
-#define TAC_LT     6
-#define TAC_GT     7
-#define TAC_LE     8
-#define TAC_GE     9
-#define TAC_EQ    10
-#define TAC_DIF   11
-#define TAC_XOR   12
-#define TAC_OR    13
-#define TAC_NOT   14
-#define TAC_COPY  15
-#define TAC_JF    16
-#define TAC_JMP   17
-#define TAC_LABEL 18
+#define TAC_SYMBOL    1
+#define TAC_ADD       2
+#define TAC_SUB       3
+#define TAC_MUL       4
+#define TAC_DIV       5
+#define TAC_LT        6
+#define TAC_GT        7
+#define TAC_LE        8
+#define TAC_GE        9
+#define TAC_EQ       10
+#define TAC_DIF      11
+#define TAC_XOR      12
+#define TAC_OR       13
+#define TAC_NOT      14
+#define TAC_COPY     15
+#define TAC_JF       16
+#define TAC_JMP      17
+#define TAC_LABEL    18
+#define TAC_BEGINFUN 19
+#define TAC_ENDFUN   20
 
 typedef struct tac_node
 {
@@ -73,5 +75,8 @@ TAC_NODE* tacLoop(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2, TAC_NODE *son3
 
 // Cria uma TAC para o while
 TAC_NODE* tacWhile(TAC_NODE *son0, TAC_NODE *son1);
+
+// Cria TACs para declarações de funções
+TAC_NODE* tacDefFun(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1);
 
 #endif

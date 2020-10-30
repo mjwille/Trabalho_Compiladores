@@ -26,25 +26,26 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
 
    // Processa então o nodo atual
    switch(node->type) {
-      case AST_SYMBOL:   tac = tacCreate(TAC_SYMBOL, node->symbol, NULL, NULL);                             break;
-      case AST_ADD:      tac = tacBinaryOperation(TAC_ADD, tacSon[0], tacSon[1]);                           break;
-      case AST_SUB:      tac = tacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);                           break;
-      case AST_MUL:      tac = tacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);                           break;
-      case AST_DIV:      tac = tacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);                           break;
-      case AST_LT:       tac = tacBinaryOperation(TAC_LT,  tacSon[0], tacSon[1]);                           break;
-      case AST_GT:       tac = tacBinaryOperation(TAC_GT,  tacSon[0], tacSon[1]);                           break;
-      case AST_LE:       tac = tacBinaryOperation(TAC_LE,  tacSon[0], tacSon[1]);                           break;
-      case AST_GE:       tac = tacBinaryOperation(TAC_GE,  tacSon[0], tacSon[1]);                           break;
-      case AST_EQ:       tac = tacBinaryOperation(TAC_EQ,  tacSon[0], tacSon[1]);                           break;
-      case AST_DIF:      tac = tacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);                           break;
-      case AST_XOR:      tac = tacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);                           break;
-      case AST_OR:       tac = tacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);                           break;
-      case AST_NOT:      tac = tacUnaryOperation(TAC_NOT,  tacSon[0]);                                      break;
-      case AST_ATTR:     tac = tacJoin(tacSon[0], tacCreate(TAC_COPY, node->symbol, tacSon[0]->res, NULL)); break;
-      case AST_IF:       tac = tacIfThen(tacSon[0], tacSon[1]);                                             break;
-      case AST_IF_ELSE:  tac = tacIfThenElse(tacSon[0], tacSon[1], tacSon[2]);                              break;
-      case AST_LOOP:     tac = tacLoop(tacSon[0], tacSon[1], tacSon[2], tacSon[3]);                         break;
-      case AST_WHILE:    tac = tacWhile(tacSon[0], tacSon[1]);                                              break;
+      case AST_SYMBOL:      tac = tacCreate(TAC_SYMBOL, node->symbol, NULL, NULL);                               break;
+      case AST_ADD:         tac = tacBinaryOperation(TAC_ADD, tacSon[0], tacSon[1]);                             break;
+      case AST_SUB:         tac = tacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);                             break;
+      case AST_MUL:         tac = tacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);                             break;
+      case AST_DIV:         tac = tacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);                             break;
+      case AST_LT:          tac = tacBinaryOperation(TAC_LT,  tacSon[0], tacSon[1]);                             break;
+      case AST_GT:          tac = tacBinaryOperation(TAC_GT,  tacSon[0], tacSon[1]);                             break;
+      case AST_LE:          tac = tacBinaryOperation(TAC_LE,  tacSon[0], tacSon[1]);                             break;
+      case AST_GE:          tac = tacBinaryOperation(TAC_GE,  tacSon[0], tacSon[1]);                             break;
+      case AST_EQ:          tac = tacBinaryOperation(TAC_EQ,  tacSon[0], tacSon[1]);                             break;
+      case AST_DIF:         tac = tacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);                             break;
+      case AST_XOR:         tac = tacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);                             break;
+      case AST_OR:          tac = tacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);                             break;
+      case AST_NOT:         tac = tacUnaryOperation(TAC_NOT,  tacSon[0]);                                        break;
+      case AST_ATTR:        tac = tacJoin(tacSon[0], tacCreate(TAC_COPY, node->symbol, tacSon[0]->res, NULL));   break;
+      case AST_IF:          tac = tacIfThen(tacSon[0], tacSon[1]);                                               break;
+      case AST_IF_ELSE:     tac = tacIfThenElse(tacSon[0], tacSon[1], tacSon[2]);                                break;
+      case AST_LOOP:        tac = tacLoop(tacSon[0], tacSon[1], tacSon[2], tacSon[3]);                           break;
+      case AST_WHILE:       tac = tacWhile(tacSon[0], tacSon[1]);                                                break;
+      case AST_DECL_FUNC:   tac = tacDefFun(node, tacSon[0], tacSon[2]);                                         break;
 
       // Caso nodo da AST não tenha opcode TAC, junta os TACs dos filhos na AST de forma unificada
       default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3])));               break;
@@ -95,24 +96,26 @@ void tacPrintNode(TAC_NODE *tac) {
    printf("TAC(");
 
    switch(tac->opcode) {
-      case TAC_ADD:     printf("TAC_ADD");      break;
-      case TAC_SUB:     printf("TAC_SUB");      break;
-      case TAC_MUL:     printf("TAC_MUL");      break;
-      case TAC_DIV:     printf("TAC_DIV");      break;
-      case TAC_LT:      printf("TAC_LT");       break;
-      case TAC_GT:      printf("TAC_GT");       break;
-      case TAC_LE:      printf("TAC_LE");       break;
-      case TAC_GE:      printf("TAC_GE");       break;
-      case TAC_EQ:      printf("TAC_EQ");       break;
-      case TAC_DIF:     printf("TAC_DIF");      break;
-      case TAC_XOR:     printf("TAC_XOR");      break;
-      case TAC_OR:      printf("TAC_OR");       break;
-      case TAC_NOT:     printf("TAC_NOT");      break;
-      case TAC_COPY:    printf("TAC_COPY");     break;
-      case TAC_JF:      printf("TAC_JF");       break;
-      case TAC_JMP:     printf("TAC_JMP");      break;
-      case TAC_LABEL:   printf("TAC_LABEL");    break;
-      default:          printf("TAC_UNKNOWN");  break;
+      case TAC_ADD:        printf("TAC_ADD");        break;
+      case TAC_SUB:        printf("TAC_SUB");        break;
+      case TAC_MUL:        printf("TAC_MUL");        break;
+      case TAC_DIV:        printf("TAC_DIV");        break;
+      case TAC_LT:         printf("TAC_LT");         break;
+      case TAC_GT:         printf("TAC_GT");         break;
+      case TAC_LE:         printf("TAC_LE");         break;
+      case TAC_GE:         printf("TAC_GE");         break;
+      case TAC_EQ:         printf("TAC_EQ");         break;
+      case TAC_DIF:        printf("TAC_DIF");        break;
+      case TAC_XOR:        printf("TAC_XOR");        break;
+      case TAC_OR:         printf("TAC_OR");         break;
+      case TAC_NOT:        printf("TAC_NOT");        break;
+      case TAC_COPY:       printf("TAC_COPY");       break;
+      case TAC_JF:         printf("TAC_JF");         break;
+      case TAC_JMP:        printf("TAC_JMP");        break;
+      case TAC_LABEL:      printf("TAC_LABEL");      break;
+      case TAC_BEGINFUN:   printf("TAC_BEGINFUN");   break;
+      case TAC_ENDFUN:     printf("TAC_ENDFUN");     break;
+      default:             printf("TAC_UNKNOWN");    break;
    }
 
    // Impressão dos campos de resposta e operandos dos nodos (caso tenha um ponteiro para a tabela hash)
@@ -277,4 +280,21 @@ TAC_NODE* tacWhile(TAC_NODE *son0, TAC_NODE *son1) {
     * Tudo isso precisa ser juntado quando chegar no nodo da AST que representa o while
     */
    return tacJoin(tacLabel1, tacJoin(son0, tacJoin(tacJf, tacJoin(son1, tacJoin(tacJmp, tacLabel2)))));
+}
+
+
+// Cria TACs para declarações de funções
+TAC_NODE* tacDefFun(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1) {
+   TAC_NODE *tacBeginFun = tacCreate(TAC_BEGINFUN, node->symbol, NULL, NULL);
+   TAC_NODE *tacEndFun   = tacCreate(TAC_ENDFUN,   node->symbol, NULL, NULL);
+   /* Faz os joins para que a declaração da função fique na forma:
+    *
+    * TAC_BEGINFUN
+    * código da lista de parâmetros (son0)
+    * corpo da função (son1)
+    * TAC_ENDFUN
+    *
+    * Tudo isso precisa ser juntado quando chegar no nodo da AST que representa a declaração da função
+    */
+   return tacJoin(tacBeginFun, tacJoin(son0, tacJoin(son1, tacEndFun)));
 }
