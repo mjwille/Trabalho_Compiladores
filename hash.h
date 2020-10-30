@@ -32,6 +32,8 @@
 #define DATATYPE_INT   13
 #define DATATYPE_FLOAT 14
 
+// Símbolo extra para reconhecer labels das TACs na hash table
+#define SYMBOL_LABEL 15
 
 typedef struct hash_node
 {
@@ -67,5 +69,8 @@ char* formatType(int type);
 
 // Cria um nodo com um temporário para a geração de TACs
 HASH_NODE* makeTemp();
+
+// Cria um nodo com um label para a geração de TACs
+HASH_NODE* makeLabel();
 
 #endif

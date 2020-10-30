@@ -41,6 +41,7 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
       case AST_OR:     tac = tacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);                           break;
       case AST_NOT:    tac = tacUnaryOperation(TAC_NOT,  tacSon[0]);                                      break;
       case AST_ATTR:   tac = tacJoin(tacSon[0], tacCreate(TAC_COPY, node->symbol, tacSon[0]->res, NULL)); break;
+      case AST_IF:     tac = tacIfThen(tacSon[0], tacSon[1]);                                             break;
 
       // Caso nodo da AST não tenha opcode TAC, junta os TACs dos filhos na AST de forma unificada
       default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3])));               break;
@@ -105,6 +106,8 @@ void tacPrintNode(TAC_NODE *tac) {
       case TAC_OR:      printf("TAC_OR");       break;
       case TAC_NOT:     printf("TAC_NOT");      break;
       case TAC_COPY:    printf("TAC_COPY");     break;
+      case TAC_JF:      printf("TAC_JF");       break;
+      case TAC_LABEL:   printf("TAC_LABEL");    break;
       default:          printf("TAC_UNKNOWN");  break;
    }
 
@@ -140,6 +143,27 @@ TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son1) {
    TAC_NODE *tacOperation = tacCreate(opcode, temp, op1, NULL);
    // Junta por fim o código do filho (que vem antes da operação) com o código da própria operação
    return tacJoin(son1, tacOperation);
+}
+
+
+// Cria uma TAC para o if/then
+TAC_NODE* tacIfThen(TAC_NODE *son1, TAC_NODE *son2) {
+   // Cria TACs auxiliares para montar a lógica do código do If
+   HASH_NODE *label = makeLabel();
+   TAC_NODE *tacJf  = tacCreate(TAC_JF, label, son1->res, NULL);
+   // Cria TAC label que vai ficar antes do código pra dar jump se for falso (JF - Jump If False)
+   TAC_NODE *tacLabel = tacCreate(TAC_LABEL, label, NULL, NULL);
+   /* Faz os joins para que o If fique na forma:
+    *
+    * expr (código de son1)
+    * TAC_JF -------------------
+    * expr (código de son2)    |
+    * TAC_LABEL <--------------
+    * ...
+    *
+    * Tudo isso precisa ser juntado quando chegar no nodo da AST que representa o If/Then
+    */
+   return tacJoin(son1, tacJoin(tacJf, tacJoin(son2, tacLabel)));
 }
 
 

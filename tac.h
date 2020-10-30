@@ -25,6 +25,8 @@
 #define TAC_OR    13
 #define TAC_NOT   14
 #define TAC_COPY  15
+#define TAC_JF    16
+#define TAC_LABEL 17
 
 typedef struct tac_node
 {
@@ -53,6 +55,9 @@ TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son1, TAC_NODE *son2);
 
 // Cria uma TAC para operadores unários
 TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son1);
+
+// Cria uma TAC para o if/then
+TAC_NODE* tacIfThen(TAC_NODE *son1, TAC_NODE *son2);
 
 // Junta 2 TACs em uma TAC única maior
 TAC_NODE* tacJoin(TAC_NODE *tac1, TAC_NODE *tac2);

@@ -123,6 +123,7 @@ char* formatType(int type)
 		case SYMBOL_SCALAR:        return "SCALAR";
 		case SYMBOL_VECTOR:        return "VECTOR";
 		case SYMBOL_FUNCTION:      return "FUNCTION";
+		case SYMBOL_LABEL:         return "LABEL";
 		case DATATYPE_BOOL:        return "BOOL";
 		case DATATYPE_CHAR:        return "CHAR";
 		case DATATYPE_INT:         return "INT";
@@ -138,4 +139,13 @@ HASH_NODE* makeTemp() {
 	char str[60];
 	sprintf(str, "__temp__%d", serial++);
 	return hashInsert(str, SYMBOL_SCALAR, DATATYPE_NULL);
+}
+
+
+// Cria um nodo com um label para a geração de TACs
+HASH_NODE* makeLabel() {
+	static int serial = 0;
+	char str[60];
+	sprintf(str, "__label__%d", serial++);
+	return hashInsert(str, SYMBOL_LABEL, DATATYPE_NULL);
 }
