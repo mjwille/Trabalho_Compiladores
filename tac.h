@@ -47,8 +47,11 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node);
 // Cria nodo do tipo TAC e coloca 'prev' e 'next' para NULL
 TAC_NODE* tacCreate(int opcode, HASH_NODE *res, HASH_NODE *op1, HASH_NODE *op2);
 
-// Imprime as TACs da frente para trás
+// Função principal chamada pelo parser.y para imprimir as TACs (chama a função de impressão recursiva)
 void tacPrint(TAC_NODE *tac);
+
+// Imprime as TACs da frente para trás de forma recursiva
+void tacPrintRecursive(TAC_NODE *tac);
 
 // Imprime um nodo do tipo TAC
 void tacPrintNode(TAC_NODE *tac);

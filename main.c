@@ -41,10 +41,10 @@ int main(int argc, char *argv[])
 	yyparse();
 
 	// Imprime a tabela de símbolos
-	// hashPrint();
+	hashPrint();
 
 	// Imprime mensagem de compilação bem feita até o fim
-	printf("\nCompilation was a success.\n\n");
+	printf("==> Compilation was a success.\n\n");
 
 	// Fecha arquivo de output (de ast.h) e encerra programa com código de sucesso
 	fclose(outputFile);

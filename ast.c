@@ -31,7 +31,7 @@ AST_NODE *astInsert(int type, HASH_NODE *symbol, AST_NODE *son0, AST_NODE *son1,
 
 // Imprime toda a AST
 void astPrint(AST_NODE *node) {
-	printf("\nABSTRACT SYNTAX TREE:\n\n");
+	printf("\nAbstract Syntax Tree:\n\n");
 	// chama a função que imprime nodo a nodo recursivamente a AST (se tiver algum nodo)
 	if(node != NULL) {
 		astPrintNode(node, 0, 0, 0);
