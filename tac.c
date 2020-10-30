@@ -48,6 +48,7 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
       case AST_DECL_FUNC:   tac = makeTacDefFun(node, tacSon[0], tacSon[2]);                                              break;
       case AST_READ:        tac = tacCreate(TAC_READ, node->symbol, NULL, NULL);                                          break;
       case AST_RETURN:      tac = makeTacRet(tacSon[0]);                                                                  break;
+      case AST_FUNCALL:     tac = makeTacCall(node, tacSon[0]);                                                           break;
       case AST_VEC:         tac = makeTacVecRead(node, tacSon[0]);                                                        break;
       case AST_ATTR_VEC:    tac = makeTacVecCopy(node, tacSon[0], tacSon[1]);                                             break;
 
@@ -129,6 +130,7 @@ void tacPrintNode(TAC_NODE *tac) {
       case TAC_ENDFUN:     printf("TAC_ENDFUN");     break;
       case TAC_READ:       printf("TAC_READ");       break;
       case TAC_RET:        printf("TAC_RET");        break;
+      case TAC_CALL:       printf("TAC_CALL");       break;
       case TAC_VECREAD:    printf("TAC_VECREAD");    break;
       case TAC_VECCOPY:    printf("TAC_VECCOPY");    break;
       default:             printf("TAC_UNKNOWN");    break;
@@ -324,6 +326,17 @@ TAC_NODE* makeTacRet(TAC_NODE *son0) {
     * antes do código de retorna (que pega essa resposta e retorna)
     */
    return tacJoin(son0, tacRet);
+}
+
+
+// Cria TAC para chamada de função
+TAC_NODE* makeTacCall(AST_NODE *node, TAC_NODE *son0) {
+   // Cria um temporário na hash table para onde o resultado da TAC será colocado
+   HASH_NODE *temp = makeTemp();
+   // Cria TAC de chamada de função onde único argumento é o símbolo da função chamada e a resposta vai para um temporário
+   TAC_NODE *tacCall = tacCreate(TAC_CALL, temp, node->symbol, NULL);
+   // Precisa colocar antes do código da chamada da função as TACs dos argumentos (depois no assembly isso resulta em PUSHs na pilha, antes de pular para o endereço da função com CALL)
+   return tacJoin(son0, tacCall);
 }
 
 

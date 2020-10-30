@@ -90,6 +90,9 @@ TAC_NODE* makeTacDefFun(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1);
 // Cria TAC para comando return
 TAC_NODE* makeTacRet(TAC_NODE *son0);
 
+// Cria TAC para chamada de função
+TAC_NODE* makeTacCall(AST_NODE *node, TAC_NODE *son0);
+
 // Cria TAC para leitura de posição do vetor
 TAC_NODE* makeTacVecRead(AST_NODE *node, TAC_NODE *son0);
 
