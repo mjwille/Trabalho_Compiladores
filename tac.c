@@ -107,6 +107,7 @@ void tacPrintNode(TAC_NODE *tac) {
       case TAC_NOT:     printf("TAC_NOT");      break;
       case TAC_COPY:    printf("TAC_COPY");     break;
       case TAC_JF:      printf("TAC_JF");       break;
+      case TAC_JMP:     printf("TAC_JMP");      break;
       case TAC_LABEL:   printf("TAC_LABEL");    break;
       default:          printf("TAC_UNKNOWN");  break;
    }
@@ -120,50 +121,50 @@ void tacPrintNode(TAC_NODE *tac) {
 
 
 // Cria uma TAC para operadores binários
-TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son1, TAC_NODE *son2) {
+TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son0, TAC_NODE *son1) {
    // Cria um temporário na hash table para onde o resultado da operação será colocado
    HASH_NODE *temp = makeTemp();
    // Cria o código TAC da operação, que tem como operandos os resultados dos códigos dos filhos
-   HASH_NODE *op1 = (son1->res) ? son1->res : 0;
-   HASH_NODE *op2 = (son2->res) ? son2->res : 0;
+   HASH_NODE *op1 = (son0->res) ? son0->res : 0;
+   HASH_NODE *op2 = (son1->res) ? son1->res : 0;
    TAC_NODE *tacOperation = tacCreate(opcode, temp, op1, op2);
    // Junta o código dos filhos para os quais a operação binária será aplicada
-   TAC_NODE *tacSons = tacJoin(son1, son2);
+   TAC_NODE *tacSons = tacJoin(son0, son1);
    // Junta por fim o código dos filhos (que vem antes da operação) com o código da própria operação
    return tacJoin(tacSons, tacOperation);
 }
 
 
 // Cria uma TAC para operadores unários
-TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son1) {
+TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son0) {
    // Cria um temporário na hash table para onde o resultado da operação será colocado
    HASH_NODE *temp = makeTemp();
    // Cria o código TAC da operação, que tem como operandos os resultados dos códigos dos filhos
-   HASH_NODE *op1 = (son1->res) ? son1->res : 0;
+   HASH_NODE *op1 = (son0->res) ? son0->res : 0;
    TAC_NODE *tacOperation = tacCreate(opcode, temp, op1, NULL);
    // Junta por fim o código do filho (que vem antes da operação) com o código da própria operação
-   return tacJoin(son1, tacOperation);
+   return tacJoin(son0, tacOperation);
 }
 
 
 // Cria uma TAC para o if/then
-TAC_NODE* tacIfThen(TAC_NODE *son1, TAC_NODE *son2) {
+TAC_NODE* tacIfThen(TAC_NODE *son0, TAC_NODE *son1) {
    // Cria TACs auxiliares para montar a lógica do código do If
    HASH_NODE *label = makeLabel();
-   TAC_NODE *tacJf  = tacCreate(TAC_JF, label, son1->res, NULL);
+   TAC_NODE *tacJf  = tacCreate(TAC_JF, label, son0->res, NULL);
    // Cria TAC label que vai ficar antes do código pra dar jump se for falso (JF - Jump If False)
    TAC_NODE *tacLabel = tacCreate(TAC_LABEL, label, NULL, NULL);
    /* Faz os joins para que o If fique na forma:
     *
-    * expr (código de son1)
+    * expr (código de son0)
     * TAC_JF -------------------
-    * expr (código de son2)    |
+    * expr (código de son1)    |
     * TAC_LABEL <--------------
     * ...
     *
     * Tudo isso precisa ser juntado quando chegar no nodo da AST que representa o If/Then
     */
-   return tacJoin(son1, tacJoin(tacJf, tacJoin(son2, tacLabel)));
+   return tacJoin(son0, tacJoin(tacJf, tacJoin(son1, tacLabel)));
 }
 
 

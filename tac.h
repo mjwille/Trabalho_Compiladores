@@ -26,7 +26,8 @@
 #define TAC_NOT   14
 #define TAC_COPY  15
 #define TAC_JF    16
-#define TAC_LABEL 17
+#define TAC_JMP   17
+#define TAC_LABEL 18
 
 typedef struct tac_node
 {
@@ -51,13 +52,16 @@ void tacPrint(TAC_NODE *tac);
 void tacPrintNode(TAC_NODE *tac);
 
 // Cria uma TAC para operadores binários
-TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son1, TAC_NODE *son2);
+TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son0, TAC_NODE *son1);
 
 // Cria uma TAC para operadores unários
-TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son1);
+TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son0);
 
 // Cria uma TAC para o if/then
-TAC_NODE* tacIfThen(TAC_NODE *son1, TAC_NODE *son2);
+TAC_NODE* tacIfThen(TAC_NODE *son0, TAC_NODE *son1);
+
+// Cria uma TAC para o if/then/else
+TAC_NODE* tacIfThenElse(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2);
 
 // Junta 2 TACs em uma TAC única maior
 TAC_NODE* tacJoin(TAC_NODE *tac1, TAC_NODE *tac2);
