@@ -26,28 +26,30 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
 
    // Processa então o nodo atual
    switch(node->type) {
-      case AST_SYMBOL:      tac = tacCreate(TAC_SYMBOL, node->symbol, NULL, NULL);                                       break;
-      case AST_ADD:         tac = tacBinaryOperation(TAC_ADD, tacSon[0], tacSon[1]);                                     break;
-      case AST_SUB:         tac = tacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);                                     break;
-      case AST_MUL:         tac = tacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);                                     break;
-      case AST_DIV:         tac = tacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);                                     break;
-      case AST_LT:          tac = tacBinaryOperation(TAC_LT,  tacSon[0], tacSon[1]);                                     break;
-      case AST_GT:          tac = tacBinaryOperation(TAC_GT,  tacSon[0], tacSon[1]);                                     break;
-      case AST_LE:          tac = tacBinaryOperation(TAC_LE,  tacSon[0], tacSon[1]);                                     break;
-      case AST_GE:          tac = tacBinaryOperation(TAC_GE,  tacSon[0], tacSon[1]);                                     break;
-      case AST_EQ:          tac = tacBinaryOperation(TAC_EQ,  tacSon[0], tacSon[1]);                                     break;
-      case AST_DIF:         tac = tacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);                                     break;
-      case AST_XOR:         tac = tacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);                                     break;
-      case AST_OR:          tac = tacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);                                     break;
-      case AST_NOT:         tac = tacUnaryOperation(TAC_NOT,  tacSon[0]);                                                break;
-      case AST_ATTR:        tac = tacJoin(tacSon[0], tacCreate(TAC_COPY, node->symbol, tacResCheck(tacSon[0]), NULL));   break;
-      case AST_IF:          tac = tacIfThen(tacSon[0], tacSon[1]);                                                       break;
-      case AST_IF_ELSE:     tac = tacIfThenElse(tacSon[0], tacSon[1], tacSon[2]);                                        break;
-      case AST_LOOP:        tac = tacLoop(tacSon[0], tacSon[1], tacSon[2], tacSon[3]);                                   break;
-      case AST_WHILE:       tac = tacWhile(tacSon[0], tacSon[1]);                                                        break;
-      case AST_DECL_FUNC:   tac = tacDefFun(node, tacSon[0], tacSon[2]);                                                 break;
-      case AST_READ:        tac = tacCreate(TAC_READ, node->symbol, NULL, NULL);                                         break;
-      case AST_RETURN:      tac = tacReturn(tacSon[0]);                                                                  break;
+      case AST_SYMBOL:      tac = tacCreate(TAC_SYMBOL, node->symbol, NULL, NULL);                                        break;
+      case AST_ADD:         tac = makeTacBinaryOperation(TAC_ADD, tacSon[0], tacSon[1]);                                  break;
+      case AST_SUB:         tac = makeTacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);                                  break;
+      case AST_MUL:         tac = makeTacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);                                  break;
+      case AST_DIV:         tac = makeTacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);                                  break;
+      case AST_LT:          tac = makeTacBinaryOperation(TAC_LT,  tacSon[0], tacSon[1]);                                  break;
+      case AST_GT:          tac = makeTacBinaryOperation(TAC_GT,  tacSon[0], tacSon[1]);                                  break;
+      case AST_LE:          tac = makeTacBinaryOperation(TAC_LE,  tacSon[0], tacSon[1]);                                  break;
+      case AST_GE:          tac = makeTacBinaryOperation(TAC_GE,  tacSon[0], tacSon[1]);                                  break;
+      case AST_EQ:          tac = makeTacBinaryOperation(TAC_EQ,  tacSon[0], tacSon[1]);                                  break;
+      case AST_DIF:         tac = makeTacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);                                  break;
+      case AST_XOR:         tac = makeTacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);                                  break;
+      case AST_OR:          tac = makeTacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);                                  break;
+      case AST_NOT:         tac = makeTacUnaryOperation(TAC_NOT,  tacSon[0]);                                             break;
+      case AST_ATTR:        tac = tacJoin(tacSon[0], tacCreate(TAC_COPY, node->symbol, tacResCheck(tacSon[0]), NULL));    break;
+      case AST_IF:          tac = makeTacIfThen(tacSon[0], tacSon[1]);                                                    break;
+      case AST_IF_ELSE:     tac = makeTacIfThenElse(tacSon[0], tacSon[1], tacSon[2]);                                     break;
+      case AST_LOOP:        tac = makeTacLoop(tacSon[0], tacSon[1], tacSon[2], tacSon[3]);                                break;
+      case AST_WHILE:       tac = makeTacWhile(tacSon[0], tacSon[1]);                                                     break;
+      case AST_DECL_FUNC:   tac = makeTacDefFun(node, tacSon[0], tacSon[2]);                                              break;
+      case AST_READ:        tac = tacCreate(TAC_READ, node->symbol, NULL, NULL);                                          break;
+      case AST_RETURN:      tac = makeTacRet(tacSon[0]);                                                                  break;
+      case AST_VEC:         tac = makeTacVecRead(node, tacSon[0]);                                                        break;
+      case AST_ATTR_VEC:    tac = makeTacVecCopy(node, tacSon[0], tacSon[1]);                                             break;
 
       // Caso nodo da AST não tenha opcode TAC, junta os TACs dos filhos na AST de forma unificada
       default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3])));               break;
@@ -127,6 +129,8 @@ void tacPrintNode(TAC_NODE *tac) {
       case TAC_ENDFUN:     printf("TAC_ENDFUN");     break;
       case TAC_READ:       printf("TAC_READ");       break;
       case TAC_RET:        printf("TAC_RET");        break;
+      case TAC_VECREAD:    printf("TAC_VECREAD");    break;
+      case TAC_VECCOPY:    printf("TAC_VECCOPY");    break;
       default:             printf("TAC_UNKNOWN");    break;
    }
 
@@ -167,7 +171,7 @@ TAC_NODE* tacJoin(TAC_NODE *tac1, TAC_NODE *tac2) {
 
 
 // Cria TAC para operadores binários
-TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son0, TAC_NODE *son1) {
+TAC_NODE* makeTacBinaryOperation(int opcode, TAC_NODE *son0, TAC_NODE *son1) {
    // Cria um temporário na hash table para onde o resultado da operação será colocado
    HASH_NODE *temp = makeTemp();
    // Cria o código TAC da operação, que tem como operandos os resultados dos códigos dos filhos
@@ -182,7 +186,7 @@ TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son0, TAC_NODE *son1) {
 
 
 // Cria TAC para operadores unários
-TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son0) {
+TAC_NODE* makeTacUnaryOperation(int opcode, TAC_NODE *son0) {
    // Cria um temporário na hash table para onde o resultado da operação será colocado
    HASH_NODE *temp = makeTemp();
    // Cria o código TAC da operação, que tem como operandos os resultados dos códigos dos filhos
@@ -194,7 +198,7 @@ TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son0) {
 
 
 // Cria TAC para o if/then
-TAC_NODE* tacIfThen(TAC_NODE *son0, TAC_NODE *son1) {
+TAC_NODE* makeTacIfThen(TAC_NODE *son0, TAC_NODE *son1) {
    // Cria TAC e label na hash para montar a lógica do if/then
    HASH_NODE *label = makeLabel();
    TAC_NODE *tacJf  = tacCreate(TAC_JF, label, tacResCheck(son0), NULL);
@@ -215,7 +219,7 @@ TAC_NODE* tacIfThen(TAC_NODE *son0, TAC_NODE *son1) {
 
 
 // Cria TAC para o if/then/else
-TAC_NODE* tacIfThenElse(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2) {
+TAC_NODE* makeTacIfThenElse(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2) {
    // Cria TACs e labels na hash para montar a lógica do if/then/else
    HASH_NODE *label1 = makeLabel();
    HASH_NODE *label2 = makeLabel();
@@ -242,7 +246,7 @@ TAC_NODE* tacIfThenElse(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2) {
 
 
 // Cria TAC para o loop
-TAC_NODE* tacLoop(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2, TAC_NODE *son3) {
+TAC_NODE* makeTacLoop(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2, TAC_NODE *son3) {
    // Cria TACs e labels na hash para montar a lógica do loop
    HASH_NODE *label1 = makeLabel();
    HASH_NODE *label2 = makeLabel();
@@ -270,7 +274,7 @@ TAC_NODE* tacLoop(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2, TAC_NODE *son3
 
 
 // Cria TAC para o while
-TAC_NODE* tacWhile(TAC_NODE *son0, TAC_NODE *son1) {
+TAC_NODE* makeTacWhile(TAC_NODE *son0, TAC_NODE *son1) {
    // Cria TACs e labels na hash para montar a lógica do while
    HASH_NODE *label1 = makeLabel();
    HASH_NODE *label2 = makeLabel();
@@ -296,7 +300,7 @@ TAC_NODE* tacWhile(TAC_NODE *son0, TAC_NODE *son1) {
 
 
 // Cria TACs para declarações de funções
-TAC_NODE* tacDefFun(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1) {
+TAC_NODE* makeTacDefFun(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1) {
    TAC_NODE *tacBeginFun = tacCreate(TAC_BEGINFUN, node->symbol, NULL, NULL);
    TAC_NODE *tacEndFun   = tacCreate(TAC_ENDFUN,   node->symbol, NULL, NULL);
    /* Faz os joins para que a declaração da função fique na forma:
@@ -313,13 +317,42 @@ TAC_NODE* tacDefFun(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1) {
 
 
 // Cria TAC para comando return
-TAC_NODE* tacReturn(TAC_NODE *son0) {
+TAC_NODE* makeTacRet(TAC_NODE *son0) {
    // Argumento para o código é a resposta do código que vai ser retornado
    TAC_NODE *tacRet = tacCreate(TAC_RET, NULL, tacResCheck(son0), NULL);
    /* Resta então colocar o código cuja resposta deve ser retornada
     * antes do código de retorna (que pega essa resposta e retorna)
     */
    return tacJoin(son0, tacRet);
+}
+
+
+// Cria TAC para leitura de posição do vetor
+TAC_NODE* makeTacVecRead(AST_NODE *node, TAC_NODE *son0) {
+   // Cria um temporário na hash table onde o resultado da operação de leitura do vetor vai ser colocado
+   HASH_NODE *temp = makeTemp();
+   // Cria TAC de leitura do vetor, tendo como argumentos o símbolo do vetor e o resultado da expressão (son0) que resulta em um inteiro
+   TAC_NODE *tacVecRead = tacCreate(TAC_VECREAD, temp, node->symbol, tacResCheck(son0));
+   /* Como o código de índice do vetor (son0) pode ser uma expressão que resulta
+    * em um inteiro, precisa colocar esse código antes de pegar o seu resultado
+    * como argumento para o acesso do vetor.
+    */
+   return tacJoin(son0, tacVecRead);
+}
+
+
+// Cria TAC para mover valor para posição do vetor
+TAC_NODE* makeTacVecCopy(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1) {
+   // Cria a TAC que faz cópia do valor para índice do vetor. Assim como a cópia, resultado vai para o símbolo
+   // na tabela hash. Primeiro argumento é o resultado do código que gera o índice. O segundo argumento é o
+   // resultado do código que gera o valor a ser copiado para a posição do vetor
+   TAC_NODE *tacVecCopy = tacCreate(TAC_VECCOPY, node->symbol, tacResCheck(son0), tacResCheck(son1));
+   /* Por fim, devemos colocar os códigos que geram o índice e o valor antes de fazer a cópia dos mesmos para a posição do vetor
+    *
+    * código que gera do índice (son0)
+    * código que gera o valor (son1)
+    */
+   return tacJoin(son0, tacJoin(son1, tacVecCopy));
 }
 
 

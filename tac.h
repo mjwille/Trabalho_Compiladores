@@ -33,6 +33,8 @@
 #define TAC_READ     21
 #define TAC_RET      22
 #define TAC_CALL     23
+#define TAC_VECREAD  24
+#define TAC_VECCOPY  25
 
 typedef struct tac_node
 {
@@ -65,28 +67,34 @@ TAC_NODE* tacJoin(TAC_NODE *tac1, TAC_NODE *tac2);
 /* ------------------------- Funções Auxiliares ------------------------- */
 
 // Cria TAC para operadores binários
-TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son0, TAC_NODE *son1);
+TAC_NODE* makeTacBinaryOperation(int opcode, TAC_NODE *son0, TAC_NODE *son1);
 
 // Cria TAC para operadores unários
-TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son0);
+TAC_NODE* makeTacUnaryOperation(int opcode, TAC_NODE *son0);
 
 // Cria TAC para o if/then
-TAC_NODE* tacIfThen(TAC_NODE *son0, TAC_NODE *son1);
+TAC_NODE* makeTacIfThen(TAC_NODE *son0, TAC_NODE *son1);
 
 // Cria TAC para o if/then/else
-TAC_NODE* tacIfThenElse(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2);
+TAC_NODE* makeTacIfThenElse(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2);
 
 // Cria TAC para o loop
-TAC_NODE* tacLoop(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2, TAC_NODE *son3);
+TAC_NODE* makeTacLoop(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2, TAC_NODE *son3);
 
 // Cria TAC para o while
-TAC_NODE* tacWhile(TAC_NODE *son0, TAC_NODE *son1);
+TAC_NODE* makeTacWhile(TAC_NODE *son0, TAC_NODE *son1);
 
 // Cria TACs para declarações de funções
-TAC_NODE* tacDefFun(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1);
+TAC_NODE* makeTacDefFun(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1);
 
 // Cria TAC para comando return
-TAC_NODE* tacReturn(TAC_NODE *son0);
+TAC_NODE* makeTacRet(TAC_NODE *son0);
+
+// Cria TAC para leitura de posição do vetor
+TAC_NODE* makeTacVecRead(AST_NODE *node, TAC_NODE *son0);
+
+// Cria TAC para mover valor para posição do vetor
+TAC_NODE* makeTacVecCopy(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1);
 
 // Função usada para verificar se a TAC realmente possui o campo na struct diferente de NULL e evitar segfaults
 HASH_NODE* tacResCheck(TAC_NODE *tac);
