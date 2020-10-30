@@ -26,22 +26,23 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
 
    // Processa então o nodo atual
    switch(node->type) {
-      case AST_SYMBOL: tac = tacCreate(TAC_SYMBOL, node->symbol, NULL, NULL);                             break;
-      case AST_ADD:    tac = tacBinaryOperation(TAC_ADD, tacSon[0], tacSon[1]);                           break;
-      case AST_SUB:    tac = tacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);                           break;
-      case AST_MUL:    tac = tacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);                           break;
-      case AST_DIV:    tac = tacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);                           break;
-      case AST_LT:     tac = tacBinaryOperation(TAC_LT,  tacSon[0], tacSon[1]);                           break;
-      case AST_GT:     tac = tacBinaryOperation(TAC_GT,  tacSon[0], tacSon[1]);                           break;
-      case AST_LE:     tac = tacBinaryOperation(TAC_LE,  tacSon[0], tacSon[1]);                           break;
-      case AST_GE:     tac = tacBinaryOperation(TAC_GE,  tacSon[0], tacSon[1]);                           break;
-      case AST_EQ:     tac = tacBinaryOperation(TAC_EQ,  tacSon[0], tacSon[1]);                           break;
-      case AST_DIF:    tac = tacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);                           break;
-      case AST_XOR:    tac = tacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);                           break;
-      case AST_OR:     tac = tacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);                           break;
-      case AST_NOT:    tac = tacUnaryOperation(TAC_NOT,  tacSon[0]);                                      break;
-      case AST_ATTR:   tac = tacJoin(tacSon[0], tacCreate(TAC_COPY, node->symbol, tacSon[0]->res, NULL)); break;
-      case AST_IF:     tac = tacIfThen(tacSon[0], tacSon[1]);                                             break;
+      case AST_SYMBOL:   tac = tacCreate(TAC_SYMBOL, node->symbol, NULL, NULL);                             break;
+      case AST_ADD:      tac = tacBinaryOperation(TAC_ADD, tacSon[0], tacSon[1]);                           break;
+      case AST_SUB:      tac = tacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);                           break;
+      case AST_MUL:      tac = tacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);                           break;
+      case AST_DIV:      tac = tacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);                           break;
+      case AST_LT:       tac = tacBinaryOperation(TAC_LT,  tacSon[0], tacSon[1]);                           break;
+      case AST_GT:       tac = tacBinaryOperation(TAC_GT,  tacSon[0], tacSon[1]);                           break;
+      case AST_LE:       tac = tacBinaryOperation(TAC_LE,  tacSon[0], tacSon[1]);                           break;
+      case AST_GE:       tac = tacBinaryOperation(TAC_GE,  tacSon[0], tacSon[1]);                           break;
+      case AST_EQ:       tac = tacBinaryOperation(TAC_EQ,  tacSon[0], tacSon[1]);                           break;
+      case AST_DIF:      tac = tacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);                           break;
+      case AST_XOR:      tac = tacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);                           break;
+      case AST_OR:       tac = tacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);                           break;
+      case AST_NOT:      tac = tacUnaryOperation(TAC_NOT,  tacSon[0]);                                      break;
+      case AST_ATTR:     tac = tacJoin(tacSon[0], tacCreate(TAC_COPY, node->symbol, tacSon[0]->res, NULL)); break;
+      case AST_IF:       tac = tacIfThen(tacSon[0], tacSon[1]);                                             break;
+      case AST_IF_ELSE:  tac = tacIfThenElse(tacSon[0], tacSon[1], tacSon[2]);                              break;
 
       // Caso nodo da AST não tenha opcode TAC, junta os TACs dos filhos na AST de forma unificada
       default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3])));               break;
@@ -149,7 +150,7 @@ TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son0) {
 
 // Cria uma TAC para o if/then
 TAC_NODE* tacIfThen(TAC_NODE *son0, TAC_NODE *son1) {
-   // Cria TACs auxiliares para montar a lógica do código do If
+   // Cria TACs e labels para montar a lógica do código do If
    HASH_NODE *label = makeLabel();
    TAC_NODE *tacJf  = tacCreate(TAC_JF, label, son0->res, NULL);
    // Cria TAC label que vai ficar antes do código pra dar jump se for falso (JF - Jump If False)
@@ -165,6 +166,33 @@ TAC_NODE* tacIfThen(TAC_NODE *son0, TAC_NODE *son1) {
     * Tudo isso precisa ser juntado quando chegar no nodo da AST que representa o If/Then
     */
    return tacJoin(son0, tacJoin(tacJf, tacJoin(son1, tacLabel)));
+}
+
+
+// Cria uma TAC para o if/then/else
+TAC_NODE* tacIfThenElse(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2) {
+   // Cria TACs e labels para montar a lógica do código do If
+   HASH_NODE *label1 = makeLabel();
+   HASH_NODE *label2 = makeLabel();
+   TAC_NODE *tacJf   = tacCreate(TAC_JF,  label1, son0->res, NULL);
+   TAC_NODE *tacJmp  = tacCreate(TAC_JMP, label2, NULL, NULL);
+   // Cria TAC labels utilizadas para dar os jumps do if/then/else
+   TAC_NODE *tacLabel1 = tacCreate(TAC_LABEL, label1, NULL, NULL);
+   TAC_NODE *tacLabel2 = tacCreate(TAC_LABEL, label2, NULL, NULL);
+   /* Faz os joins para que o If fique na forma:
+    *
+    *               expr (código de son0)
+    *               TAC_JF -------------------
+    *               expr (código de son1)    |
+    *          ---- TAC_JMP                  |
+    *          |    TAC_LABEL1 <-------------
+    *          |    expr (código de son2)
+    *          ---> TAC_LABEL2
+    *               ...
+    *
+    * Tudo isso precisa ser juntado quando chegar no nodo da AST que representa o If/Then
+    */
+   return tacJoin(son0, tacJoin(tacJf, tacJoin(son1, tacJoin(tacJmp, tacJoin(tacLabel1, tacJoin(son2, tacLabel2))))));
 }
 
 
