@@ -30,6 +30,9 @@
 #define TAC_LABEL    18
 #define TAC_BEGINFUN 19
 #define TAC_ENDFUN   20
+#define TAC_READ     21
+#define TAC_RET      22
+#define TAC_CALL     23
 
 typedef struct tac_node
 {

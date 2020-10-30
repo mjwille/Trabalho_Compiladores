@@ -46,6 +46,7 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
       case AST_LOOP:        tac = tacLoop(tacSon[0], tacSon[1], tacSon[2], tacSon[3]);                           break;
       case AST_WHILE:       tac = tacWhile(tacSon[0], tacSon[1]);                                                break;
       case AST_DECL_FUNC:   tac = tacDefFun(node, tacSon[0], tacSon[2]);                                         break;
+      case AST_READ:        tac = tacCreate(TAC_READ, node->symbol, NULL, NULL);                                 break;
 
       // Caso nodo da AST não tenha opcode TAC, junta os TACs dos filhos na AST de forma unificada
       default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3])));               break;
@@ -123,6 +124,7 @@ void tacPrintNode(TAC_NODE *tac) {
       case TAC_LABEL:      printf("TAC_LABEL");      break;
       case TAC_BEGINFUN:   printf("TAC_BEGINFUN");   break;
       case TAC_ENDFUN:     printf("TAC_ENDFUN");     break;
+      case TAC_READ:       printf("TAC_READ");       break;
       default:             printf("TAC_UNKNOWN");    break;
    }
 
