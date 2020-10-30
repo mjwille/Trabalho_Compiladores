@@ -43,6 +43,8 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
       case AST_ATTR:     tac = tacJoin(tacSon[0], tacCreate(TAC_COPY, node->symbol, tacSon[0]->res, NULL)); break;
       case AST_IF:       tac = tacIfThen(tacSon[0], tacSon[1]);                                             break;
       case AST_IF_ELSE:  tac = tacIfThenElse(tacSon[0], tacSon[1], tacSon[2]);                              break;
+      case AST_LOOP:     tac = tacLoop(tacSon[0], tacSon[1], tacSon[2], tacSon[3]);                         break;
+      case AST_WHILE:    tac = tacWhile(tacSon[0], tacSon[1]);                                              break;
 
       // Caso nodo da AST não tenha opcode TAC, junta os TACs dos filhos na AST de forma unificada
       default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3])));               break;
@@ -121,6 +123,34 @@ void tacPrintNode(TAC_NODE *tac) {
 }
 
 
+// Junta 2 TACs em uma TAC única maior
+TAC_NODE* tacJoin(TAC_NODE *tac1, TAC_NODE *tac2) {
+   // Se não tem a primeira TAC, retorna a segunda TAC
+   if(tac1 == NULL)
+      return tac2;
+
+   // Se não tem a segunda TAC, retorna a primeira TAC
+   if(tac2 == NULL)
+      return tac1;
+
+   TAC_NODE *aux;
+   // Passa por todos os TAC prévios de tac2 para realmente colocar tac1 no início de tac2
+   for(aux = tac2; aux->prev != NULL; aux = aux->prev);
+   // Coloca tac1 no início de tac2
+   aux->prev = tac1;
+
+   /* Agora as duas devem estar assim:
+    *
+    * [a -> b -> c] tac1 -> [x -> y -> z] tac2
+    *
+    * onde a, b, c, ..., x, y, z eram as tacs dentro de tac1 e tac2, e z, y, x foi o que
+    * percorremos com o 'prev' para que tac1 apontasse para o primeiro tac de tac2 (eg. x)
+    */
+
+   return tac2;
+}
+
+
 // Cria uma TAC para operadores binários
 TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son0, TAC_NODE *son1) {
    // Cria um temporário na hash table para onde o resultado da operação será colocado
@@ -150,10 +180,10 @@ TAC_NODE* tacUnaryOperation(int opcode, TAC_NODE *son0) {
 
 // Cria uma TAC para o if/then
 TAC_NODE* tacIfThen(TAC_NODE *son0, TAC_NODE *son1) {
-   // Cria TACs e labels para montar a lógica do código do If
+   // Cria TAC e label na hash para montar a lógica do If/Then
    HASH_NODE *label = makeLabel();
    TAC_NODE *tacJf  = tacCreate(TAC_JF, label, son0->res, NULL);
-   // Cria TAC label que vai ficar antes do código pra dar jump se for falso (JF - Jump If False)
+   // Cria TAC_LABEL que vai ficar antes do código pra dar jump se for falso (JF - Jump If False)
    TAC_NODE *tacLabel = tacCreate(TAC_LABEL, label, NULL, NULL);
    /* Faz os joins para que o If fique na forma:
     *
@@ -171,15 +201,15 @@ TAC_NODE* tacIfThen(TAC_NODE *son0, TAC_NODE *son1) {
 
 // Cria uma TAC para o if/then/else
 TAC_NODE* tacIfThenElse(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2) {
-   // Cria TACs e labels para montar a lógica do código do If
+   // Cria TACs e labels na hash para montar a lógica do If/Then/Else
    HASH_NODE *label1 = makeLabel();
    HASH_NODE *label2 = makeLabel();
    TAC_NODE *tacJf   = tacCreate(TAC_JF,  label1, son0->res, NULL);
    TAC_NODE *tacJmp  = tacCreate(TAC_JMP, label2, NULL, NULL);
-   // Cria TAC labels utilizadas para dar os jumps do if/then/else
+   // Cria TAC_LABELs utilizados para dar os jumps do If/Then/Else
    TAC_NODE *tacLabel1 = tacCreate(TAC_LABEL, label1, NULL, NULL);
    TAC_NODE *tacLabel2 = tacCreate(TAC_LABEL, label2, NULL, NULL);
-   /* Faz os joins para que o If fique na forma:
+   /* Faz os joins para que o If/Then/Else fique na forma:
     *
     *               expr (código de son0)
     *               TAC_JF -------------------
@@ -190,35 +220,61 @@ TAC_NODE* tacIfThenElse(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2) {
     *          ---> TAC_LABEL2
     *               ...
     *
-    * Tudo isso precisa ser juntado quando chegar no nodo da AST que representa o If/Then
+    * Tudo isso precisa ser juntado quando chegar no nodo da AST que representa o If/Then/Else
     */
    return tacJoin(son0, tacJoin(tacJf, tacJoin(son1, tacJoin(tacJmp, tacJoin(tacLabel1, tacJoin(son2, tacLabel2))))));
 }
 
 
-// Junta 2 TACs em uma TAC única maior
-TAC_NODE* tacJoin(TAC_NODE *tac1, TAC_NODE *tac2) {
-   // Se não tem a primeira TAC, retorna a segunda TAC
-   if(tac1 == NULL)
-      return tac2;
-
-   // Se não tem a segunda TAC, retorna a primeira TAC
-   if(tac2 == NULL)
-      return tac1;
-
-   TAC_NODE *aux;
-   // Passa por todos os TAC prévios de tac2 para realmente colocar tac1 no início de tac2
-   for(aux = tac2; aux->prev != NULL; aux = aux->prev);
-   // Coloca tac1 no início de tac2
-   aux->prev = tac1;
-
-   /* Agora as duas devem estar assim:
+// Cria uma TAC para o loop
+TAC_NODE* tacLoop(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2, TAC_NODE *son3) {
+   // Cria TACs e labels na hash para montar a lógica do loop
+   HASH_NODE *label1 = makeLabel();
+   HASH_NODE *label2 = makeLabel();
+   TAC_NODE *tacJf   = tacCreate(TAC_JF,  label2, son1->res, NULL);
+   TAC_NODE *tacJmp  = tacCreate(TAC_JMP, label1, NULL, NULL);
+   // Cria TAC_LABELs utilizados para dar os jumps do loop
+   TAC_NODE *tacLabel1 = tacCreate(TAC_LABEL, label1, NULL, NULL);
+   TAC_NODE *tacLabel2 = tacCreate(TAC_LABEL, label2, NULL, NULL);
+   /* Faz os joins para que o loop fique na forma:
     *
-    * [a -> b -> c] tac1 -> [x -> y -> z] tac2
+    *                expr (código de son0)                    *inicialização do loop
+    *           ---> TAC_LABEL1
+    *          |     expr (código de son1)                    *condição de parada do loop
+    *          |     TAC_JF -------------------
+    *          |     expr (código de son3)    |               *corpo do loop
+    *          |     expr (código de son2)    |               *expressão de update do loop
+    *          ---- TAC_JMP                   |
+    *               TAC_LABEL2 <-------------
+    *               ...
     *
-    * onde a, b, c, ..., x, y, z eram as tacs dentro de tac1 e tac2, e z, y, x foi o que
-    * percorremos com o 'prev' para que tac1 apontasse para o primeiro tac de tac2 (eg. x)
+    * Tudo isso precisa ser juntado quando chegar no nodo da AST que representa o loop
     */
+   return tacJoin(son0, tacJoin(tacLabel1, tacJoin(son1, tacJoin(tacJf, tacJoin(son3, tacJoin(son2, tacJoin(tacJmp, tacLabel2)))))));
+}
 
-   return tac2;
+
+// Cria uma TAC para o while
+TAC_NODE* tacWhile(TAC_NODE *son0, TAC_NODE *son1) {
+   // Cria TACs e labels na hash para montar a lógica do while
+   HASH_NODE *label1 = makeLabel();
+   HASH_NODE *label2 = makeLabel();
+   TAC_NODE *tacJf   = tacCreate(TAC_JF,  label2, son0->res, NULL);
+   TAC_NODE *tacJmp  = tacCreate(TAC_JMP, label1, NULL, NULL);
+   // Cria TAC_LABELs utilizados para dar os jumps do while
+   TAC_NODE *tacLabel1 = tacCreate(TAC_LABEL, label1, NULL, NULL);
+   TAC_NODE *tacLabel2 = tacCreate(TAC_LABEL, label2, NULL, NULL);
+   /* Faz os joins para que o loop fique na forma:
+    *
+    *           ---> TAC_LABEL1
+    *          |     expr (código de son0)                    *condição do while
+    *          |     TAC_JF -------------------
+    *          |     expr (código de son1)    |               *corpo do while
+    *          ---- TAC_JMP                   |
+    *               TAC_LABEL2 <-------------
+    *               ...
+    *
+    * Tudo isso precisa ser juntado quando chegar no nodo da AST que representa o while
+    */
+   return tacJoin(tacLabel1, tacJoin(son0, tacJoin(tacJf, tacJoin(son1, tacJoin(tacJmp, tacLabel2)))));
 }

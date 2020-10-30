@@ -51,6 +51,11 @@ void tacPrint(TAC_NODE *tac);
 // Imprime um nodo do tipo TAC
 void tacPrintNode(TAC_NODE *tac);
 
+// Junta 2 TACs em uma TAC única maior
+TAC_NODE* tacJoin(TAC_NODE *tac1, TAC_NODE *tac2);
+
+/* ------------------------- Funções Auxiliares ------------------------- */
+
 // Cria uma TAC para operadores binários
 TAC_NODE* tacBinaryOperation(int opcode, TAC_NODE *son0, TAC_NODE *son1);
 
@@ -63,7 +68,10 @@ TAC_NODE* tacIfThen(TAC_NODE *son0, TAC_NODE *son1);
 // Cria uma TAC para o if/then/else
 TAC_NODE* tacIfThenElse(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2);
 
-// Junta 2 TACs em uma TAC única maior
-TAC_NODE* tacJoin(TAC_NODE *tac1, TAC_NODE *tac2);
+// Cria uma TAC para o loop
+TAC_NODE* tacLoop(TAC_NODE *son0, TAC_NODE *son1, TAC_NODE *son2, TAC_NODE *son3);
+
+// Cria uma TAC para o while
+TAC_NODE* tacWhile(TAC_NODE *son0, TAC_NODE *son1);
 
 #endif
