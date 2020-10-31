@@ -33,8 +33,9 @@
 #define TAC_READ     21
 #define TAC_RET      22
 #define TAC_CALL     23
-#define TAC_VECREAD  24
-#define TAC_VECCOPY  25
+#define TAC_ARG      24
+#define TAC_VECREAD  25
+#define TAC_VECCOPY  26
 
 typedef struct tac_node
 {
@@ -92,6 +93,9 @@ TAC_NODE* makeTacRet(TAC_NODE *son0);
 
 // Cria TAC para chamada de função
 TAC_NODE* makeTacCall(AST_NODE *node, TAC_NODE *son0);
+
+// Cria TAC para argumento de função
+TAC_NODE* makeTacArg(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1);
 
 // Cria TAC para leitura de posição do vetor
 TAC_NODE* makeTacVecRead(AST_NODE *node, TAC_NODE *son0);

@@ -49,6 +49,7 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
       case AST_READ:        tac = tacCreate(TAC_READ, node->symbol, NULL, NULL);                                          break;
       case AST_RETURN:      tac = makeTacRet(tacSon[0]);                                                                  break;
       case AST_FUNCALL:     tac = makeTacCall(node, tacSon[0]);                                                           break;
+      case AST_ARGS:        tac = makeTacArg(node, tacSon[0], tacSon[1]);                                                 break;
       case AST_VEC:         tac = makeTacVecRead(node, tacSon[0]);                                                        break;
       case AST_ATTR_VEC:    tac = makeTacVecCopy(node, tacSon[0], tacSon[1]);                                             break;
 
@@ -131,6 +132,7 @@ void tacPrintNode(TAC_NODE *tac) {
       case TAC_READ:       printf("TAC_READ");       break;
       case TAC_RET:        printf("TAC_RET");        break;
       case TAC_CALL:       printf("TAC_CALL");       break;
+      case TAC_ARG:        printf("TAC_ARG");        break;
       case TAC_VECREAD:    printf("TAC_VECREAD");    break;
       case TAC_VECCOPY:    printf("TAC_VECCOPY");    break;
       default:             printf("TAC_UNKNOWN");    break;
@@ -335,8 +337,36 @@ TAC_NODE* makeTacCall(AST_NODE *node, TAC_NODE *son0) {
    HASH_NODE *temp = makeTemp();
    // Cria TAC de chamada de função onde único argumento é o símbolo da função chamada e a resposta vai para um temporário
    TAC_NODE *tacCall = tacCreate(TAC_CALL, temp, node->symbol, NULL);
-   // Precisa colocar antes do código da chamada da função as TACs dos argumentos (depois no assembly isso resulta em PUSHs na pilha, antes de pular para o endereço da função com CALL)
-   return tacJoin(son0, tacCall);
+   // Se tem filho e não é uma lista de argumentos, só tem um argumento e é preciso criá-lo aqui
+   if(node->son[0] && node->son[0]->type != AST_ARGS) {
+      // Cria TAC de argumento que tem como resposta a resposta do código TAC do argumento
+      TAC_NODE *tacArg = tacCreate(TAC_ARG, tacResCheck(son0), NULL, NULL);
+      // Coloca o código TAC do argumento antes (pois pega sua resposta), o argumento, e por fim a chamada de função
+      return tacJoin(son0, tacJoin(tacArg, tacCall));
+   }
+   // Se não tem argumentos ou possui uma lista de argumentos
+   else {
+      // Apenas precisa colocar a lista de argumentos antes do TAC da chamada de função
+      return tacJoin(son0, tacCall);
+   }
+}
+
+
+// Cria TAC para argumento de função
+TAC_NODE* makeTacArg(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1) {
+   // Como a lista de argumentos é uma recursão à direita, pega sempre como argumento o filho à esquerda (a resposta do código dele)
+   TAC_NODE *tacArg = tacCreate(TAC_ARG, tacResCheck(son0), NULL, NULL);
+   // Se não for o último nodo da lista de argumentos
+   if(node->son[1] && node->son[1]->type == AST_ARGS) {
+      // Coloca o código TAC de son0 antes (pois precisa da resposta) e o do argumento seguinte a ele depois (son1)
+      return tacJoin(son0, tacJoin(tacArg, son1));
+   }
+   // Se for o último nodo da lista de argumentos, o filho da direita encerra a recursão e assim como son0, é um argumento pronto
+   else {
+      TAC_NODE *tacArg2 = tacCreate(TAC_ARG, tacResCheck(son1), NULL, NULL);
+      // Coloca então o código de son0 antes da TAC que pega sua resposta, e o código de son1 antes da TAC que pega sua resposta
+      return tacJoin(son0, tacJoin(son1, tacJoin(tacArg, tacArg2)));
+   }
 }
 
 
