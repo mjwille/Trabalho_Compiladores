@@ -26,37 +26,40 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
 
    // Processa então o nodo atual
    switch(node->type) {
-      case AST_SYMBOL:      tac = tacCreate(TAC_SYMBOL, node->symbol, NULL, NULL);                                        break;
-      case AST_ADD:         tac = makeTacBinaryOperation(TAC_ADD, tacSon[0], tacSon[1]);                                  break;
-      case AST_SUB:         tac = makeTacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);                                  break;
-      case AST_MUL:         tac = makeTacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);                                  break;
-      case AST_DIV:         tac = makeTacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);                                  break;
-      case AST_LT:          tac = makeTacBinaryOperation(TAC_LT,  tacSon[0], tacSon[1]);                                  break;
-      case AST_GT:          tac = makeTacBinaryOperation(TAC_GT,  tacSon[0], tacSon[1]);                                  break;
-      case AST_LE:          tac = makeTacBinaryOperation(TAC_LE,  tacSon[0], tacSon[1]);                                  break;
-      case AST_GE:          tac = makeTacBinaryOperation(TAC_GE,  tacSon[0], tacSon[1]);                                  break;
-      case AST_EQ:          tac = makeTacBinaryOperation(TAC_EQ,  tacSon[0], tacSon[1]);                                  break;
-      case AST_DIF:         tac = makeTacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);                                  break;
-      case AST_XOR:         tac = makeTacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);                                  break;
-      case AST_OR:          tac = makeTacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);                                  break;
-      case AST_NOT:         tac = makeTacUnaryOperation(TAC_NOT,  tacSon[0]);                                             break;
-      case AST_ATTR:        tac = tacJoin(tacSon[0], tacCreate(TAC_COPY, node->symbol, tacResCheck(tacSon[0]), NULL));    break;
-      case AST_IF:          tac = makeTacIfThen(tacSon[0], tacSon[1]);                                                    break;
-      case AST_IF_ELSE:     tac = makeTacIfThenElse(tacSon[0], tacSon[1], tacSon[2]);                                     break;
-      case AST_LOOP:        tac = makeTacLoop(tacSon[0], tacSon[1], tacSon[2], tacSon[3]);                                break;
-      case AST_WHILE:       tac = makeTacWhile(tacSon[0], tacSon[1]);                                                     break;
-      case AST_DECL_FUNC:   tac = makeTacDefFun(node, tacSon[0], tacSon[2]);                                              break;
-      case AST_READ:        tac = tacCreate(TAC_READ, node->symbol, NULL, NULL);                                          break;
-      case AST_RETURN:      tac = makeTacRet(tacSon[0]);                                                                  break;
+      case AST_SYMBOL:       tac = tacCreate(TAC_SYMBOL, node->symbol, NULL, NULL);                                       break;
+      case AST_ADD:          tac = makeTacBinaryOperation(TAC_ADD, tacSon[0], tacSon[1]);                                 break;
+      case AST_SUB:          tac = makeTacBinaryOperation(TAC_SUB, tacSon[0], tacSon[1]);                                 break;
+      case AST_MUL:          tac = makeTacBinaryOperation(TAC_MUL, tacSon[0], tacSon[1]);                                 break;
+      case AST_DIV:          tac = makeTacBinaryOperation(TAC_DIV, tacSon[0], tacSon[1]);                                 break;
+      case AST_LT:           tac = makeTacBinaryOperation(TAC_LT,  tacSon[0], tacSon[1]);                                 break;
+      case AST_GT:           tac = makeTacBinaryOperation(TAC_GT,  tacSon[0], tacSon[1]);                                 break;
+      case AST_LE:           tac = makeTacBinaryOperation(TAC_LE,  tacSon[0], tacSon[1]);                                 break;
+      case AST_GE:           tac = makeTacBinaryOperation(TAC_GE,  tacSon[0], tacSon[1]);                                 break;
+      case AST_EQ:           tac = makeTacBinaryOperation(TAC_EQ,  tacSon[0], tacSon[1]);                                 break;
+      case AST_DIF:          tac = makeTacBinaryOperation(TAC_DIF, tacSon[0], tacSon[1]);                                 break;
+      case AST_XOR:          tac = makeTacBinaryOperation(TAC_XOR, tacSon[0], tacSon[1]);                                 break;
+      case AST_OR:           tac = makeTacBinaryOperation(TAC_OR,  tacSon[0], tacSon[1]);                                 break;
+      case AST_NOT:          tac = makeTacUnaryOperation(TAC_NOT,  tacSon[0]);                                            break;
+      case AST_ATTR:         tac = tacJoin(tacSon[0], tacCreate(TAC_COPY, node->symbol, tacResCheck(tacSon[0]), NULL));   break;
+      case AST_IF:           tac = makeTacIfThen(tacSon[0], tacSon[1]);                                                   break;
+      case AST_IF_ELSE:      tac = makeTacIfThenElse(tacSon[0], tacSon[1], tacSon[2]);                                    break;
+      case AST_LOOP:         tac = makeTacLoop(tacSon[0], tacSon[1], tacSon[2], tacSon[3]);                               break;
+      case AST_WHILE:        tac = makeTacWhile(tacSon[0], tacSon[1]);                                                    break;
+      case AST_DECL_FUNC:    tac = makeTacDefFun(node, tacSon[0], tacSon[2]);                                             break;
+      case AST_READ:         tac = tacCreate(TAC_READ, node->symbol, NULL, NULL);                                         break;
+      case AST_RETURN:       tac = makeTacRet(tacSon[0]);                                                                 break;
       case AST_PRINT:
-      case AST_PRINT_LIST:  tac = makeTacPrint(node, tacSon[0], tacSon[1]);                                               break;
-      case AST_FUNCALL:     tac = makeTacCall(node, tacSon[0]);                                                           break;
-      case AST_ARGS:        tac = makeTacArg(node, tacSon[0], tacSon[1]);                                                 break;
-      case AST_VEC:         tac = makeTacVecRead(node, tacSon[0]);                                                        break;
-      case AST_ATTR_VEC:    tac = makeTacVecCopy(node, tacSon[0], tacSon[1]);                                             break;
+      case AST_PRINT_LIST:   tac = makeTacPrint(node, tacSon[0], tacSon[1]);                                              break;
+      case AST_FUNCALL:      tac = makeTacCall(node, tacSon[0]);                                                          break;
+      case AST_ARGS:         tac = makeTacArg(node, tacSon[0], tacSon[1]);                                                break;
+      case AST_VEC:          tac = makeTacVecRead(node, tacSon[0]);                                                       break;
+      case AST_ATTR_VEC:     tac = makeTacVecCopy(node, tacSon[0], tacSon[1]);                                            break;
+      case AST_DECL_VAR:     tac = makeTacVarDecl(node, tacSon[1]);                                                       break;
+      case AST_DECL_VAR_VEC: tac = makeTacVecDecl(node, tacSon[2]);                                                                  break;
+      case AST_VEC_VAL:      tac = tacVecVal(node, tacSon[0], tacSon[1]);                                                 break;
 
       // Caso nodo da AST não tenha opcode TAC, junta os TACs dos filhos na AST de forma unificada
-      default: tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3])));               break;
+      default:               tac = tacJoin(tacSon[0], tacJoin(tacSon[1], tacJoin(tacSon[2], tacSon[3])));                 break;
    }
 
    return tac;
@@ -138,6 +141,8 @@ void tacPrintNode(TAC_NODE *tac) {
       case TAC_ARG:        printf("TAC_ARG");        break;
       case TAC_VECREAD:    printf("TAC_VECREAD");    break;
       case TAC_VECCOPY:    printf("TAC_VECCOPY");    break;
+      case TAC_VARDECL:    printf("TAC_VARDECL");    break;
+      case TAC_VECDECL:    printf("TAC_VECDECL");    break;
       default:             printf("TAC_UNKNOWN");    break;
    }
 
@@ -437,6 +442,65 @@ TAC_NODE* makeTacVecCopy(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1) {
     * código que gera o valor (son1)
     */
    return tacJoin(son0, tacJoin(son1, tacVecCopy));
+}
+
+
+// Cria TAC para inicializar variável com valor em son0
+TAC_NODE* makeTacVarDecl(AST_NODE *node, TAC_NODE *son0) {
+   // Cria TAC que tem como resultado o símbolo da variável (identificador) e argumento o valor a ser inicialziado
+   TAC_NODE *tacVarDecl = tacCreate(TAC_VARDECL, node->symbol, tacResCheck(son0), NULL);
+   return tacVarDecl;
+}
+
+
+// Cria TAC para inicializar vetor com seus valores se tiver valores para serem inicializados
+TAC_NODE* makeTacVecDecl(AST_NODE *node, TAC_NODE *son0) {
+   // Se não inicializou vetor com algum valor
+   if(node->son[2] == NULL) {
+      return tacCreate(TAC_VECDECL, node->symbol, NULL, NULL);
+   }
+   // Se inicializou vetor com apenas um valor
+   else if(node->son[2]->type != AST_VEC_VAL) {
+      return tacCreate(TAC_VECDECL, node->symbol, tacResCheck(son0), NULL);
+   }
+   // Se inicialização tem uma lista de valores (AST_VEC_VAL)
+   else {
+      // Preenche as TACs da lista de inicialização com a referência para o vetor
+      changeTacVecVals(son0, node);
+      // Retorna a TAC com lista de valores inicializados agora com a referência ao vetor adicionados às TACs
+      return son0;
+
+   }
+}
+
+
+// Percorre os valores de inicialização do vetor, criando as TACs de declaração do mesmo
+TAC_NODE* tacVecVal(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1) {
+   // Como a lista de valores do vetor é uma recursão à direita, pega sempre o filho à esquerda pra inicializar
+   TAC_NODE *tacVec = tacCreate(TAC_VECDECL, NULL, tacResCheck(son0), NULL);
+   // Se não for o último nodo da lista de argumentos
+   if(node->son[1] && node->son[1]->type == AST_VEC_VAL) {
+      // Coloca o código TAC de son0 antes (pois precisa da resposta) e o valor de inicialização seguinte a ele depois (son1)
+      return tacJoin(son0, tacJoin(tacVec, son1));
+   }
+   // Se for o último nodo da lista de valores, o filho da direita encerra a recursão e assim como son0, é um valor de inicialização pronto
+   else {
+      TAC_NODE *tacVec2 = tacCreate(TAC_VECDECL, NULL, tacResCheck(son1), NULL);
+      // Coloca então o código de son0 antes da TAC que pega sua resposta, e o código de son1 antes da TAC que pega sua resposta
+      return tacJoin(son0, tacJoin(son1, tacJoin(tacVec, tacVec2)));
+   }
+}
+
+
+// Função para percorrer as TACs com inicialização do vetor e colocar nas posições corretas a referência para o vetor
+void changeTacVecVals(TAC_NODE *tac, AST_NODE *node) {
+   // Condição de saída do percorrimento das TACs de inicialização do vetor
+   if(tac == NULL)
+      return;
+   // Vai até o início dos valores de inicialização do vetor
+   changeTacVecVals(tac->prev, node);
+   // Coloca a referência para o vetor nas TACs de inicialização
+   tac->res = node->symbol;
 }
 
 

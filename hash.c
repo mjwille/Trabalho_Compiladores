@@ -137,7 +137,7 @@ char* formatType(int type)
 HASH_NODE* makeTemp() {
 	static int serial = 0;
 	char str[60];
-	sprintf(str, "__temp__%d", serial++);
+	sprintf(str, "__temp%d", serial++);
 	return hashInsert(str, SYMBOL_SCALAR, DATATYPE_NULL);
 }
 
@@ -146,6 +146,6 @@ HASH_NODE* makeTemp() {
 HASH_NODE* makeLabel() {
 	static int serial = 0;
 	char str[60];
-	sprintf(str, "__label__%d", serial++);
+	sprintf(str, "__label%d", serial++);
 	return hashInsert(str, SYMBOL_LABEL, DATATYPE_NULL);
 }

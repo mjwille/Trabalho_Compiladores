@@ -37,6 +37,8 @@
 #define TAC_ARG      25
 #define TAC_VECREAD  26
 #define TAC_VECCOPY  27
+#define TAC_VARDECL  28
+#define TAC_VECDECL  29
 
 typedef struct tac_node
 {
@@ -106,6 +108,18 @@ TAC_NODE* makeTacVecRead(AST_NODE *node, TAC_NODE *son0);
 
 // Cria TAC para mover valor para posição do vetor
 TAC_NODE* makeTacVecCopy(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1);
+
+// Cria TAC para inicializar variável com valor
+TAC_NODE* makeTacVarDecl(AST_NODE *node, TAC_NODE *son0);
+
+// Cria TAC para inicializar vetor com seus valores se tiver valores para serem inicializados
+TAC_NODE* makeTacVecDecl(AST_NODE *node, TAC_NODE *son0);
+
+// Percorre os valores de inicialização do vetor, criando as TACs de declaração do mesmo
+TAC_NODE* tacVecVal(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1);
+
+// Função para percorrer as TACs com inicialização do vetor e colocar nas posições corretas a referência para o vetor
+void changeTacVecVals(TAC_NODE *tac, AST_NODE *node);
 
 // Função usada para verificar se a TAC realmente possui o campo na struct diferente de NULL e evitar segfaults
 HASH_NODE* tacResCheck(TAC_NODE *tac);
