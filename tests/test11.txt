@@ -1,0 +1,30 @@
+/* Programa que calcula a distância
+ * de Hamming entre 2 strings.
+ */
+
+arr1 = char[7] : 'r' 'o' 'd' 'r' 'i' 'g' 'o';
+arr2 = char[7] : 'r' 'o' 'd' 'o' 'l' 'f' 'o';
+
+i = int : 0;
+count = int : 0;
+
+hamming() = int {
+	count = 0
+
+	loop(i : 0, i<10, i + 1) {
+		if(arr1[i] != arr2[i]) then
+			count = count + 1
+	}
+
+	return count
+};
+
+dst = int : 0;
+
+main() = int {
+
+	dst = hamming()
+	print "The hamming distance is: ", dst
+
+	return 0
+};

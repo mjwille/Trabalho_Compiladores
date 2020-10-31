@@ -97,7 +97,7 @@ void hashPrint()
 	for(i=0; i<HASH_SIZE; i++) {
 		if(HASH_TABLE[i] != NULL)
 		{
-			printf("[%d]", i);
+			printf("[%03d]", i);
 			for(node=HASH_TABLE[i]; node; node=node->next)
 				printf(" <- [ Type: %s | Text: %s | Datatype: %s ]", formatType(node->type), node->text, formatType(node->dataType));
 			printf("\n");
