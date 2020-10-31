@@ -1,0 +1,30 @@
+/* Programa que implementa a conjectura
+ * de collatz para os números de 1 a 100.
+ */
+
+q = int : 0;   // quociente da divisão
+r = int : 0;   // resto da divisão
+
+collatz(n = int) = int {
+	while(n != 1) {
+		q = n / 2
+		r = n - (q * 2)
+		if(r == 0) then
+			n = n / 2
+		else
+			n = 3 * n + 1
+	}
+	return n
+};
+
+i = int : 1;
+
+ main() = int {
+
+	 while(i <= 100) {
+		 print collatz(i)
+		 i = i + 1
+	 }
+
+	return 0
+};

@@ -6,6 +6,12 @@
 arr = int[10] : 15 33 1 10 2 20 4 9 7 16;
 arr_size = int : 10;
 
+aux = int : 0;
+
+i = int : 0;
+j = int : 0;
+k = int : 0;
+
 selectionSort() = int {
 
 	loop(i : 0, i < arr_size - 1, 1) {
@@ -22,6 +28,8 @@ selectionSort() = int {
 
 	return 0
 };
+
+x = int[10];
 
 main() = int {
 	x = selectionSort()

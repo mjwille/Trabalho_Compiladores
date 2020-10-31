@@ -4,6 +4,10 @@
 
 arr = int[10] : 15 33 1 10 2 20 4 9 7 16;
 
+acc = int : 0;
+i = int : 0;
+result = int : 0;
+
 sumNumbers(n = int) = int {
 
 	acc = 0
@@ -16,7 +20,7 @@ sumNumbers(n = int) = int {
 };
 
 main() = int {
-	result = sumNumbers()
+	result = sumNumbers(10)
 	print "The sum is: ", result
 	return 0
 };

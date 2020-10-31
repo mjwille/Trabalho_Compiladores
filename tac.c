@@ -86,7 +86,12 @@ TAC_NODE* tacCreate(int opcode, HASH_NODE *res, HASH_NODE *op1, HASH_NODE *op2) 
 // Função principal chamada pelo parser.y para imprimir as TACs (chama a função de impressão recursiva)
 void tacPrint(TAC_NODE *tac) {
    printf("\nIntermediate Code:\n\n");
-   tacPrintRecursive(tac);
+   // Se programa vazio, imprime que é o programa vazio
+   if(tac == NULL)
+      printf("Empty Program.\n");
+   // Imprime recursivamente as TACs
+   else
+      tacPrintRecursive(tac);
    printf("\n");
 }
 

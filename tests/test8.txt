@@ -1,0 +1,45 @@
+/* Programa que recebe como entrada
+ * do usuário 15 valores (0 ou 1) e
+ * define se eles satisfazem a equação:
+ * (x1 v x2 v x3) ^ (x4 v x5 v x6) ˆ (x7 v x8 v x9) ˆ (x10 v x11 v x12) ˆ (x13 v x14 v x15)
+ * "Satisfiability Problem".
+ */
+
+arr = bool[15];
+
+true = bool : TRUE;
+false = bool : FALSE;
+
+i = int : 0;
+ans = bool : TRUE;
+
+satisfy () = bool {
+	loop(i : 0, i<15, i + 3) {
+		ans = arr[i] | arr[i + 1] | arr [i + 2]
+		// Se encontrou uma falsa, retorna falso (pois AND externo vai dar falso)
+		if(~ ans) then
+			return ans
+	}
+	return ans
+};
+
+v = int : 0;
+x = bool : TRUE;
+
+main() = int {
+	while(i < 15) {
+		read v
+
+		if (v == 0) then
+			x = false
+		else
+			x = true
+
+		arr[i] = x
+		i = i + 1
+	}
+
+	print satisfy()
+
+	return 0
+};

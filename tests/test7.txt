@@ -1,0 +1,30 @@
+/* Programa que retorna o índice
+ * do caractere em um array. Se não
+ * estiver no array, retorna -1.
+ */
+
+arr = char[13] : 'a' 'b' 'd' 'e' 'f' 'g' 'm' 'n' 'r' 's' 't' 'u' 'v';
+
+i = int : 0;
+
+isInArr(c = char) = int {
+	while(i < 13) {
+		if(arr[i] == c) then
+			return i
+	}
+	return -1
+};
+
+index = char : 0;
+
+main() = int {
+	index = isInArr('b')
+	print index
+	index = isInArr('c')
+	print index
+	index = isInArr('m')
+	print index
+	index = isInArr('p')
+	print index
+	return 0
+};

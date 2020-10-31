@@ -2,9 +2,11 @@
  * usando a linguagem do trabalho.
  */
 
-sumNumbers(n = int) = int {
+i = int : 0;
+acc = int : 0;
+result = int : 0;
 
-	acc = 0
+sumNumbers(n = int) = int {
 
 	loop(i : 1, i <= n,  1) {
 		acc = acc + i
@@ -14,7 +16,7 @@ sumNumbers(n = int) = int {
 };
 
 main() = int {
-	result = sumNumbers()
+	result = sumNumbers(10)
 	print "The sum is: ", result
 	return 0
 };

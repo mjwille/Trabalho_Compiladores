@@ -3,6 +3,9 @@
  * definida para o trabalho.
  */
 
+quocient = int : 0;
+rest = int : 0;
+
 euclides(divisor = int, dividend = int) = int {
 	quocient = divisor / dividend                // divisão inteira
 	rest = divisor - (quocient * dividend)
@@ -14,6 +17,8 @@ euclides(divisor = int, dividend = int) = int {
 	}
 	return quocient
 };
+
+result = int : 0;
 
 main() = int {
 	result = euclides(38, 16)
