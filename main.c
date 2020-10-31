@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	yyparse();
 
 	// Imprime a tabela de símbolos
-	// hashPrint();
+	hashPrint();
 
 	// Imprime mensagem de compilação bem feita até o fim
 	printf("==> Compilation was a success.\n\n");

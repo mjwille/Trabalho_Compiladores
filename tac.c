@@ -48,6 +48,8 @@ TAC_NODE* tacCodeGenerate(AST_NODE *node) {
       case AST_DECL_FUNC:   tac = makeTacDefFun(node, tacSon[0], tacSon[2]);                                              break;
       case AST_READ:        tac = tacCreate(TAC_READ, node->symbol, NULL, NULL);                                          break;
       case AST_RETURN:      tac = makeTacRet(tacSon[0]);                                                                  break;
+      case AST_PRINT:
+      case AST_PRINT_LIST:  tac = makeTacPrint(node, tacSon[0], tacSon[1]);                                               break;
       case AST_FUNCALL:     tac = makeTacCall(node, tacSon[0]);                                                           break;
       case AST_ARGS:        tac = makeTacArg(node, tacSon[0], tacSon[1]);                                                 break;
       case AST_VEC:         tac = makeTacVecRead(node, tacSon[0]);                                                        break;
@@ -80,7 +82,7 @@ TAC_NODE* tacCreate(int opcode, HASH_NODE *res, HASH_NODE *op1, HASH_NODE *op2) 
 
 // Função principal chamada pelo parser.y para imprimir as TACs (chama a função de impressão recursiva)
 void tacPrint(TAC_NODE *tac) {
-   printf("\nCódigo Intermediário:\n\n");
+   printf("\nIntermediate Code:\n\n");
    tacPrintRecursive(tac);
    printf("\n");
 }
@@ -131,6 +133,7 @@ void tacPrintNode(TAC_NODE *tac) {
       case TAC_ENDFUN:     printf("TAC_ENDFUN");     break;
       case TAC_READ:       printf("TAC_READ");       break;
       case TAC_RET:        printf("TAC_RET");        break;
+      case TAC_PRINT:      printf("TAC_PRINT");      break;
       case TAC_CALL:       printf("TAC_CALL");       break;
       case TAC_ARG:        printf("TAC_ARG");        break;
       case TAC_VECREAD:    printf("TAC_VECREAD");    break;
@@ -331,6 +334,44 @@ TAC_NODE* makeTacRet(TAC_NODE *son0) {
 }
 
 
+// Cria TAC para fazer print
+TAC_NODE* makeTacPrint(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1) {
+   // Se for AST_PRINT
+   if(node->type == AST_PRINT) {
+      // Se for diferente de uma lista de prints, só tem um elemento para imprimir
+      if(node->son[0] && node->son[0]->type != AST_PRINT_LIST) {
+         // Cria TAC de impressão com resposta do código TAC de son0
+         TAC_NODE *tacPrint = tacCreate(TAC_PRINT, tacResCheck(son0), NULL, NULL);
+         // Coloca son0 antes para ter a resposta dele disponível no código do TAC_PRINT
+         return tacJoin(son0, tacPrint);
+      }
+      // Se for uma lista de prints o filho de print
+      else {
+         // Apenas retorna essa lista de prints como a TAC do próprio print (propaga essa TAC para cima)
+         return son0;
+      }
+   }
+   // Se for AST_PRINT_LIST
+   else {
+      // Como a lista de prints é uma recursão à direita, pega sempre o filho à esquerda (a resposta do código dele)
+      TAC_NODE *tacPrint = tacCreate(TAC_PRINT, tacResCheck(son0), NULL, NULL);
+      // E dependendo do que for o filho à direita (outra lista de prints ou um símbolo para printar, faz alguma coisa)
+      // Se for uma lista de prints
+      if(node->son[1] && node->son[1]->type == AST_PRINT_LIST) {
+         // Coloca o código TAC de son0 antes (pois precisa do valor pra printar) e o código de prints seguinte a ele depois (son1)
+         return tacJoin(son0, tacJoin(tacPrint, son1));
+      }
+      // Se for um símbolo para printar (fim da recursão)
+      else {
+         // Cria mais uma TAC pra dar print
+         TAC_NODE *tacPrint2 = tacCreate(TAC_PRINT, tacResCheck(son1), NULL, NULL);
+         // Coloca então o código de son0 antes da TAC que printa seu resultado, e o código de son1 antes da TAC que printa o seu resultado.
+         return tacJoin(son0, tacJoin(tacPrint, tacJoin(son1, tacPrint2)));
+      }
+   }
+}
+
+
 // Cria TAC para chamada de função
 TAC_NODE* makeTacCall(AST_NODE *node, TAC_NODE *son0) {
    // Cria um temporário na hash table para onde o resultado da TAC será colocado
@@ -358,7 +399,7 @@ TAC_NODE* makeTacArg(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1) {
    TAC_NODE *tacArg = tacCreate(TAC_ARG, tacResCheck(son0), NULL, NULL);
    // Se não for o último nodo da lista de argumentos
    if(node->son[1] && node->son[1]->type == AST_ARGS) {
-      // Coloca o código TAC de son0 antes (pois precisa da resposta) e o do argumento seguinte a ele depois (son1)
+      // Coloca o código TAC de son0 antes (pois precisa da resposta) e o argumento seguinte a ele depois (son1)
       return tacJoin(son0, tacJoin(tacArg, son1));
    }
    // Se for o último nodo da lista de argumentos, o filho da direita encerra a recursão e assim como son0, é um argumento pronto

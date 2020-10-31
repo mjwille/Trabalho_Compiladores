@@ -32,10 +32,11 @@
 #define TAC_ENDFUN   20
 #define TAC_READ     21
 #define TAC_RET      22
-#define TAC_CALL     23
-#define TAC_ARG      24
-#define TAC_VECREAD  25
-#define TAC_VECCOPY  26
+#define TAC_PRINT    23
+#define TAC_CALL     24
+#define TAC_ARG      25
+#define TAC_VECREAD  26
+#define TAC_VECCOPY  27
 
 typedef struct tac_node
 {
@@ -90,6 +91,9 @@ TAC_NODE* makeTacDefFun(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1);
 
 // Cria TAC para comando return
 TAC_NODE* makeTacRet(TAC_NODE *son0);
+
+// Cria TAC para fazer print
+TAC_NODE* makeTacPrint(AST_NODE *node, TAC_NODE *son0, TAC_NODE *son1);
 
 // Cria TAC para chamada de função
 TAC_NODE* makeTacCall(AST_NODE *node, TAC_NODE *son0);
