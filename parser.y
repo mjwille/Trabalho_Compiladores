@@ -10,6 +10,7 @@
         #include "ast.h"
         #include "semantic.h"
         #include "tac.h"
+        #include "asm.h"
 
         int yylex();
         int getLineNumber(void);
@@ -92,15 +93,15 @@
 
 %%
 
-programa: decl            { $$ = $1; semanticAnalysis($$); tacPrint(tacCodeGenerate($$)); /* astPrint($$); */ decompile($$); }
+programa: decl         { $$ = $1; semanticAnalysis($$); /* astPrint($$); */  generateAsm(tacReverse(tacCodeGenerate($$))); }
         ;
 
-decl: dec ';' decl        { $$ = astInsert(AST_DECL,  NULL, $1, $3, NULL, NULL); }
-    |                     { $$ = NULL; }
+decl: dec ';' decl     { $$ = astInsert(AST_DECL,  NULL, $1, $3, NULL, NULL); }
+    |                  { $$ = NULL; }
     ;
 
-dec: global_var           { $$ = $1; }
-   | func                 { $$ = $1; }
+dec: global_var        { $$ = $1; }
+   | func              { $$ = $1; }
    ;
 
 /* Variáveis Globais */

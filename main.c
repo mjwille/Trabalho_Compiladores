@@ -1,6 +1,20 @@
 /* Trabalho de Compiladores 2020/ERE
    Nome: Marcelo Jantsch Wille
    Universidade Federal do Rio Grande do Sul
+
+   Instruções de Uso:
+
+   1. Executar este programa com uma entrada válida da linguagem
+   ./etapa6 my_program.txt
+
+   2. Usar a saída do comando anterior (asm_code.s) com gcc para gerar o arquivo objeto
+   gcc -c asm_code.s -o obj_code.o
+
+   3. Gerar o arquivo executável
+   gcc obj_code.o -o my_program
+
+   4. Executar o arquivo
+   ./my_program
 */
 
 #include <stdio.h>
@@ -15,8 +29,8 @@ extern int yyparse();            // from parser.y
 int main(int argc, char *argv[])
 {
 	// Faz verificações de número de argumentos
-	if(argc < 3) {
-		fprintf(stderr, "Error.\nUsage: ./etapa5 <input_filename> <output_filename>\n");
+	if(argc < 2) {
+		fprintf(stderr, "Error.\nUsage: ./etapa6 <input_filename>\n");
 		exit(1);
 	}
 
@@ -24,13 +38,6 @@ int main(int argc, char *argv[])
 	yyin = fopen(argv[1], "r");
 	if(yyin == 0) {
 		fprintf(stderr, "Error.\nInput file %s could not be opened.\n", argv[1]);
-		exit(2);
-	}
-
-	// Faz verificação de abertura correta do arquivo de output
-	outputFile = fopen(argv[2], "w");
-	if(outputFile == 0) {
-		fprintf(stderr, "Error.\nOutput file %s could not be opened.\n", argv[2]);
 		exit(2);
 	}
 

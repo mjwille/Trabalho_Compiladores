@@ -159,6 +159,20 @@ void tacPrintNode(TAC_NODE *tac) {
 }
 
 
+// Percorre TACs pra retornar o primeiro. Percorre indo pelo 'prev' e setando o next corretamente
+TAC_NODE* tacReverse(TAC_NODE *tac) {
+   // Cria TAC auxiliar para percorrer
+   TAC_NODE *aux;
+   // Percorre as TACs indo para a TAC anterior
+   for(aux = tac; aux->prev != NULL; aux = aux->prev) {
+      // O next da TAC prévia a atual é a TAC atual (para reverter a lista encadeada de TACs)
+      aux->prev->next = aux;
+   }
+   // Chegou na última TAC (não tem mais prev != NULL)
+   return aux;
+}
+
+
 // Junta 2 TACs em uma TAC única maior
 TAC_NODE* tacJoin(TAC_NODE *tac1, TAC_NODE *tac2) {
    // Se não tem a primeira TAC, retorna a segunda TAC
