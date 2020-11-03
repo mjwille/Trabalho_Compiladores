@@ -93,7 +93,7 @@
 
 %%
 
-programa: decl         { $$ = $1; semanticAnalysis($$); /* astPrint($$); */   tacPrint(tacCodeGenerate($$)); generateAsm(tacReverse(tacCodeGenerate($$))); }
+programa: decl         { $$ = $1; semanticAnalysis($$); /* astPrint($$); */   TAC_NODE *tac = tacCodeGenerate($$); tacPrint(tac); generateAsm(tacReverse(tac)); }
         ;
 
 decl: dec ';' decl     { $$ = astInsert(AST_DECL,  NULL, $1, $3, NULL, NULL); }
