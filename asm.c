@@ -28,13 +28,21 @@ void generateAsm(TAC_NODE *tac) {
 		exit(5);
 	}
 
-	// Coloca os dados
-	fprintf(fp, ".section .data\n\n");
+	// Coloca comentários iniciais
+	fprintf(fp, "# Código assembly gerado a partir do código fonte da linguagem\n");
+	fprintf(fp, "# Trabalho de Compiladores 2020/ERE\n");
+	fprintf(fp, "# Nome: Marcelo Jantsch Wille\n");
+	fprintf(fp, "# Universidade Federal do Rio Grande do Sul\n");
+
+	// Coloca os dados na sessão de dados
+	fprintf(fp, "\n.section .data\n\n");
 	// Adiciona o que está na tabela hash à sessão de dados
-	// ...
+	addVarsToData(tac);
+	addTempsToData();
+	//addStringsToData();
 
 	// Coloca o código assembly
-	fprintf(fp, ".section .text\n\n");
+	fprintf(fp, "\n.section .text\n\n");
 	// Converte o código intermediário das TACs para assembly
 	generateAsmFromTac(tac);
 
@@ -128,4 +136,66 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
    // Vai para a próxima TAC
    generateAsmFromTac(tac->next);
+}
+
+
+// Percorre as TACs e coloca na sessão de dados do assembly as variáveis globais
+void addVarsToData(TAC_NODE *tac) {
+	// Condição de parada do percorrimento das TACs
+   if(tac == NULL)
+      return;
+
+	// Declarações de variáveis escalares globais
+	if(tac->opcode == TAC_VARDECL) {
+		// Se variável global for do tipo char
+		if(tac->res->dataType == DATATYPE_CHAR) {
+			fprintf(fp, "%s:\n", tac->res->text);
+			// TODO: vai o char ou a representação inteira dele após .byte?
+		}
+		// Se variável global for do tipo int
+		else if(tac->res->dataType == DATATYPE_INT) {
+			fprintf(fp, "%s:\n", tac->res->text);
+			fprintf(fp, "\t.long %s\n", tac->op1->text);
+		}
+		// Se variável global for do tipo float
+		else if(tac->res->dataType == DATATYPE_FLOAT) {
+			fprintf(fp, "%s:\n", tac->res->text);
+			// TODO: como representar floats na sessão de dados do assembly?
+		}
+		// Se variável global for do tipo boolean
+		else {
+			fprintf(fp, "%s:\n", tac->res->text);
+			// TODO: como representar booleanos (0 ou 1)?
+		}
+	}
+
+	// Declarações de variáveis vetores globais
+	else if(tac->opcode == TAC_VECDECL) {
+		// TODO: vetores vai ser uma lista, mas incorre nos mesmos problemas de tipos que faltam do anterior
+	}
+
+	// Vai para a próxima TAC
+   addVarsToData(tac->next);
+}
+
+
+// Percorre a tabela de símbolos e coloca os temporários na sessão de dados do assembly
+void addTempsToData() {
+	char *prefix = "__temp";
+	int i;
+	HASH_NODE *node;
+	// Percorre todo índice da tabela de símbolos
+	for(i=0; i<HASH_SIZE; i++) {
+		if(HASH_TABLE[i] != NULL) {
+			// Percorre toda a lista encadeada dos índices
+			for(node=HASH_TABLE[i]; node; node=node->next) {
+				// Se texto começa com __temp
+				if(!strncmp(prefix, node->text, strlen(prefix))) {
+					// Coloca o temporário na sessão de dados do assembly
+					fprintf(fp, "%s:\n", node->text);
+					fprintf(fp, "\t.long 0\n");
+				}
+			}
+		}
+	}
 }

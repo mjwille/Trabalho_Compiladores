@@ -15,4 +15,10 @@ void generateAsm(TAC_NODE *tac);
 // Função que é chamada por generateAsm para percorrer as TACs recursivamente e gerar o código
 void generateAsmFromTac(TAC_NODE *tac);
 
+// Percorre as TACs e coloca na sessão de dados do assembly as variáveis globais
+void addVarsToData(TAC_NODE *tac);
+
+// Percorre a tabela de símbolos e coloca os temporários na sessão de dados do assembly
+void addTempsToData();
+
 #endif
