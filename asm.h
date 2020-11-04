@@ -15,7 +15,7 @@ void generateAsm(TAC_NODE *tac);
 // Função que é chamada por generateAsm para percorrer as TACs recursivamente e gerar o código
 void generateAsmFromTac(TAC_NODE *tac);
 
-// Gera código assembly para operações binárias
+// Gera código assembly para operações binárias de soma, subtração e multiplicação
 void generateAsmBinOperation(TAC_NODE *tac, char *mnemonic);
 
 // Percorre as TACs e coloca na sessão de dados do assembly as variáveis globais

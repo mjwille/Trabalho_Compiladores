@@ -117,6 +117,35 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		generateAsmBinOperation(tac, "imul");
 	}
 
+	else if(tac->opcode == TAC_DIV) {
+		fprintf(fp, "\t# Operação binária\n");
+		// Coloca dividendo em %eax
+		// Se for literal, precisa ser modo imediato
+		if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+			fprintf(fp, "\tmov $%s, %%eax\n", tac->op1->text);
+
+		}
+		// Caso não seja literal, acessa pelo modo direto a variável na sessão de dados
+		else {
+			fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
+		}
+		// Coloca divisor em %ebx
+		// Mesma coisa para o operando 2
+		if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+			fprintf(fp, "\tmov $%s, %%ebx\n", tac->op2->text);
+		}
+		else {
+			fprintf(fp, "\tmov %s, %%ebx\n", tac->op2->text);
+		}
+		// %edx precisa ser zero
+		fprintf(fp, "\tmov $0, %%edx\n");
+		// Faz a operação
+		fprintf(fp, "\tidiv %%ebx, %%eax\n");
+		// Quociente vai para %eax e resto para %edx
+		// Coloca resultado da divisão para o campo resultado da TAC (na sessão de dados do assembly)
+		fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+	}
+
 	// Atribuição
 	else if(tac->opcode == TAC_COPY) {
 		fprintf(fp, "\t# Atribuição\n");
@@ -144,12 +173,12 @@ void generateAsmFromTac(TAC_NODE *tac) {
 }
 
 
-// Gera código assembly para operações binárias
+// Gera código assembly para operações binárias de soma, subtração e multiplicação
 void generateAsmBinOperation(TAC_NODE *tac, char *mnemonic) {
 	fprintf(fp, "\t# Operação binária\n");
 	// Copia os operandos para %eax e %ebx
-	// Se for literal, precisa ser modo imediato (TODO: char, float, vetor, ...)
-	if(tac->op1->type == SYMBOL_LIT_INTEGER) {
+	// Se for literal, precisa ser modo imediato
+	if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
 		fprintf(fp, "\tmov $%s, %%eax\n", tac->op1->text);
 
 	}
@@ -159,7 +188,7 @@ void generateAsmBinOperation(TAC_NODE *tac, char *mnemonic) {
 	}
 
 	// Mesma coisa para o operando 2
-	if(tac->op2->type == SYMBOL_LIT_INTEGER) {
+	if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
 		fprintf(fp, "\tmov $%s, %%ebx\n", tac->op2->text);
 	}
 	else {
@@ -168,7 +197,7 @@ void generateAsmBinOperation(TAC_NODE *tac, char *mnemonic) {
 
 	// Faz a operação (resultado fica em %eax)
 	fprintf(fp, "\t%s %%ebx, %%eax\n", mnemonic);
-	// Coloca resultado da soma para o campo resultado da TAC (na sessão de dados do assembly)
+	// Coloca resultado da operação para o campo resultado da TAC (na sessão de dados do assembly)
 	fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
 }
 
