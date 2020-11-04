@@ -104,17 +104,17 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 	// Adição
 	else if(tac->opcode == TAC_ADD) {
-		generateAsmBinOperation(tac, "add");
+		asmBinaryOperation(tac, "add");
 	}
 
 	// Subtração
 	else if(tac->opcode == TAC_SUB) {
-		generateAsmBinOperation(tac, "sub");
+		asmBinaryOperation(tac, "sub");
 	}
 
 	// Multiplicação
 	else if(tac->opcode == TAC_MUL) {
-		generateAsmBinOperation(tac, "imul");
+		asmBinaryOperation(tac, "imul");
 	}
 
 	else if(tac->opcode == TAC_DIV) {
@@ -146,6 +146,30 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
 	}
 
+	else if(tac->opcode == TAC_EQ) {
+		asmComparisonOperation(tac, "je");
+	}
+
+	else if(tac->opcode == TAC_DIF) {
+		asmComparisonOperation(tac, "jne");
+	}
+
+	else if(tac->opcode == TAC_GE) {
+		asmComparisonOperation(tac, "jge");
+	}
+
+	else if(tac->opcode == TAC_LE) {
+		asmComparisonOperation(tac, "jle");
+	}
+
+	else if(tac->opcode == TAC_GT) {
+		asmComparisonOperation(tac, "jg");
+	}
+
+	else if(tac->opcode == TAC_LT) {
+		asmComparisonOperation(tac, "jl");
+	}
+
 	// Atribuição
 	else if(tac->opcode == TAC_COPY) {
 		fprintf(fp, "\t# Atribuição\n");
@@ -157,13 +181,26 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 	// Label para fazer os jumps (condicionais e incondicionais)
 	else if(tac->opcode == TAC_LABEL) {
+		fprintf(fp, "\t# Label\n");
 		// Apenas coloca o label no código assembly
 		fprintf(fp, "\t%s:\n", tac->res->text);
 	}
 
-	// Jump
+	// Jump Incondicional
 	else if(tac->opcode == TAC_JMP) {
+		fprintf(fp, "\t# Pulo incondicional\n");
 		fprintf(fp, "\tjmp %s\n", tac->res->text);
+	}
+
+	// Jump Condicional (Jump If False)
+	else if(tac->opcode == TAC_JF) {
+		fprintf(fp, "\t# Pulo condicional\n");
+		// Move o operador a ser testado falso para o registrador %eax
+		fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
+		// Faz comparação com false
+		fprintf(fp, "\tcmp $0, %%eax\n");
+		// Pula para o label se realmente for false (igual a zero)
+		fprintf(fp, "\tje %s\n", tac->res->text);
 	}
 
 	// ...
@@ -174,7 +211,7 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 
 // Gera código assembly para operações binárias de soma, subtração e multiplicação
-void generateAsmBinOperation(TAC_NODE *tac, char *mnemonic) {
+void asmBinaryOperation(TAC_NODE *tac, char *mnemonic) {
 	fprintf(fp, "\t# Operação binária\n");
 	// Copia os operandos para %eax e %ebx
 	// Se for literal, precisa ser modo imediato
@@ -199,6 +236,47 @@ void generateAsmBinOperation(TAC_NODE *tac, char *mnemonic) {
 	fprintf(fp, "\t%s %%ebx, %%eax\n", mnemonic);
 	// Coloca resultado da operação para o campo resultado da TAC (na sessão de dados do assembly)
 	fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+}
+
+
+// Gera código assembly para operações de comparação (igual, diferente, maior que, menor que, maior igual que, menor igual que)
+void asmComparisonOperation(TAC_NODE *tac, char *mnemonic) {
+	fprintf(fp, "\t# Comparação\n");
+	// Copia os operandos para %eax e %ebx
+	// Se for literal, precisa ser modo imediato
+	if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+		fprintf(fp, "\tmov $%s, %%eax\n", tac->op1->text);
+
+	}
+	// Caso não seja literal, acessa pelo modo direto a variável na sessão de dados
+	else {
+		fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
+	}
+
+	// Mesma coisa para o operando 2
+	if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+		fprintf(fp, "\tmov $%s, %%ebx\n", tac->op2->text);
+	}
+	else {
+		fprintf(fp, "\tmov %s, %%ebx\n", tac->op2->text);
+	}
+
+	// Faz a comparação
+	fprintf(fp, "\tcmp %%ebx, %%eax\n");
+
+	// Cria os labels para efetuar os pulos
+	HASH_NODE *label1 = makeLabel();
+	HASH_NODE *label2 = makeLabel();
+
+	// Cria a lógica dos operadore de comparação (baseado nas flags setadas pelo operador 'cmp' já feito)
+	fprintf(fp, "\t%s %s\n", mnemonic, label1->text);
+	fprintf(fp, "\tmov $0, %%eax\n");
+	fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+	fprintf(fp, "\tjmp %s\n", label2->text);
+	fprintf(fp, "\t%s:\n", label1->text);
+	fprintf(fp, "\tmov $1, %%eax\n");
+	fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+	fprintf(fp, "\t%s:\n", label2->text);
 }
 
 
