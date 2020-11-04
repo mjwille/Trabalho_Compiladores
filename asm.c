@@ -84,15 +84,34 @@ void generateAsmFromTac(TAC_NODE *tac) {
 	// Retorno de função
 	else if(tac->opcode == TAC_RET) {
 		fprintf(fp, "\t# Retorno\n");
+
 		if(IS_INSIDE_MAIN) {
 			// Move 1 para %eax antes da chamada de sistema (valor 1 em %eax = exit)
 			fprintf(fp, "\tmov   $1, %%eax\n");
-			// Valor de retorno vai estar no primeiro operando, que precisa ser colocado em %ebx
-			fprintf(fp, "\tmov %s, %%ebx\n", tac->op1->text);
+			// Se for um literal, precisa colocar como modo imediato
+			if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+				// Valor de retorno no registrador %ebx
+				fprintf(fp, "\tmov $%s, %%ebx\n", tac->op1->text);
+			}
+			// Senão, precisa usar modo direto
+			else {
+				// Valor de retorno no registrador %ebx
+				fprintf(fp, "\tmov %s, %%ebx\n", tac->op1->text);
+			}
 			// Faz a chamada de sistema com o mnêmonico 'int'
 			fprintf(fp, "\tint  $0x80\n\n");
 		}
-		if(!IS_INSIDE_MAIN) {
+		else {
+			// Se for um literal, precisa colocar como modo imediato
+			if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+				// Valor de retorno no registrador %eax
+				fprintf(fp, "\tmov $%s, %%eax\n", tac->op1->text);
+			}
+			// Senão, precisa usar modo direto
+			else {
+				// Valor de retorno no registrador %eax
+				fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
+			}
 			fprintf(fp, "\tret\n\n");    // TODO: ainda tem mais por fazer no retorno (epílogo?)
 		}
 	}
