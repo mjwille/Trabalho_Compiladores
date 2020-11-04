@@ -83,6 +83,7 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 	// Retorno de função
 	else if(tac->opcode == TAC_RET) {
+		fprintf(fp, "\t# Retorno\n");
 		if(IS_INSIDE_MAIN) {
 			// Move 1 para %eax antes da chamada de sistema (valor 1 em %eax = exit)
 			fprintf(fp, "\tmov   $1, %%eax\n");
@@ -103,33 +104,37 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 	// Adição
 	else if(tac->opcode == TAC_ADD) {
-		// Copia o que está no primeiro operando para %eax
-		if(tac->op1->type == SYMBOL_LIT_INTEGER) {
-			fprintf(fp, "\tmov $%s, %%eax\n", tac->op1->text);
+		generateAsmBinOperation(tac, "add");
+	}
 
-		}
-		else { // TODO: precisa diferenciar char, int, float, id, vetor do ADD (modo imediato)
-			fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
-		}
-		// Copia o que está no segundo operando para %ebx
-		if(tac->op2->type == SYMBOL_LIT_INTEGER) {
-			fprintf(fp, "\tmov $%s, %%ebx\n", tac->op2->text);
-		}
-		else {
-			fprintf(fp, "\tmov %s, %%ebx\n", tac->op2->text);
-		}
-		// Faz a soma (resultado fica em %eax)
-		fprintf(fp, "\tadd %%ebx, %%eax\n");
-		// Coloca resultado da soma para o campo resultado da TAC que deve estar na sessão de dados do assembly
-		fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+	// Subtração
+	else if(tac->opcode == TAC_SUB) {
+		generateAsmBinOperation(tac, "sub");
+	}
+
+	// Multiplicação
+	else if(tac->opcode == TAC_MUL) {
+		generateAsmBinOperation(tac, "imul");
 	}
 
 	// Atribuição
 	else if(tac->opcode == TAC_COPY) {
+		fprintf(fp, "\t# Atribuição\n");
 		// Copia valor a ser atribuído para %eax
 		fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
 		// Coloca valor em %eax para a variável do lado esquerdo da atribuição
 		fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+	}
+
+	// Label para fazer os jumps (condicionais e incondicionais)
+	else if(tac->opcode == TAC_LABEL) {
+		// Apenas coloca o label no código assembly
+		fprintf(fp, "\t%s:\n", tac->res->text);
+	}
+
+	// Jump
+	else if(tac->opcode == TAC_JMP) {
+		fprintf(fp, "\tjmp %s\n", tac->res->text);
 	}
 
 	// ...
@@ -137,6 +142,42 @@ void generateAsmFromTac(TAC_NODE *tac) {
    // Vai para a próxima TAC
    generateAsmFromTac(tac->next);
 }
+
+
+// Gera código assembly para operações binárias
+void generateAsmBinOperation(TAC_NODE *tac, char *mnemonic) {
+	fprintf(fp, "\t# Operação binária\n");
+	// Copia os operandos para %eax e %ebx
+	// Se for literal, precisa ser modo imediato (TODO: char, float, vetor, ...)
+	if(tac->op1->type == SYMBOL_LIT_INTEGER) {
+		fprintf(fp, "\tmov $%s, %%eax\n", tac->op1->text);
+
+	}
+	// Caso não seja literal, acessa pelo modo direto a variável na sessão de dados
+	else {
+		fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
+	}
+
+	// Mesma coisa para o operando 2
+	if(tac->op2->type == SYMBOL_LIT_INTEGER) {
+		fprintf(fp, "\tmov $%s, %%ebx\n", tac->op2->text);
+	}
+	else {
+		fprintf(fp, "\tmov %s, %%ebx\n", tac->op2->text);
+	}
+
+	// Faz a operação (resultado fica em %eax)
+	fprintf(fp, "\t%s %%ebx, %%eax\n", mnemonic);
+	// Coloca resultado da soma para o campo resultado da TAC (na sessão de dados do assembly)
+	fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+}
+
+
+/* Abaixo, funções para colocar dados na sessão de dados do assembly.
+ * -> Declarações globais de escalares e vetores
+ * -> Strings usadas com o comando print
+ * -> Temporaríos gerados pelas TACs (precisa percorrer as TACs uma vez antes de começar a gerar o assembly)
+ */
 
 
 // Percorre as TACs e coloca na sessão de dados do assembly as variáveis globais
