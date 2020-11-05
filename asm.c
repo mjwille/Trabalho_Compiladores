@@ -165,6 +165,21 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
 	}
 
+	// Xor
+	else if(tac->opcode == TAC_XOR) {
+		asmBinaryOperation(tac, "xor");
+	}
+
+	// Or
+	else if(tac->opcode == TAC_OR) {
+		asmBinaryOperation(tac, "or");
+	}
+
+	// Not (Boolean Not, e não o 'not' do assembly que inverte todos os bits)
+	else if(tac->opcode == TAC_NOT) {
+		// TODO
+	}
+
 	else if(tac->opcode == TAC_EQ) {
 		asmComparisonOperation(tac, "je");
 	}
@@ -332,7 +347,11 @@ void addVarsToData(TAC_NODE *tac) {
 		// Se variável global for do tipo boolean
 		else {
 			fprintf(fp, "%s:\n", tac->res->text);
-			// TODO: como representar booleanos (0 ou 1)?
+			// Se valor for FALSE, coloca valor zero. Se valor for TRUE, coloca valor 1
+			if(!strcmp("TRUE", tac->op1->text))
+				fprintf(fp, "\t.long 1\n");
+			else
+				fprintf(fp, "\t.long 0\n");
 		}
 	}
 
