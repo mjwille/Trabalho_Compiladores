@@ -38,13 +38,15 @@ void generateAsm(TAC_NODE *tac) {
 	fprintf(fp, "\n.section .data\n\n");
 	// Adiciona o que está na tabela hash à sessão de dados
 	addVarsToData(tac);
-	addTempsToData();
-	//addStringsToData();
+	addSymbolsToData();
 
 	// Coloca o código assembly
 	fprintf(fp, "\n.section .text\n\n");
 	// Converte o código intermediário das TACs para assembly
 	generateAsmFromTac(tac);
+
+	// TODO: Coloca função auxiliar para printar inteiros no fim
+	// ...
 
 	fclose(fp);
 }
@@ -269,6 +271,28 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		fprintf(fp, "\tje %s\n", tac->res->text);
 	}
 
+	else if(tac->opcode == TAC_PRINT) {
+		fprintf(fp, "\t# Print\n");
+		// Se for uma string
+		if(tac->res->type == SYMBOL_LIT_STRING) {
+			fprintf(fp, "\tmov $4, %%eax\n");
+			fprintf(fp, "\tmov $1, %%ebx\n");
+			fprintf(fp, "\tmov $%s, %%ecx\n", tac->res->strName);
+			fprintf(fp, "\tmov $%lu, %%edx\n", strlen(tac->res->text)-2);
+			fprintf(fp, "\tint $0x80\n");
+		}
+		else {
+			// Se for uma variável escalar inteira (modo imediato)
+			if(tac->res->type == SYMBOL_LIT_INTEGER) {      // TODO: char, float, vetor, ...
+				// ...
+			}
+			// Se for uma variável escalar (modo direto)
+			else if (tac->res->type == SYMBOL_SCALAR) {
+				// ...
+			}
+		}
+	}
+
 	// ...
 
    // Vai para a próxima TAC
@@ -395,8 +419,8 @@ void addVarsToData(TAC_NODE *tac) {
 }
 
 
-// Percorre a tabela de símbolos e coloca os temporários na sessão de dados do assembly
-void addTempsToData() {
+// Percorre a tabela de símbolos e coloca temporários e strings na sessão de dados do assembly
+void addSymbolsToData() {
 	char *prefix = "__temp";
 	int i;
 	HASH_NODE *node;
@@ -415,6 +439,9 @@ void addTempsToData() {
 				if(node->type == SYMBOL_LIT_STRING) {
 					// Coloca um nome para a string (para referenciar no assembly quando der print)
 					node->strName = createStr(node->strName);
+					// Coloca string na sessão de dados do assembly
+					fprintf(fp, "%s:\n", node->strName);
+					fprintf(fp, "\t.ascii %s\n", node->text);
 				}
 			}
 		}

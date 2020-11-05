@@ -24,7 +24,7 @@ void asmComparisonOperation(TAC_NODE *tac, char *mnemonic);
 // Percorre as TACs e coloca na sessão de dados do assembly as variáveis globais
 void addVarsToData(TAC_NODE *tac);
 
-// Percorre a tabela de símbolos e coloca os temporários na sessão de dados do assembly
-void addTempsToData();
+// Percorre a tabela de símbolos e coloca temporários e strings na sessão de dados do assembly
+void addSymbolsToData();
 
 #endif
