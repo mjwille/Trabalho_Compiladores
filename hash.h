@@ -40,6 +40,7 @@ typedef struct hash_node
 	int type;
 	char *text;
 	int dataType;
+	char *strName;
 	struct hash_node *next;
 } HASH_NODE;
 
@@ -59,7 +60,7 @@ int hashAddress(char *text);
 HASH_NODE* hashFind(char *text);
 
 // Insere elemento dentro da tabela hash
-HASH_NODE* hashInsert(char *text, int type, int dataType);
+HASH_NODE* hashInsert(char *text, int type, int dataType, char *strName);
 
 // Imprime todo elemento que a tabela hash contém dentro dela (índice a índice)
 void hashPrint();
@@ -67,10 +68,16 @@ void hashPrint();
 // Função auxiliar que retorna o tipo ou dataType em uma melhor formatação para a impressão em hashPrint
 char* formatType(int type);
 
+// Função auxiliar que retorna o nome da string a ser impresso na tabela de símbolos
+char* formatStr(char *strName);
+
 // Cria um nodo com um temporário para a geração de TACs
 HASH_NODE* makeTemp();
 
 // Cria um nodo com um label para a geração de TACs
 HASH_NODE* makeLabel();
+
+// Cria nome de uma string para poder referenciar no assembly e fazer print
+char* createStr(char *strName);
 
 #endif

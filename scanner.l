@@ -63,15 +63,15 @@ int lineNumber = 1;
 "!="           { return OPERATOR_DIF; }
 
  /* Literais */
-[+-]?[0-9ABCDEF]+                      { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_INTEGER, 0);   return LIT_INTEGER; }
-[+-]?[0-9ABCDEF]*\.[0-9ABCDEF]+        { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_FLOAT, 0);     return LIT_FLOAT;   }
-"TRUE"                                 { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_TRUE, 0);      return LIT_TRUE;    }
-"FALSE"                                { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_FALSE, 0);     return LIT_FALSE;   }
-'.'                                    { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_CHAR, 0);      return LIT_CHAR;    }
-\"[^\"]*\"                             { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_STRING, 0);    return LIT_STRING;  }
+[+-]?[0-9ABCDEF]+                      { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_INTEGER, 0, NULL);   return LIT_INTEGER; }
+[+-]?[0-9ABCDEF]*\.[0-9ABCDEF]+        { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_FLOAT,   0, NULL);   return LIT_FLOAT;   }
+"TRUE"                                 { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_TRUE,    0, NULL);   return LIT_TRUE;    }
+"FALSE"                                { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_FALSE,   0, NULL);   return LIT_FALSE;   }
+'.'                                    { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_CHAR,    0, NULL);   return LIT_CHAR;    }
+\"[^\"]*\"                             { yylval.symbol = hashInsert(yytext, SYMBOL_LIT_STRING,  0, NULL);   return LIT_STRING;  }
 
  /* Identificadores */
-[A-Za-z@_]+[A-Za-z@_0-9]*              { yylval.symbol = hashInsert(yytext, SYMBOL_IDENTIFIER, 0); return TK_IDENTIFIER;  }
+[A-Za-z@_]+[A-Za-z@_0-9]*              { yylval.symbol = hashInsert(yytext, SYMBOL_IDENTIFIER, 0, NULL); return TK_IDENTIFIER;  }
 
  /* Comentários */
 "//".*     {}

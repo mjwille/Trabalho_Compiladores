@@ -411,6 +411,11 @@ void addTempsToData() {
 					fprintf(fp, "%s:\n", node->text);
 					fprintf(fp, "\t.long 0\n");
 				}
+				// Se for um literal string
+				if(node->type == SYMBOL_LIT_STRING) {
+					// Coloca um nome para a string (para referenciar no assembly quando der print)
+					node->strName = createStr(node->strName);
+				}
 			}
 		}
 	}

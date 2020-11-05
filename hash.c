@@ -54,7 +54,7 @@ HASH_NODE* hashFind(char *text)
 
 
 // Insere elemento dentro da tabela hash
-HASH_NODE* hashInsert(char *text, int type, int dataType)
+HASH_NODE* hashInsert(char *text, int type, int dataType, char *strName)
 {
 	HASH_NODE *node;
 
@@ -75,6 +75,7 @@ HASH_NODE* hashInsert(char *text, int type, int dataType)
 	// Coloca dentro do nodo alocado os seus respectivos valores
 	node->type = type;
 	node->dataType = DATATYPE_NULL;
+	node->strName = strName;
 	node->text = (char*) calloc(strlen(text)+1, sizeof(char));
 	strcpy(node->text, text);
 
@@ -99,7 +100,7 @@ void hashPrint()
 		{
 			printf("[%03d]", i);
 			for(node=HASH_TABLE[i]; node; node=node->next)
-				printf(" <- [ Type: %s | Text: %s | Datatype: %s ]", formatType(node->type), node->text, formatType(node->dataType));
+				printf(" <- [ Type: %s | Text: %s | Datatype: %s | StrName: %s ]", formatType(node->type), node->text, formatType(node->dataType), formatStr(node->strName));
 			printf("\n");
 		}
 	}
@@ -133,12 +134,23 @@ char* formatType(int type)
 }
 
 
+// Função auxiliar que retorna o nome da string a ser impresso na tabela de símbolos
+char* formatStr(char *strName) {
+	if(strName == NULL) {
+		return "NULL";
+	}
+	else {
+		return strName;
+	}
+}
+
+
 // Cria um nodo com um temporário para a geração de TACs
 HASH_NODE* makeTemp() {
 	static int serial = 0;
 	char str[60];
 	sprintf(str, "__temp%d", serial++);
-	return hashInsert(str, SYMBOL_SCALAR, DATATYPE_NULL);
+	return hashInsert(str, SYMBOL_SCALAR, DATATYPE_NULL, NULL);
 }
 
 
@@ -147,5 +159,14 @@ HASH_NODE* makeLabel() {
 	static int serial = 0;
 	char str[60];
 	sprintf(str, "__label%d", serial++);
-	return hashInsert(str, SYMBOL_LABEL, DATATYPE_NULL);
+	return hashInsert(str, SYMBOL_LABEL, DATATYPE_NULL, NULL);
+}
+
+
+// Cria nome de uma string para poder referenciar no assembly e fazer print
+char* createStr(char *strName) {
+	static int serial = 0;
+	strName = (char*) calloc(60, sizeof(char));
+	sprintf(strName, "__str%d", serial++);
+	return strName;
 }
