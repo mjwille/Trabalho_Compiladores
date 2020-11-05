@@ -123,20 +123,24 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 	// Adição
 	else if(tac->opcode == TAC_ADD) {
+		fprintf(fp, "\t# Operação ADD\n");
 		asmBinaryOperation(tac, "add");
 	}
 
 	// Subtração
 	else if(tac->opcode == TAC_SUB) {
+		fprintf(fp, "\t# Operação SUB\n");
 		asmBinaryOperation(tac, "sub");
 	}
 
 	// Multiplicação
 	else if(tac->opcode == TAC_MUL) {
+		fprintf(fp, "\t# Operação MUL\n");
 		asmBinaryOperation(tac, "imul");
 	}
 
 	else if(tac->opcode == TAC_DIV) {
+		fprintf(fp, "\t# Operação DIV\n");
 		fprintf(fp, "\t# Operação binária\n");
 		// Coloca dividendo em %eax
 		// Se for literal, precisa ser modo imediato
@@ -167,40 +171,68 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 	// Xor
 	else if(tac->opcode == TAC_XOR) {
+		fprintf(fp, "\t# Operação XOR\n");
 		asmBinaryOperation(tac, "xor");
 	}
 
 	// Or
 	else if(tac->opcode == TAC_OR) {
+		fprintf(fp, "\t# Operação OR\n");
 		asmBinaryOperation(tac, "or");
 	}
 
 	// Not (Boolean Not, e não o 'not' do assembly que inverte todos os bits)
 	else if(tac->opcode == TAC_NOT) {
-		// TODO
+		fprintf(fp, "\t# Operação NOT\n");
+
+		HASH_NODE *label1 = makeLabel();
+		HASH_NODE *label2 = makeLabel();
+
+		fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
+		// Testa se é true
+		fprintf(fp, "\tcmp $1, %%eax\n");
+		// Se for true (igual a 1), pula
+		fprintf(fp, "\tje %s\n", label1->text);
+		// Senão, coloca 1 na resposta da TAC na sessão de dados (era false)
+		fprintf(fp, "\tmov $1, %%eax\n");
+		fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+		// Pula para não fazer a condição do true
+		fprintf(fp, "\tjmp %s\n", label2->text);
+		// Se true vai pular pra cá, onde coloca zero na resposta da TAC na sessão de dados (era true)
+		fprintf(fp, "\t%s:\n", label1->text);
+		fprintf(fp, "\tmov $0, %%eax\n");
+		fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+		// Label para pular depois de colocar 1
+		fprintf(fp, "\t%s:\n", label2->text);
 	}
 
 	else if(tac->opcode == TAC_EQ) {
+		fprintf(fp, "\t# Comparação EQ\n");
 		asmComparisonOperation(tac, "je");
 	}
 
 	else if(tac->opcode == TAC_DIF) {
+		fprintf(fp, "\t# Comparação DIF\n");
 		asmComparisonOperation(tac, "jne");
 	}
 
 	else if(tac->opcode == TAC_GE) {
+		fprintf(fp, "\t# Comparação GE\n");
 		asmComparisonOperation(tac, "jge");
 	}
 
 	else if(tac->opcode == TAC_LE) {
+		fprintf(fp, "\t# Comparação LE\n");
 		asmComparisonOperation(tac, "jle");
 	}
 
 	else if(tac->opcode == TAC_GT) {
+		fprintf(fp, "\t# Comparação GT\n");
 		asmComparisonOperation(tac, "jg");
 	}
 
 	else if(tac->opcode == TAC_LT) {
+		fprintf(fp, "\t# Comparação LT\n");
 		asmComparisonOperation(tac, "jl");
 	}
 
@@ -246,7 +278,6 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 // Gera código assembly para operações binárias de soma, subtração e multiplicação
 void asmBinaryOperation(TAC_NODE *tac, char *mnemonic) {
-	fprintf(fp, "\t# Operação binária\n");
 	// Copia os operandos para %eax e %ebx
 	// Se for literal, precisa ser modo imediato
 	if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
@@ -275,7 +306,6 @@ void asmBinaryOperation(TAC_NODE *tac, char *mnemonic) {
 
 // Gera código assembly para operações de comparação (igual, diferente, maior que, menor que, maior igual que, menor igual que)
 void asmComparisonOperation(TAC_NODE *tac, char *mnemonic) {
-	fprintf(fp, "\t# Comparação\n");
 	// Copia os operandos para %eax e %ebx
 	// Se for literal, precisa ser modo imediato
 	if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
