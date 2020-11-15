@@ -34,11 +34,13 @@ void generateAsm(TAC_NODE *tac) {
 	fprintf(fp, "# Nome: Marcelo Jantsch Wille\n");
 	fprintf(fp, "# Universidade Federal do Rio Grande do Sul\n");
 
-	// Coloca os dados na sessão de dados
+	// Coloca as variáveis e temporários na sessão de dados
+	fprintf(fp, "\n.section __DATA, __data\n\n");
+	addVarsToAsm(tac);
+	addTempsToAsm();
+	// Adiciona strings para sessão de strings
 	fprintf(fp, "\n.section __TEXT, __cstring, cstring_literals\n\n");
-	// Adiciona o que está na tabela hash à sessão de dados
-	addVarsToData(tac);
-	addSymbolsToData();
+	addStringsToAsm();
 
 	// Coloca o código assembly na sessão de código (text)
 	fprintf(fp, "\n.section __TEXT, __text, regular, pure_instructions\n\n");
@@ -57,10 +59,11 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 	// Início de função
 	if(tac->opcode == TAC_BEGINFUN) {
+		fprintf(fp, "# Início de Função\n");
 		// Se for a função main
 		if(!strcmp(tac->res->text, "main")) {
 			// Apenas declara como global e coloca o label de início de função
-			fprintf(fp, ".globl _main\n\n");
+			fprintf(fp, ".globl _main\n");
 			fprintf(fp, "_main:\n");
 			// Preâmbulo da main
 			fprintf(fp, "\tpushq %%rbp\n");
@@ -77,11 +80,13 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 	// Final de função
 	if(tac->opcode == TAC_ENDFUN) {
+		fprintf(fp, "\t# Fim de Função\n");
 		// Só for main, precisa fazer syscall de exit
 		if(!strcmp(tac->res->text, "main")) {
 			IS_INSIDE_MAIN = 0;
 		}
-		// TODO: precisa tratar o fim de funções ?
+		fprintf(fp, "\tpopq %%rbp\n");
+		fprintf(fp, "\tretq\n");
 	}
 
 	// Retorno de função
@@ -89,13 +94,11 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		fprintf(fp, "\t# Retorno\n");
 
 		if(IS_INSIDE_MAIN) {
-			// TODO: valor de retorno no %eax
-			fprintf(fp, "\tpopq %%rbp\n");
-			fprintf(fp, "\tretq\n");
+			// TODO: coloca valor de retorno no %eax
 		}
 		// Se não estiver dentro da main
 		else {
-			// TODO: ...
+			// TODO: coloca valor de retorno no %eax
 		}
 	}
 
@@ -290,26 +293,26 @@ void asmBinaryOperation(TAC_NODE *tac, char *mnemonic) {
 	// Copia os operandos para %eax e %ebx
 	// Se for literal, precisa ser modo imediato
 	if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
-		fprintf(fp, "\tmov $%s, %%eax\n", tac->op1->text);
+		fprintf(fp, "\tmovq $%s, %%eax\n", tac->op1->text);
 
 	}
 	// Caso não seja literal, acessa pelo modo direto a variável na sessão de dados
 	else {
-		fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
+		fprintf(fp, "\tmovq %s, %%eax\n", tac->op1->text);
 	}
 
 	// Mesma coisa para o operando 2
 	if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
-		fprintf(fp, "\tmov $%s, %%ebx\n", tac->op2->text);
+		fprintf(fp, "\tmovq $%s, %%ebx\n", tac->op2->text);
 	}
 	else {
-		fprintf(fp, "\tmov %s, %%ebx\n", tac->op2->text);
+		fprintf(fp, "\tmovq %s, %%ebx\n", tac->op2->text);
 	}
 
 	// Faz a operação (resultado fica em %eax)
 	fprintf(fp, "\t%s %%ebx, %%eax\n", mnemonic);
 	// Coloca resultado da operação para o campo resultado da TAC (na sessão de dados do assembly)
-	fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+	fprintf(fp, "\tmovq %%eax, %s\n", tac->res->text);
 }
 
 
@@ -361,7 +364,7 @@ void asmComparisonOperation(TAC_NODE *tac, char *mnemonic) {
 
 
 // Percorre as TACs e coloca na sessão de dados do assembly as variáveis globais
-void addVarsToData(TAC_NODE *tac) {
+void addVarsToAsm(TAC_NODE *tac) {
 	// Condição de parada do percorrimento das TACs
    if(tac == NULL)
       return;
@@ -400,12 +403,12 @@ void addVarsToData(TAC_NODE *tac) {
 	}
 
 	// Vai para a próxima TAC
-   addVarsToData(tac->next);
+   addVarsToAsm(tac->next);
 }
 
 
-// Percorre a tabela de símbolos e coloca temporários e strings na sessão de dados do assembly
-void addSymbolsToData() {
+// Percorre a tabela de símbolos e coloca temporários na sessão de dados do assembly
+void addTempsToAsm() {
 	char *prefix = "__temp";
 	int i;
 	HASH_NODE *node;
@@ -420,6 +423,22 @@ void addSymbolsToData() {
 					fprintf(fp, "%s:\n", node->text);
 					fprintf(fp, "\t.long 0\n");
 				}
+			}
+		}
+	}
+}
+
+
+// Percorre a tabela de símbolos e coloca strings na sessão de strings do assembly
+void addStringsToAsm() {
+	char *prefix = "__temp";
+	int i;
+	HASH_NODE *node;
+	// Percorre todo índice da tabela de símbolos
+	for(i=0; i<HASH_SIZE; i++) {
+		if(HASH_TABLE[i] != NULL) {
+			// Percorre toda a lista encadeada dos índices
+			for(node=HASH_TABLE[i]; node; node=node->next) {
 				// Se for um literal string
 				if(node->type == SYMBOL_LIT_STRING) {
 					// Coloca um nome para a string (para referenciar no assembly quando der print)

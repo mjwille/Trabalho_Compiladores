@@ -22,9 +22,12 @@ void asmBinaryOperation(TAC_NODE *tac, char *mnemonic);
 void asmComparisonOperation(TAC_NODE *tac, char *mnemonic);
 
 // Percorre as TACs e coloca na sessão de dados do assembly as variáveis globais
-void addVarsToData(TAC_NODE *tac);
+void addVarsToAsm(TAC_NODE *tac);
 
-// Percorre a tabela de símbolos e coloca temporários e strings na sessão de dados do assembly
-void addSymbolsToData();
+// Percorre a tabela de símbolos e coloca temporários na sessão de dados do assembly
+void addTempsToAsm();
+
+// Percorre a tabela de símbolos e coloca strings na sessão de strings do assembly
+void addStringsToAsm();
 
 #endif
