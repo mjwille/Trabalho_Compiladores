@@ -293,26 +293,26 @@ void asmBinaryOperation(TAC_NODE *tac, char *mnemonic) {
 	// Copia os operandos para %eax e %ebx
 	// Se for literal, precisa ser modo imediato
 	if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
-		fprintf(fp, "\tmovq $%s, %%eax\n", tac->op1->text);
+		fprintf(fp, "\tmovq $%s, %%rax\n", tac->op1->text);
 
 	}
-	// Caso não seja literal, acessa pelo modo direto a variável na sessão de dados
+	// Caso não seja literal, acessa em relação ao %rip
 	else {
-		fprintf(fp, "\tmovq %s, %%eax\n", tac->op1->text);
+		fprintf(fp, "\tmovq %s(%%rip), %%rax\n", tac->op1->text);
 	}
 
 	// Mesma coisa para o operando 2
 	if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
-		fprintf(fp, "\tmovq $%s, %%ebx\n", tac->op2->text);
+		fprintf(fp, "\tmovq $%s, %%rbx\n", tac->op2->text);
 	}
 	else {
-		fprintf(fp, "\tmovq %s, %%ebx\n", tac->op2->text);
+		fprintf(fp, "\tmovq %s(%%rip), %%rbx\n", tac->op2->text);
 	}
 
 	// Faz a operação (resultado fica em %eax)
-	fprintf(fp, "\t%s %%ebx, %%eax\n", mnemonic);
+	fprintf(fp, "\t%s %%rbx, %%rax\n", mnemonic);
 	// Coloca resultado da operação para o campo resultado da TAC (na sessão de dados do assembly)
-	fprintf(fp, "\tmovq %%eax, %s\n", tac->res->text);
+	fprintf(fp, "\tmovq %%rax, %s(%%rip)\n", tac->res->text);
 }
 
 
