@@ -9,14 +9,11 @@
    1. Executar este programa com uma entrada válida da linguagem
    ./etapa6 my_program.txt
 
-   2. Usar a saída do comando anterior (asm_code.s) com assembler 'as' para gerar código objeto
-   as asm_code.s -o obj_code.o
+   2. Usar a saída do comando anterior (asm_code.s) com gcc
+   gcc asm_code.s
 
-   3. Gerar o arquivo executável usando o linker 'ld' sobre o código objeto
-   ld obj_code.o -o my_program
-
-   4. Executar o arquivo
-   ./my_program
+   3. Executar o arquivo
+   ./a.out
 */
 
 #include <stdio.h>

@@ -17,7 +17,7 @@ int IS_INSIDE_MAIN = 0;
 
 
 // Função principal que transforma o código intermediário em um código assembly para
-// arquitetura-alvo x86-64/Linux usando sintaxe AT&T usando o assembler GNU Assembler (GAS)
+// arquitetura-alvo x86/UNIX usando sintaxe AT&T usando o assembler do gcc
 void generateAsm(TAC_NODE *tac) {
 
 	// Abre arquivo para escrever o assembly correspondente ao programa
@@ -35,18 +35,15 @@ void generateAsm(TAC_NODE *tac) {
 	fprintf(fp, "# Universidade Federal do Rio Grande do Sul\n");
 
 	// Coloca os dados na sessão de dados
-	fprintf(fp, "\n.section .data\n\n");
+	fprintf(fp, "\n.section __TEXT, __cstring, cstring_literals\n\n");
 	// Adiciona o que está na tabela hash à sessão de dados
 	addVarsToData(tac);
 	addSymbolsToData();
 
-	// Coloca o código assembly
-	fprintf(fp, "\n.section .text\n\n");
+	// Coloca o código assembly na sessão de código (text)
+	fprintf(fp, "\n.section __TEXT, __text, regular, pure_instructions\n\n");
 	// Converte o código intermediário das TACs para assembly
 	generateAsmFromTac(tac);
-
-	// TODO: Coloca função auxiliar para printar inteiros no fim
-	// ...
 
 	fclose(fp);
 }
@@ -63,14 +60,18 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		// Se for a função main
 		if(!strcmp(tac->res->text, "main")) {
 			// Apenas declara como global e coloca o label de início de função
-			fprintf(fp, ".globl _start\n\n");
-			fprintf(fp, "_start:\n");
+			fprintf(fp, ".globl _main\n\n");
+			fprintf(fp, "_main:\n");
+			// Preâmbulo da main
+			fprintf(fp, "\tpushq %%rbp\n");
+			fprintf(fp, "\tmovq %%rsp, %%rbp\n");
 			IS_INSIDE_MAIN = 1;
 		}
 		// Se for alguma outra função
 		else {
 			fprintf(fp, ".globl %s\n\n", tac->res->text);
 			fprintf(fp, "%s:\n", tac->res->text);
+			// TODO: Preâmbulo da outra função
 		}
 	}
 
@@ -88,33 +89,13 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		fprintf(fp, "\t# Retorno\n");
 
 		if(IS_INSIDE_MAIN) {
-			// Move 1 para %eax antes da chamada de sistema (valor 1 em %eax = exit)
-			fprintf(fp, "\tmov   $1, %%eax\n");
-			// Se for um literal, precisa colocar como modo imediato
-			if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
-				// Valor de retorno no registrador %ebx
-				fprintf(fp, "\tmov $%s, %%ebx\n", tac->op1->text);
-			}
-			// Senão, precisa usar modo direto
-			else {
-				// Valor de retorno no registrador %ebx
-				fprintf(fp, "\tmov %s, %%ebx\n", tac->op1->text);
-			}
-			// Faz a chamada de sistema com o mnêmonico 'int'
-			fprintf(fp, "\tint  $0x80\n\n");
+			// TODO: valor de retorno no %eax
+			fprintf(fp, "\tpopq %%rbp\n");
+			fprintf(fp, "\tretq\n");
 		}
+		// Se não estiver dentro da main
 		else {
-			// Se for um literal, precisa colocar como modo imediato
-			if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
-				// Valor de retorno no registrador %eax
-				fprintf(fp, "\tmov $%s, %%eax\n", tac->op1->text);
-			}
-			// Senão, precisa usar modo direto
-			else {
-				// Valor de retorno no registrador %eax
-				fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
-			}
-			fprintf(fp, "\tret\n\n");    // TODO: ainda tem mais por fazer no retorno (epílogo?)
+			// TODO: ...
 		}
 	}
 
@@ -142,7 +123,6 @@ void generateAsmFromTac(TAC_NODE *tac) {
 	}
 
 	else if(tac->opcode == TAC_DIV) {
-		fprintf(fp, "\t# Operação DIV\n");
 		fprintf(fp, "\t# Operação binária\n");
 		// Coloca dividendo em %eax
 		// Se for literal, precisa ser modo imediato
@@ -275,20 +255,25 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		fprintf(fp, "\t# Print\n");
 		// Se for uma string
 		if(tac->res->type == SYMBOL_LIT_STRING) {
-			fprintf(fp, "\tmov $4, %%eax\n");
-			fprintf(fp, "\tmov $1, %%ebx\n");
-			fprintf(fp, "\tmov $%s, %%ecx\n", tac->res->strName);
-			fprintf(fp, "\tmov $%lu, %%edx\n", strlen(tac->res->text)-2);
-			fprintf(fp, "\tint $0x80\n");
+			fprintf(fp, "\tleaq %s(%%rip), %%rdi\n", tac->res->strName);
+			fprintf(fp, "\tmovb $0, %%al\n");
+			fprintf(fp, "\tcallq _printf\n");
 		}
+		// Se for um dígito
 		else {
-			// Se for uma variável escalar inteira (modo imediato)
-			if(tac->res->type == SYMBOL_LIT_INTEGER) {      // TODO: char, float, vetor, ...
-				// ...
+			// Se for um escalar
+			if(tac->res->type == SYMBOL_LIT_INTEGER) {
+				fprintf(fp, "\tleaq __strDigit(%%rip), %%rdi\n");
+				fprintf(fp, "\tmovl $%s, %%esi\n", tac->res->text);
+				fprintf(fp, "\tmovb $0, %%al\n");
+				fprintf(fp, "\tcallq _printf\n");
 			}
-			// Se for uma variável escalar (modo direto)
+			// Se for uma variável
 			else if (tac->res->type == SYMBOL_SCALAR) {
-				// ...
+				fprintf(fp, "\tleaq __strDigit(%%rip), %%rdi\n");
+				fprintf(fp, "\tmovl %s(%%rip), %%esi\n", tac->res->text);
+				fprintf(fp, "\tmovb $0, %%al\n");
+				fprintf(fp, "\tcallq _printf\n");
 			}
 		}
 	}
@@ -441,9 +426,12 @@ void addSymbolsToData() {
 					node->strName = createStr(node->strName);
 					// Coloca string na sessão de dados do assembly
 					fprintf(fp, "%s:\n", node->strName);
-					fprintf(fp, "\t.ascii %s\n", node->text);
+					fprintf(fp, "\t.asciz %s\n", node->text);
 				}
 			}
 		}
 	}
+	// Adiciona símbolo final para imprimir inteiros
+	fprintf(fp, "__strDigit:\n");
+	fprintf(fp, "\t.asciz \"%%d\"\n");
 }
