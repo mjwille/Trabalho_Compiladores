@@ -118,7 +118,7 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		fprintf(fp, "\t# Operação binária\n");
 		// Coloca dividendo em %eax
 		// Se for literal, precisa ser modo imediato
-		if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+		if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float
 			fprintf(fp, "\tmovl $%s, %%eax\n", tac->op1->text);
 
 		}
@@ -128,7 +128,7 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		}
 		// Coloca divisor em %ebx
 		// Mesma coisa para o operando 2
-		if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+		if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float
 			fprintf(fp, "\tmovl $%s, %%ebx\n", tac->op2->text);
 		}
 		else {
@@ -273,11 +273,28 @@ void generateAsmFromTac(TAC_NODE *tac) {
 	// ...
 
 	else if(tac->opcode == TAC_VECREAD) {
-
+		fprintf(fp, "\t# Leitura de Vetor\n");
+		int i = 4*(atoi(tac->op2->text));
+		// Copia valor a ser atribuído para %eax
+		fprintf(fp, "\tmovl %s+%d(%%rip), %%eax\n", tac->op1->text, i);
+		// Coloca valor em %eax para a variável do lado esquerdo da atribuição
+		fprintf(fp, "\tmovl %%eax, %s(%%rip)\n", tac->res->text);
 	}
 
 	else if(tac->opcode == TAC_VECCOPY) {
-
+		fprintf(fp, "\t# Escrita em Vetor\n");
+		int i = 4*(atoi(tac->op1->text));
+		// Copia valor a ser atribuído para %eax
+		// Se for literal, precisa ser modo imediato
+		if(tac->op2->type == SYMBOL_LIT_INTEGER) {
+			fprintf(fp, "\tmovl $%s, %%eax\n", tac->op2->text);
+		}
+		// Caso não seja literal, acessa em relação ao %rip (modo indexado)
+		else {
+			fprintf(fp, "\tmovl %s(%%rip), %%eax\n", tac->op2->text);
+		}
+		// Coloca valor em %eax para a variável do lado esquerdo da atribuição
+		fprintf(fp, "\tmovl %%eax, %s+%d(%%rip)\n", tac->res->text, i);
 	}
 
    // Vai para a próxima TAC
@@ -289,17 +306,17 @@ void generateAsmFromTac(TAC_NODE *tac) {
 void asmBinaryOperation(TAC_NODE *tac, char *mnemonic) {
 	// Copia os operandos para %eax e %ebx
 	// Se for literal, precisa ser modo imediato
-	if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+	if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float
 		fprintf(fp, "\tmovq $%s, %%rax\n", tac->op1->text);
 
 	}
-	// Caso não seja literal, acessa em relação ao %rip
+	// Caso não seja literal, acessa em relação ao %rip (modo indexado)
 	else {
 		fprintf(fp, "\tmovq %s(%%rip), %%rax\n", tac->op1->text);
 	}
 
 	// Mesma coisa para o operando 2
-	if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+	if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float
 		fprintf(fp, "\tmovq $%s, %%rbx\n", tac->op2->text);
 	}
 	else {
@@ -317,7 +334,7 @@ void asmBinaryOperation(TAC_NODE *tac, char *mnemonic) {
 void asmComparisonOperation(TAC_NODE *tac, char *mnemonic) {
 	// Copia os operandos para %eax e %ebx
 	// Se for literal, precisa ser modo imediato
-	if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+	if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float
 		fprintf(fp, "\tmovl $%s, %%eax\n", tac->op1->text);
 
 	}
@@ -327,7 +344,7 @@ void asmComparisonOperation(TAC_NODE *tac, char *mnemonic) {
 	}
 
 	// Mesma coisa para o operando 2
-	if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
+	if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float
 		fprintf(fp, "\tmovl $%s, %%ebx\n", tac->op2->text);
 	}
 	else {
