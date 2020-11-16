@@ -173,20 +173,20 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		HASH_NODE *label1 = makeLabel();
 		HASH_NODE *label2 = makeLabel();
 
-		fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
+		fprintf(fp, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
 		// Testa se é true
-		fprintf(fp, "\tcmp $1, %%eax\n");
+		fprintf(fp, "\tcmpl $1, %%eax\n");
 		// Se for true (igual a 1), pula
 		fprintf(fp, "\tje %s\n", label1->text);
 		// Senão, coloca 1 na resposta da TAC na sessão de dados (era false)
-		fprintf(fp, "\tmov $1, %%eax\n");
-		fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+		fprintf(fp, "\tmovl $1, %%eax\n");
+		fprintf(fp, "\tmovl %%eax, %s(%%rip)\n", tac->res->text);
 		// Pula para não fazer a condição do true
 		fprintf(fp, "\tjmp %s\n", label2->text);
 		// Se true vai pular pra cá, onde coloca zero na resposta da TAC na sessão de dados (era true)
 		fprintf(fp, "\t%s:\n", label1->text);
-		fprintf(fp, "\tmov $0, %%eax\n");
-		fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+		fprintf(fp, "\tmovl $0, %%eax\n");
+		fprintf(fp, "\tmovl %%eax, %s(%%rip)\n", tac->res->text);
 		// Label para pular depois de colocar 1
 		fprintf(fp, "\t%s:\n", label2->text);
 	}
