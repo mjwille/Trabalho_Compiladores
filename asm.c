@@ -12,8 +12,8 @@
 FILE *fp = NULL;
 // Nome do arquivo de output
 char *OUTPUT_FILE = "./asm_code.s";
-// Como a função main é um caso a parte, precisa identifcar quando está nela (retorno é diferente, por exemplo)
-int IS_INSIDE_MAIN = 0;
+// Variável auxiliar para guardar o nome do último vetor lido
+char *prevVec = NULL;
 
 
 // Função principal que transforma o código intermediário em um código assembly para
@@ -37,9 +37,10 @@ void generateAsm(TAC_NODE *tac) {
 	// Coloca as variáveis e temporários na sessão de dados
 	fprintf(fp, "\n.section __DATA, __data\n\n");
 	addVarsToAsm(tac);
+	addVecsToAsm(tac);
 	addTempsToAsm();
 	// Adiciona strings para sessão de strings
-	fprintf(fp, "\n.section __TEXT, __cstring, cstring_literals\n\n");
+	fprintf(fp, "\n.section __TEXT, __cstring, cstring_literals\n");
 	addStringsToAsm();
 
 	// Coloca o código assembly na sessão de código (text)
@@ -68,7 +69,6 @@ void generateAsmFromTac(TAC_NODE *tac) {
 			// Preâmbulo da main
 			fprintf(fp, "\tpushq %%rbp\n");
 			fprintf(fp, "\tmovq %%rsp, %%rbp\n");
-			IS_INSIDE_MAIN = 1;
 		}
 		// Se for alguma outra função
 		else {
@@ -81,10 +81,6 @@ void generateAsmFromTac(TAC_NODE *tac) {
 	// Final de função
 	if(tac->opcode == TAC_ENDFUN) {
 		fprintf(fp, "\t# Fim de Função\n");
-		// Só for main, precisa fazer syscall de exit
-		if(!strcmp(tac->res->text, "main")) {
-			IS_INSIDE_MAIN = 0;
-		}
 		fprintf(fp, "\tpopq %%rbp\n");
 		fprintf(fp, "\tretq\n");
 	}
@@ -92,14 +88,7 @@ void generateAsmFromTac(TAC_NODE *tac) {
 	// Retorno de função
 	else if(tac->opcode == TAC_RET) {
 		fprintf(fp, "\t# Retorno\n");
-
-		if(IS_INSIDE_MAIN) {
-			// TODO: coloca valor de retorno no %eax
-		}
-		// Se não estiver dentro da main
-		else {
-			// TODO: coloca valor de retorno no %eax
-		}
+		// TODO: coloca valor de retorno no %eax
 	}
 
 	// Chamada de função
@@ -283,6 +272,14 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 	// ...
 
+	else if(tac->opcode == TAC_VECREAD) {
+
+	}
+
+	else if(tac->opcode == TAC_VECCOPY) {
+
+	}
+
    // Vai para a próxima TAC
    generateAsmFromTac(tac->next);
 }
@@ -363,13 +360,13 @@ void asmComparisonOperation(TAC_NODE *tac, char *mnemonic) {
  */
 
 
-// Percorre as TACs e coloca na sessão de dados do assembly as variáveis globais
+// Percorre as TACs e coloca na sessão de dados do assembly as variáveis escalares
 void addVarsToAsm(TAC_NODE *tac) {
 	// Condição de parada do percorrimento das TACs
    if(tac == NULL)
       return;
 
-	// Declarações de variáveis escalares globais
+	// Declarações de variáveis escalares
 	if(tac->opcode == TAC_VARDECL) {
 		// Se variável global for do tipo char
 		if(tac->res->dataType == DATATYPE_CHAR) {
@@ -397,13 +394,53 @@ void addVarsToAsm(TAC_NODE *tac) {
 		}
 	}
 
-	// Declarações de variáveis vetores globais
-	else if(tac->opcode == TAC_VECDECL) {
-		// TODO: vetores vai ser uma lista, mas incorre nos mesmos problemas de tipos que faltam do anterior
+	// Vai para a próxima TAC
+   addVarsToAsm(tac->next);
+}
+
+
+// Percorre as TACs e coloca na sessão de dados do assembly os vetores
+void addVecsToAsm(TAC_NODE *tac) {
+	// Condição de parada do percorrimento das TACs
+   	if(tac == NULL)
+      return;
+
+	if(tac->opcode == TAC_VECDECL) {
+		// Se vetor é um vetor sem valores de inicialização
+		if(tac->op1 == NULL) {
+			fprintf(fp,"%s:\n", tac->res->text);
+			int i;
+			for(i=0; i<atoi(tac->op2->text); i++) {
+				fprintf(fp, "\t.long 0\n");
+			}
+		}
+		// Se vetor é um vetor com valores de inicialização
+		else {
+			// Se prevVec já contém texto de vetor
+			if(prevVec != NULL) {
+				// Se for o mesmo que o vetor anterior, apenas adiciona no 'long' do assembly
+				if(!strcmp(prevVec, tac->res->text)) {
+					fprintf(fp, "\t.long %s\n", tac->op1->text);
+				}
+				// Se for diferente, cria nova variável no assembly e atualiza vetor (prevVector)
+				else {
+					fprintf(fp,"%s:\n", tac->res->text);
+					fprintf(fp, "\t.long %s\n", tac->op1->text);
+					prevVec = tac->res->text;
+				}
+			}
+			// Senão é a primeira vez que lê uma declaração de vetor
+			else {
+				// Inicializa nova variável no assembly
+				fprintf(fp,"%s:\n", tac->res->text);
+				fprintf(fp, "\t.long %s\n", tac->op1->text);
+				prevVec = tac->res->text;
+			}
+		}
 	}
 
 	// Vai para a próxima TAC
-   addVarsToAsm(tac->next);
+	addVecsToAsm(tac->next);
 }
 
 
@@ -444,7 +481,7 @@ void addStringsToAsm() {
 					// Coloca um nome para a string (para referenciar no assembly quando der print)
 					node->strName = createStr(node->strName);
 					// Coloca string na sessão de dados do assembly
-					fprintf(fp, "%s:\n", node->strName);
+					fprintf(fp, "\n%s:\n", node->strName);
 					fprintf(fp, "\t.asciz %s\n", node->text);
 				}
 			}

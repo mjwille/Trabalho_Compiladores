@@ -476,7 +476,7 @@ TAC_NODE* makeTacVarDecl(AST_NODE *node, TAC_NODE *son0) {
 TAC_NODE* makeTacVecDecl(AST_NODE *node, TAC_NODE *son0) {
    // Se não inicializou vetor com algum valor
    if(node->son[2] == NULL) {
-      return tacCreate(TAC_VECDECL, node->symbol, NULL, NULL);
+      return tacCreate(TAC_VECDECL, node->symbol, NULL, node->son[1]->symbol);
    }
    // Se inicializou vetor com apenas um valor
    else if(node->son[2]->type != AST_VEC_VAL) {

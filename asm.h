@@ -21,8 +21,11 @@ void asmBinaryOperation(TAC_NODE *tac, char *mnemonic);
 // Gera código assembly para operações de comparação (igual, diferente, maior que, menor que, maior igual que, menor igual que)
 void asmComparisonOperation(TAC_NODE *tac, char *mnemonic);
 
-// Percorre as TACs e coloca na sessão de dados do assembly as variáveis globais
+// Percorre as TACs e coloca na sessão de dados do assembly as variáveis escalares
 void addVarsToAsm(TAC_NODE *tac);
+
+// Percorre as TACs e coloca na sessão de dados do assembly os vetores
+void addVecsToAsm(TAC_NODE *tac);
 
 // Percorre a tabela de símbolos e coloca temporários na sessão de dados do assembly
 void addTempsToAsm();
