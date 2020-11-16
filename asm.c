@@ -17,7 +17,7 @@ int IS_INSIDE_MAIN = 0;
 
 
 // Função principal que transforma o código intermediário em um código assembly para
-// arquitetura-alvo x86/UNIX usando sintaxe AT&T usando o assembler do gcc
+// arquitetura-alvo x86-64/UNIX usando sintaxe AT&T usando o assembler do gcc
 void generateAsm(TAC_NODE *tac) {
 
 	// Abre arquivo para escrever o assembly correspondente ao programa
@@ -225,9 +225,9 @@ void generateAsmFromTac(TAC_NODE *tac) {
 	else if(tac->opcode == TAC_COPY) {
 		fprintf(fp, "\t# Atribuição\n");
 		// Copia valor a ser atribuído para %eax
-		fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
+		fprintf(fp, "\tmovq %s(%%rip), %%rax\n", tac->op1->text);
 		// Coloca valor em %eax para a variável do lado esquerdo da atribuição
-		fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+		fprintf(fp, "\tmovq %%rax, %s(%%rip)\n", tac->res->text);
 	}
 
 	// Label para fazer os jumps (condicionais e incondicionais)
@@ -247,9 +247,9 @@ void generateAsmFromTac(TAC_NODE *tac) {
 	else if(tac->opcode == TAC_JF) {
 		fprintf(fp, "\t# Pulo condicional\n");
 		// Move o operador a ser testado falso para o registrador %eax
-		fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
+		fprintf(fp, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
 		// Faz comparação com false
-		fprintf(fp, "\tcmp $0, %%eax\n");
+		fprintf(fp, "\tcmpl $0, %%eax\n");
 		// Pula para o label se realmente for false (igual a zero)
 		fprintf(fp, "\tje %s\n", tac->res->text);
 	}
@@ -321,24 +321,24 @@ void asmComparisonOperation(TAC_NODE *tac, char *mnemonic) {
 	// Copia os operandos para %eax e %ebx
 	// Se for literal, precisa ser modo imediato
 	if(tac->op1->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
-		fprintf(fp, "\tmov $%s, %%eax\n", tac->op1->text);
+		fprintf(fp, "\tmovl $%s, %%eax\n", tac->op1->text);
 
 	}
-	// Caso não seja literal, acessa pelo modo direto a variável na sessão de dados
+	// Caso não seja literal, acessa em relação ao %rip
 	else {
-		fprintf(fp, "\tmov %s, %%eax\n", tac->op1->text);
+		fprintf(fp, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
 	}
 
 	// Mesma coisa para o operando 2
 	if(tac->op2->type == SYMBOL_LIT_INTEGER) {                    // TODO: char, float, vetor, ...
-		fprintf(fp, "\tmov $%s, %%ebx\n", tac->op2->text);
+		fprintf(fp, "\tmovl $%s, %%ebx\n", tac->op2->text);
 	}
 	else {
-		fprintf(fp, "\tmov %s, %%ebx\n", tac->op2->text);
+		fprintf(fp, "\tmovl %s(%%rip), %%ebx\n", tac->op2->text);
 	}
 
 	// Faz a comparação
-	fprintf(fp, "\tcmp %%ebx, %%eax\n");
+	fprintf(fp, "\tcmpl %%ebx, %%eax\n");
 
 	// Cria os labels para efetuar os pulos
 	HASH_NODE *label1 = makeLabel();
@@ -346,12 +346,12 @@ void asmComparisonOperation(TAC_NODE *tac, char *mnemonic) {
 
 	// Cria a lógica dos operadore de comparação (baseado nas flags setadas pelo operador 'cmp' já feito)
 	fprintf(fp, "\t%s %s\n", mnemonic, label1->text);
-	fprintf(fp, "\tmov $0, %%eax\n");
-	fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+	fprintf(fp, "\tmovl $0, %%eax\n");
+	fprintf(fp, "\tmovl %%eax, %s(%%rip)\n", tac->res->text);
 	fprintf(fp, "\tjmp %s\n", label2->text);
 	fprintf(fp, "\t%s:\n", label1->text);
-	fprintf(fp, "\tmov $1, %%eax\n");
-	fprintf(fp, "\tmov %%eax, %s\n", tac->res->text);
+	fprintf(fp, "\tmovl $1, %%eax\n");
+	fprintf(fp, "\tmovl %%eax, %s(%%rip)\n", tac->res->text);
 	fprintf(fp, "\t%s:\n", label2->text);
 }
 
