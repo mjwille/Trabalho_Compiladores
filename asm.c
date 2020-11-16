@@ -88,7 +88,15 @@ void generateAsmFromTac(TAC_NODE *tac) {
 	// Retorno de função
 	else if(tac->opcode == TAC_RET) {
 		fprintf(fp, "\t# Retorno\n");
-		// TODO: coloca valor de retorno no %eax
+		// Copia valor a ser atribuído para %eax
+		// Se for literal, precisa ser modo imediato
+		if(tac->op1->type == SYMBOL_LIT_INTEGER) {
+			fprintf(fp, "\tmovl $%s, %%eax\n", tac->op1->text);
+		}
+		// Caso não seja literal, acessa em relação ao %rip (modo indexado)
+		else {
+			fprintf(fp, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
+		}
 	}
 
 	// Chamada de função
