@@ -577,26 +577,26 @@ void addParamsToArgs(TAC_NODE *tac, AST_NODE *node) {
             }
             // Caso tenha uma lista de argumentos (AST_PARAMS)
             else {
+               // Enquanto tiver uma lista de parâmetros
                while(paramNode->type == AST_PARAMS) {
-                  //printf("Node Type: %d\n", paramNode->type);
-                  //tacPrintNode(auxTac);
-                  //printf("S:         %s\n", paramNode->son[0]->symbol->text);
-                  //printf("Next Node: %d\n", paramNode->son[1]->type);
+                  // Coloca na TAC atual o primeiro parâmetro da lista
                   auxTac->op2 = paramNode->son[0]->symbol;
+                  // Vai pra próxima TAC
                   auxTac = getNextNonSymbolTac(auxTac->next);
+                  // Vai para o próximo parâmetro (ou lista de parâmetros)
                   paramNode = paramNode->son[1];
-                  //printf("Next TAC: %d\n", auxTac->opcode);
-                  //printf("-----------------------\n");
-                  if(paramNode->type == AST_PARAM)
+                  // Se for um parâmetro, e não uma lista, vai encerrar o loop
+                  if(paramNode->type == AST_PARAM) {
+                     // Copia o último parâmetro para a TAC
                      auxTac->op2 = paramNode->symbol;
+                  }
                }
             }
          }
       }
-
+      // Limpa a variável global que aponta para a AST da declaração de função
       funcDeclNode = NULL;
    }
-
 }
 
 

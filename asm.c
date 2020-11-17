@@ -97,11 +97,6 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		}
 	}
 
-	// Chamada de função
-	else if(tac->opcode == TAC_CALL) {
-		fprintf(fp, "\tcall %s\n", tac->op1->text);   //TODO: ainda tem mais por fazer na chamada (prólogo e parâmetros)?
-	}
-
 	// Adição
 	else if(tac->opcode == TAC_ADD) {
 		fprintf(fp, "\t# Operação ADD\n");
@@ -310,14 +305,24 @@ void generateAsmFromTac(TAC_NODE *tac) {
 	}
 
 	else if(tac->opcode == TAC_ARG) {
-		// TODO: precisa mudar as TACs para colocar qual variável é em op1 (andando junto como na análise semântica?)
-		// Fazer os movl para os parâmetros (que são na verdade globais)
+		fprintf(fp, "\t# Argumento de função\n");
+		// Copia valor a ser passado como parâmetro para %eax
+		// Se for literal, precisa ser modo imediato
+		if(tac->res->type == SYMBOL_LIT_INTEGER) {
+			fprintf(fp, "\tmovl $%s, %%eax\n", tac->res->text);
+		}
+		// Caso não seja literal, acessa em relação ao %rip (modo indexado)
+		else {
+			fprintf(fp, "\tmovl %s(%%rip), %%eax\n", tac->res->text);
+		}
+		// Coloca valor de %eax na variável que corresponde ao parâmetro da função
+		fprintf(fp, "\tmovl %%eax, %s(%%rip)\n", tac->op2->text);
 	}
 
 	else if(tac->opcode == TAC_CALL) {
 		fprintf(fp, "\t# Chamada de Função\n");
 		fprintf(fp, "\tcallq %s\n", tac->op1->text);
-		//TODO: move %eax para o res dessa tac
+		fprintf(fp, "\tmovl %%eax, %s(%%rip)\n", tac->res->text);    // Valor de retorno vai estar em %eax
 	}
 
    // Vai para a próxima TAC
@@ -422,6 +427,12 @@ void addVarsToAsm(TAC_NODE *tac) {
 			else
 				fprintf(fp, "\t.long 0\n");
 		}
+	}
+
+	// Argumentos (contém o parâmetro correspondente na TAC)
+	if(tac->opcode == TAC_ARG) {
+		fprintf(fp, "%s:\n", tac->op2->text);
+		fprintf(fp, "\t.long 0\n");
 	}
 
 	// Vai para a próxima TAC
