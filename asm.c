@@ -44,7 +44,7 @@ void generateAsm(TAC_NODE *tac) {
 	addStringsToAsm();
 
 	// Coloca o código assembly na sessão de código (text)
-	fprintf(fp, "\n.section __TEXT, __text, regular, pure_instructions\n\n");
+	fprintf(fp, "\n.section __TEXT, __text, regular, pure_instructions\n");
 	// Converte o código intermediário das TACs para assembly
 	generateAsmFromTac(tac);
 
@@ -60,22 +60,20 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 	// Início de função
 	if(tac->opcode == TAC_BEGINFUN) {
-		fprintf(fp, "# Início de Função\n");
+		fprintf(fp, "\n# Início de Função\n");
 		// Se for a função main
 		if(!strcmp(tac->res->text, "main")) {
-			// Apenas declara como global e coloca o label de início de função
 			fprintf(fp, ".globl _main\n");
 			fprintf(fp, "_main:\n");
-			// Preâmbulo da main
-			fprintf(fp, "\tpushq %%rbp\n");
-			fprintf(fp, "\tmovq %%rsp, %%rbp\n");
 		}
 		// Se for alguma outra função
 		else {
-			fprintf(fp, ".globl %s\n\n", tac->res->text);
+			fprintf(fp, ".globl %s\n", tac->res->text);
 			fprintf(fp, "%s:\n", tac->res->text);
-			// TODO: Preâmbulo da outra função
 		}
+		// Preâmbulo
+		fprintf(fp, "\tpushq %%rbp\n");
+		fprintf(fp, "\tmovq %%rsp, %%rbp\n");
 	}
 
 	// Final de função
@@ -311,6 +309,17 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		fprintf(fp, "\tmovl %%eax, %s+%d(%%rip)\n", tac->res->text, i);
 	}
 
+	else if(tac->opcode == TAC_ARG) {
+		// TODO: precisa mudar as TACs para colocar qual variável é em op1 (andando junto como na análise semântica?)
+		// Fazer os movl para os parâmetros (que são na verdade globais)
+	}
+
+	else if(tac->opcode == TAC_CALL) {
+		fprintf(fp, "\t# Chamada de Função\n");
+		fprintf(fp, "\tcallq %s\n", tac->op1->text);
+		//TODO: move %eax para o res dessa tac
+	}
+
    // Vai para a próxima TAC
    generateAsmFromTac(tac->next);
 }
@@ -399,23 +408,13 @@ void addVarsToAsm(TAC_NODE *tac) {
 
 	// Declarações de variáveis escalares
 	if(tac->opcode == TAC_VARDECL) {
-		// Se variável global for do tipo char
-		if(tac->res->dataType == DATATYPE_CHAR) {
-			fprintf(fp, "%s:\n", tac->res->text);
-			// TODO: vai o char ou a representação inteira dele após .byte?
-		}
 		// Se variável global for do tipo int
-		else if(tac->res->dataType == DATATYPE_INT) {
+		if(tac->res->dataType == DATATYPE_INT) {
 			fprintf(fp, "%s:\n", tac->res->text);
 			fprintf(fp, "\t.long %s\n", tac->op1->text);
 		}
-		// Se variável global for do tipo float
-		else if(tac->res->dataType == DATATYPE_FLOAT) {
-			fprintf(fp, "%s:\n", tac->res->text);
-			// TODO: como representar floats na sessão de dados do assembly?
-		}
 		// Se variável global for do tipo boolean
-		else {
+		else if(tac->res->dataType == DATATYPE_BOOL) {
 			fprintf(fp, "%s:\n", tac->res->text);
 			// Se valor for FALSE, coloca valor zero. Se valor for TRUE, coloca valor 1
 			if(!strcmp("TRUE", tac->op1->text))
@@ -519,6 +518,6 @@ void addStringsToAsm() {
 		}
 	}
 	// Adiciona símbolo final para imprimir inteiros
-	fprintf(fp, "__strDigit:\n");
+	fprintf(fp, "\n__strDigit:\n");
 	fprintf(fp, "\t.asciz \"%%d\"\n");
 }
