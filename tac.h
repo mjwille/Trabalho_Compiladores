@@ -127,4 +127,16 @@ void changeTacVecVals(TAC_NODE *tac, AST_NODE *node);
 // Função usada para verificar se a TAC realmente possui o campo na struct diferente de NULL e evitar segfaults
 HASH_NODE* tacResCheck(TAC_NODE *tac);
 
+// Função que percorre as TACs de baixo para cima e adiciona nos argumentos o nome da função
+void addFuncToArgs(TAC_NODE *tac);
+
+// Função que percorre as TACs de cima para baixo e adiciona nos argumentos o nome do parâmetro
+void addParamsToArgs(TAC_NODE *tac, AST_NODE *node);
+
+// Função que percorre a AST e encontra o nodo da declaração da função com certo nome
+void findFuncDeclNode(AST_NODE *node, char *funcName);
+
+// Função que retorna próxima TAC que não seja TAC de símbolos
+TAC_NODE* getNextNonSymbolTac(TAC_NODE *tac);
+
 #endif

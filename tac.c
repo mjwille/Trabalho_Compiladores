@@ -8,6 +8,8 @@
 #include <string.h>
 #include "tac.h"
 
+HASH_NODE *lastFuncCall = NULL;
+AST_NODE *funcDeclNode = NULL;
 
 // Percorre recursivamente a AST para gerar os códigos TAC
 TAC_NODE* tacCodeGenerate(AST_NODE *node) {
@@ -529,4 +531,106 @@ HASH_NODE* tacResCheck(TAC_NODE *tac) {
       return tac->res;
    else
       return NULL;
+}
+
+
+// Função que percorre as TACs de baixo para cima e adiciona nos argumentos o nome da função
+void addFuncToArgs(TAC_NODE *tac) {
+   // Condição de saída do percorrimento das TACs
+   if(tac == NULL)
+      return;
+
+   // Achou nova chamada de função, coloca nome na variável que guarda última função encontrada
+   if(tac->opcode == TAC_CALL) {
+      lastFuncCall = tac->op1;
+   }
+
+   // Achou argumento, coloca nome da última função encontrada na sua TAC
+   else if(tac->opcode ==TAC_ARG) {
+      tac->op1 = lastFuncCall;
+   }
+
+   // Vai para a TAC anterior
+   addFuncToArgs(tac->prev);
+}
+
+
+// Função que percorre as TACs de cima para baixo e adiciona nos argumentos o nome do parâmetro
+void addParamsToArgs(TAC_NODE *tac, AST_NODE *node) {
+
+   AST_NODE *paramNode;
+   TAC_NODE *auxTac;
+
+   // Percorre TACs de frente para trás
+   for(auxTac = tac; auxTac != NULL; auxTac = auxTac->next) {
+      // Se encontrou um argumento
+      if(auxTac->opcode ==TAC_ARG) {
+         // Encontra na AST o nodo da declaração da função
+         findFuncDeclNode(node, auxTac->op1->text);
+         // Se encontrou um nodo na AST da declaração da função
+         if(funcDeclNode != NULL) {
+            // Pega o parâmetro ou a lista de parâmetros
+            paramNode = funcDeclNode->son[0];
+            // Caso só tenha 1 argumento
+            if(paramNode->type == AST_PARAM) {
+               auxTac->op2 = paramNode->symbol;
+            }
+            // Caso tenha uma lista de argumentos (AST_PARAMS)
+            else {
+               while(paramNode->type == AST_PARAMS) {
+                  //printf("Node Type: %d\n", paramNode->type);
+                  //tacPrintNode(auxTac);
+                  //printf("S:         %s\n", paramNode->son[0]->symbol->text);
+                  //printf("Next Node: %d\n", paramNode->son[1]->type);
+                  auxTac->op2 = paramNode->son[0]->symbol;
+                  auxTac = getNextNonSymbolTac(auxTac->next);
+                  paramNode = paramNode->son[1];
+                  //printf("Next TAC: %d\n", auxTac->opcode);
+                  //printf("-----------------------\n");
+                  if(paramNode->type == AST_PARAM)
+                     auxTac->op2 = paramNode->symbol;
+               }
+            }
+         }
+      }
+
+      funcDeclNode = NULL;
+   }
+
+}
+
+
+// Função que percorre a AST e encontra o nodo da declaração da função com certo nome
+void findFuncDeclNode(AST_NODE *node, char *funcName) {
+
+   // Se for nodo de declaração de função
+   if(node->type == AST_DECL_FUNC) {
+      // Com mesmo nome que o nome da função procurada (para associar os argumentos aos parâmetros)
+      if(!strcmp(node->symbol->text, funcName)) {
+         funcDeclNode = node;
+      }
+   }
+
+   int i;
+	// percorre todos os filhos do nodo atual
+	for(i=0; i<MAX_SONS; i++) {
+		// se filho neste índice existe
+		if(node->son[i] != NULL) {
+            findFuncDeclNode(node->son[i], funcName);
+		}
+	}
+}
+
+
+// Função que retorna próxima TAC que não seja TAC de símbolos
+TAC_NODE* getNextNonSymbolTac(TAC_NODE *tac) {
+   TAC_NODE *auxTac;
+
+   for(auxTac = tac; auxTac != NULL; auxTac = auxTac->next) {
+      if(auxTac->opcode != TAC_SYMBOL) {
+         return auxTac;
+      }
+   }
+
+   return NULL;
 }
