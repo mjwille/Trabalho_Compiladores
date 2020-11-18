@@ -10,7 +10,7 @@ Etapas:
 - [x] (30/09/2020) Geração de Árvore Sintática Abstrata (AST)
 - [x] (26/10/2020) Verificações Semânticas
 - [x] (04/11/2020) Geração de Código Intermediário (TACs)
-- [ ] (16/11/2020) Geração de Assembly
+- [x] (16/11/2020) Geração de Assembly
 - [ ] (25/11/2020) Otimização e Recuperação de Erros
 
 [Especificações das Etapas](specs)  

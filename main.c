@@ -4,7 +4,7 @@
 
    INSTRUÇÕES DE USO
 
-   Em uma máquina Linux, com arquitetura x86-64:
+   Em uma máquina Unix-like, com arquitetura x86-64:
 
    1. Executar este programa com uma entrada válida da linguagem
    ./etapa6 my_program.txt

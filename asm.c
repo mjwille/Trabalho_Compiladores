@@ -79,8 +79,6 @@ void generateAsmFromTac(TAC_NODE *tac) {
 	// Final de função
 	if(tac->opcode == TAC_ENDFUN) {
 		fprintf(fp, "\t# Fim de Função\n");
-		fprintf(fp, "\tpopq %%rbp\n");
-		fprintf(fp, "\tretq\n");
 	}
 
 	// Retorno de função
@@ -95,6 +93,8 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		else {
 			fprintf(fp, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
 		}
+		fprintf(fp, "\tpopq %%rbp\n");
+		fprintf(fp, "\tretq\n");
 	}
 
 	// Adição
@@ -215,7 +215,14 @@ void generateAsmFromTac(TAC_NODE *tac) {
 	else if(tac->opcode == TAC_COPY) {
 		fprintf(fp, "\t# Atribuição\n");
 		// Copia valor a ser atribuído para %eax
-		fprintf(fp, "\tmovq %s(%%rip), %%rax\n", tac->op1->text);
+		// Se for literal, usa modo imediato
+		if(tac->op1->type == SYMBOL_LIT_INTEGER) {
+			fprintf(fp, "\tmovq $%s, %%rax\n", tac->op1->text);
+		}
+		// Se for variável , usa modo indexado
+		else {
+			fprintf(fp, "\tmovq %s(%%rip), %%rax\n", tac->op1->text);
+		}
 		// Coloca valor em %eax para a variável do lado esquerdo da atribuição
 		fprintf(fp, "\tmovq %%rax, %s(%%rip)\n", tac->res->text);
 	}
@@ -281,16 +288,24 @@ void generateAsmFromTac(TAC_NODE *tac) {
 
 	else if(tac->opcode == TAC_VECREAD) {
 		fprintf(fp, "\t# Leitura de Vetor\n");
-		int i = 4*(atoi(tac->op2->text));
-		// Copia valor a ser atribuído para %eax
-		fprintf(fp, "\tmovl %s+%d(%%rip), %%eax\n", tac->op1->text, i);
+		// Se for literal, precisa ser modo imediato
+		if(tac->op2->type == SYMBOL_LIT_INTEGER) {
+			int i = 4*(atoi(tac->op2->text));
+			// Copia valor a ser atribuído para %eax
+			fprintf(fp, "\tmovl %s+%d(%%rip), %%eax\n", tac->op1->text, i);
+		}
+		// Se for uma varíavel
+		else {
+			fprintf(fp, "\tleaq %s(%%rip), %%rbx\n", tac->op1->text);
+			fprintf(fp, "\tmovslq %s(%%rip), %%rcx\n", tac->op2->text);
+			fprintf(fp, "\tmovl (%%rbx,%%rcx,4), %%eax\n");
+		}
 		// Coloca valor em %eax para a variável do lado esquerdo da atribuição
 		fprintf(fp, "\tmovl %%eax, %s(%%rip)\n", tac->res->text);
 	}
 
 	else if(tac->opcode == TAC_VECCOPY) {
 		fprintf(fp, "\t# Escrita em Vetor\n");
-		int i = 4*(atoi(tac->op1->text));
 		// Copia valor a ser atribuído para %eax
 		// Se for literal, precisa ser modo imediato
 		if(tac->op2->type == SYMBOL_LIT_INTEGER) {
@@ -300,8 +315,19 @@ void generateAsmFromTac(TAC_NODE *tac) {
 		else {
 			fprintf(fp, "\tmovl %s(%%rip), %%eax\n", tac->op2->text);
 		}
-		// Coloca valor em %eax para a variável do lado esquerdo da atribuição
-		fprintf(fp, "\tmovl %%eax, %s+%d(%%rip)\n", tac->res->text, i);
+
+		// Se índice for um inteiro
+		if(tac->op1->type == SYMBOL_LIT_INTEGER) {
+			int i = 4*(atoi(tac->op1->text));
+			// Coloca valor em %eax para a variável do lado esquerdo da atribuição
+			fprintf(fp, "\tmovl %%eax, %s+%d(%%rip)\n", tac->res->text, i);
+		}
+		// Se for uma variável inteira
+		else {
+			fprintf(fp, "\tleaq %s(%%rip), %%rbx\n", tac->res->text);
+			fprintf(fp, "\tmovslq %s(%%rip), %%rcx\n", tac->op1->text);
+			fprintf(fp, "\tmovl %%eax, (%%rbx,%%rcx,4)\n");
+		}
 	}
 
 	else if(tac->opcode == TAC_ARG) {
