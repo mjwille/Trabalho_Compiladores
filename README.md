@@ -11,5 +11,22 @@ Etapas:
 
 [Especificações das Etapas](specs)  
 
+## Como Rodar?
+
+```bash
+# Compila o compilador chamado 'etapa6'
+make
+# Compila um programa fonte 'test1.txt' usando o compilador 'etapa6'
+./etapa6 tests/test1.txt
+# Compila para binário Linux x86_64 o código gerado pelo compilador 'etapa6'
+gcc asm_code.s
+# Roda o programa
+./a.out
+
+# Delete o programa e o compilador gerados
+rm a.out
+make clean
+```
+
 **Marcelo Jantsch Wille**  
 *Universidade Federal do Rio Grande do Sul (UFRGS)*

@@ -1,19 +1,6 @@
 /* Trabalho de Compiladores 2020/ERE
    Nome: Marcelo Jantsch Wille
    Universidade Federal do Rio Grande do Sul
-
-   INSTRUÇÕES DE USO
-
-   Em uma máquina Unix-like, com arquitetura x86-64:
-
-   1. Executar este programa com uma entrada válida da linguagem
-   ./etapa6 my_program.txt
-
-   2. Usar a saída do comando anterior (asm_code.s) com gcc
-   gcc asm_code.s
-
-   3. Executar o arquivo
-   ./a.out
 */
 
 #include <stdio.h>
