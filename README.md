@@ -18,12 +18,12 @@ Etapas:
 make
 # Compila um programa fonte 'test1.txt' usando o compilador 'etapa6'
 ./etapa6 tests/test1.txt
-# Compila para binário Linux x86_64 o código gerado pelo compilador 'etapa6'
+# Gera executável Linux x86_64 do binário gerado pelo compilador 'etapa6'
 gcc asm_code.s
 # Roda o programa
 ./a.out
 
-# Delete o programa e o compilador gerados
+# Deleta o executável e o compilador gerados
 rm a.out
 make clean
 ```
